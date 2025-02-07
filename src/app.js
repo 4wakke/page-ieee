@@ -13,8 +13,8 @@ app.use(express.urlencoded({ extended: true }));
 
 //Routes
 app.get("/", (req, res) => res.json({ message: "test response" }));
-app.use('/api',authRoutes);
-app.use('/api',adminRoutes);
+app.use("/api", authRoutes);
+app.use("/api", adminRoutes);
 
 //Error Handler
 app.use((err, req, res, next) => {
