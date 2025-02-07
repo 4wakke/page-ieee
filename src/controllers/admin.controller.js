@@ -1,6 +1,8 @@
 import {pool} from '../db.js';
 
 export const getDetails = (req, res, next) => {
+  //console.log(req.headers);
+  
 
 // try {
 //   const { result} = await pool.query("INSERT INTO task (title, description) VALUES ($1, $2)" RETURNING * , [title, description]);
