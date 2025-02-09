@@ -1,5 +1,6 @@
-import { createContext, useState, useContext } from "react";
-import axios from "axios";
+import { createContext, useState, useContext, useEffect } from "react";
+import Cookie from "js-cookie";
+import axios from "../api/axios";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
@@ -16,34 +17,56 @@ export const useAuth = () => {
 // eslint-disable-next-line react/prop-types
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  // eslint-disable-next-line no-unused-vars
   const [isAuth, setIsAuth] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [errors, setErrors] = useState(null);
 
   const signup = async (data) => {
-    const response = await axios.post(
-      "http://localhost:3000/api/signup",
-      data,
-      {
-        withCredentials: true,
+    try {
+      const response = await axios.post("/signup", data);
+      setUser(response.data);
+      setIsAuth(true);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      if (Array.isArray(error.response.data)) {
+        return setErrors(error.response.data);
       }
-    );
-    console.log(response.data);
-    setUser(response.data);
+      setErrors([error.response.data.message]);
+    }
   };
 
   const signin = async (data) => {
-    const response = await axios.post(
-      "http://localhost:3000/api/signin",
-      data,
-      {
-        withCredentials: true,
+    try {
+      const response = await axios.post("/signin", data);
+      setUser(response.data);
+      setIsAuth(true);
+
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      if (Array.isArray(error.response.data)) {
+        return setErrors(error.response.data);
       }
-    );
-    console.log(response.data);
-    setUser(response.data);
+
+      setErrors([error.response.data.message]);
+    }
   };
+
+  useEffect(() => {
+    if (Cookie.get("token")) {
+      axios
+        .get("/profile")
+        .then((res) => {
+          setUser(res.data);
+          setIsAuth(true);
+        })
+        .catch((err) => {
+          console.log(err);
+          setUser(null);
+          setIsAuth(false);
+        });
+    }
+  }, []);
 
   return (
     <AuthContext.Provider

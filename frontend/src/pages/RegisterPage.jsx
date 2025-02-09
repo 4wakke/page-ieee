@@ -1,7 +1,7 @@
 import { Input, Button, Card, Label } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import {useAuth} from "../context/AuthContext"
+import { useAuth } from "../context/AuthContext";
 
 function RegisterPage() {
   const {
@@ -9,19 +9,27 @@ function RegisterPage() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const {signup} = useAuth()
-  const navigate = useNavigate()
+  const { signup, errors: signupErrors } = useAuth();
+  const navigate = useNavigate();
 
   const onSubmit = handleSubmit(async (data) => {
-    await signup(data)
-    navigate('/profile')
+    const user = await signup(data);
+
+    if (user) {
+      navigate("/profile");
+    }
   });
 
   return (
     <div className="h-[calc(100vh-64px)] flex items-center justify-center">
       <Card>
-        <h3 className="text-2xl font-bold">Register</h3>
+        {signupErrors &&
+          signupErrors.map((err) => (
+            // eslint-disable-next-line react/jsx-key
+            <p className="text-red-500 font-bold"> {err}</p>
+          ))}
 
+        <h3 className="text-2xl font-bold">Register</h3>
         <form onSubmit={onSubmit}>
           <Label htmlFor="name">Name</Label>
           <Input
