@@ -1,12 +1,21 @@
 import { Card, Input, Button, Label } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function LoginPage() {
   const { register, handleSubmit } = useForm();
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = handleSubmit(async (data) => {
     console.log(data);
+    const response = await axios.post(
+      "http://localhost:3000/api/signin",
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(response);
   });
 
   return (
