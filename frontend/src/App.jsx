@@ -4,6 +4,7 @@ import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
 
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="*" element={<NotFound/>} />
     </Routes>
   );
 }

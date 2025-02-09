@@ -1,5 +1,4 @@
-export { Button } from "./button";
-export { Card } from "./card";
-export { Input } from "./input";
-
-// 3:27
+export { Button } from "./Button";
+export { Card } from "./Card";
+export { Input } from "./Input";
+export { Label } from "./Label";
