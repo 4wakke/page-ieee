@@ -29,7 +29,7 @@ function RegisterPage() {
             <p className="text-red-500 font-bold"> {err}</p>
           ))}
 
-        <h3 className="text-2xl font-bold">Register</h3>
+        <h3 className="text-3xl font-bold text-center">Register</h3>
         <form onSubmit={onSubmit}>
           <Label htmlFor="name">Name</Label>
           <Input
