@@ -37,7 +37,7 @@ function RegisterPage() {
             {...register("name", { required: true })}
           />
 
-          {errors.name && <p className="text-red-700">name is required</p>}
+          {errors.name && <p className="text-red-700">Name is required</p>}
 
           <Label htmlFor="email">Email</Label>
           <Input
@@ -46,7 +46,7 @@ function RegisterPage() {
             {...register("email", { required: true })}
           />
 
-          {errors.email && <p className="text-red-700">email is required</p>}
+          {errors.email && <p className="text-red-700">Email is required</p>}
 
           <Label htmlFor="password">Password</Label>
           <Input
@@ -56,13 +56,13 @@ function RegisterPage() {
           />
 
           {errors.password && (
-            <p className="text-red-700">password is required</p>
+            <p className="text-red-700">Password is required</p>
           )}
 
           <Button>Register</Button>
 
           <div className="flex justify-between my-4">
-            <p>Already have an account?</p>
+            <p className="mr-4">Already have an account?</p>
             <Link to="/login" className="font-bold ">
               Login
             </Link>

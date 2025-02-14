@@ -1,3 +1,6 @@
+import { LuCircleUserRound } from "react-icons/lu";
+
+
 export const publicRoutes = [
   {
     name: "About",
@@ -17,5 +20,6 @@ export const privateRoutes = [
   {
     name: "Profile",
     path: "/profile",
+    icon: <LuCircleUserRound className="w-5 h-5" />,
   },
 ];

@@ -4,8 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
-  const { register, handleSubmit } = useForm();
-  const { signin, errors } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const { signin, errors: loginErrors } = useAuth();
   const navigate = useNavigate();
 
   const onSubmit = handleSubmit(async (data) => {
@@ -19,8 +23,8 @@ function LoginPage() {
   return (
     <Container className="h-[calc(100vh-10rem)] flex items-center justify-center">
       <Card>
-        {errors &&
-          errors.map((err) => (
+        {loginErrors &&
+          loginErrors.map((err) => (
             // eslint-disable-next-line react/jsx-key
             <p className="text-red-500 font-bold"> {err}</p>
           ))}
@@ -37,6 +41,8 @@ function LoginPage() {
             })}
           />
 
+          {errors.email && <p className="text-red-700">Email is required</p>}
+
           <Label htmlFor="password">Password</Label>
           <Input
             type="password"
@@ -46,10 +52,14 @@ function LoginPage() {
             })}
           />
 
+          {errors.password && (
+            <p className="text-red-700">Password is required</p>
+          )}
+
           <Button>Sign in</Button>
 
           <div className="flex justify-between my-4">
-            <p>Do not have an account?</p>
+            <p className="mr-4">Do not have an account?</p>
             <Link to="/register" className="font-bold ">
               Register
             </Link>

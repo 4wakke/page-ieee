@@ -13,10 +13,10 @@ import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 function App() {
-  const { isAuth, loading } = useAuth(); //! 
+  const { isAuth, loading } = useAuth(); //! LOADING
   //? console.log(isAuth);
 
-  if (loading) return <h1>Cargando...</h1>;//! 
+  if (loading) return <h1>Cargando...</h1>; //! LOADING
 
   return (
     <>

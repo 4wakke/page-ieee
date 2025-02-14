@@ -19,7 +19,11 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
   const [errors, setErrors] = useState(null);
-  const [loading, setLoading] = useState(false); //!
+  const [loading, setLoading] = useState(false); //! LOADING
+
+  // const clearErrors = () => {
+  //   setErrors(null);
+  // }; //! LIMPIAR ERROR
 
   const signup = async (data) => {
     try {
@@ -41,6 +45,7 @@ export function AuthProvider({ children }) {
       const response = await axios.post("/signin", data);
       setUser(response.data);
       setIsAuth(true);
+      // clearErrors(); //! LIMPIAR ERRORES
 
       return response.data;
     } catch (error) {
@@ -60,7 +65,7 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    setLoading(true); //!
+    setLoading(true); //! LOADING
     if (Cookie.get("token")) {
       axios
         .get("/profile")
@@ -74,8 +79,16 @@ export function AuthProvider({ children }) {
           setIsAuth(false);
         });
     }
-    setLoading(false); //!
+    setLoading(false); //! LOADING
   }, []);
+
+  useEffect (() => { //! LIMPIAR ERRORES CON MÓDULO
+    const clean = setTimeout(() => {
+      setErrors(null)
+    }, 5000);
+
+    return () => clearTimeout(clean);
+  }, [errors])
 
   return (
     <AuthContext.Provider
