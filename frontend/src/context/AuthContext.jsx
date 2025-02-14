@@ -82,13 +82,14 @@ export function AuthProvider({ children }) {
     setLoading(false); //! LOADING
   }, []);
 
-  useEffect (() => { //! LIMPIAR ERRORES CON MÓDULO
+  useEffect(() => {
+    //! LIMPIAR ERRORES CON MÓDULO
     const clean = setTimeout(() => {
-      setErrors(null)
+      setErrors(null);
     }, 5000);
 
     return () => clearTimeout(clean);
-  }, [errors])
+  }, [errors]);
 
   return (
     <AuthContext.Provider
