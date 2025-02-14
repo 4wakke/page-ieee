@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
   const [errors, setErrors] = useState(null);
-  const [loading, setLoading] = useState(true); //!
+  //! const [loading, setLoading] = useState(false); 
 
   const signup = async (data) => {
     try {
@@ -60,20 +60,20 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    setLoading(true);
+    //! setLoading(true);
     if (Cookie.get("token")) {
       axios
         .get("/profile")
         .then((res) => {
           setUser(res.data);
           setIsAuth(true);
-          setLoading(false); //!
+          //! setLoading(false); //!
         })
         .catch((err) => {
           console.log(err); //?
           setUser(null);
           setIsAuth(false);
-          setLoading(false); //!
+          //! setLoading(false); //!
         });
     }
   }, []);
@@ -87,7 +87,7 @@ export function AuthProvider({ children }) {
         signup,
         signin,
         signout,
-        loading
+        //! loading
       }}
     >
       {children}
