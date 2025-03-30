@@ -8,7 +8,7 @@ import {
   processPayment,
   checkPaymentStatus,
   getAllUsers,
-  getUserById,
+  getUser,
   updateUser
 } from "../controllers/auth.controller.js";
 import { isAuth } from "../middlewares/auth.middleware.js";
@@ -25,7 +25,7 @@ router.post("/signout", signout);
 
 router.post("/payment", payment);
 
-router.get("/profile", isAuth, profile);
+//router.get("/profile", isAuth, profile);
 
 router.post("/processPayment", processPayment);
 
@@ -33,7 +33,7 @@ router.get("/checkPaymentStatus",checkPaymentStatus);
 
 router.get('/users', getAllUsers);
 
-router.get('/users/:id', getUserById);
+router.get('/profile', getUser);
 
 router.put('/users/:id', updateUser);
 

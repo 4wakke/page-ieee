@@ -12,29 +12,29 @@ export const signin = async (req, res) => {
 
   const [result] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
   const user = result[0]; // ✅ Primer objeto directamente
-if (!user) {
-  return res.status(400).json({
-    message: "El correo no está registrado",
+  if (!user) {
+    return res.status(400).json({
+      message: "El correo no está registrado",
+    });
+  }
+
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) {
+    return res.status(400).json({
+      message: "Contraseña incorrecta",
+    });
+  }
+
+  const token = await createAccessToken({ id: user.id });
+
+  res.cookie("token", token, {
+    secure: true,
+    sameSite: "none",
+    maxAge: 1000 * 60 * 60 * 24, // 1 día
   });
+
+  return successResponse(res,"Usuario logado correctamente",user,200);
 }
-
-const validPassword = await bcrypt.compare(password, user.password);
-if (!validPassword) {
-  return res.status(400).json({
-    message: "Contraseña incorrecta",
-  });
-}
-
-const token = await createAccessToken({ id: user.id });
-
-res.cookie("token", token, {
-  secure: true,
-  sameSite: "none",
-  maxAge: 1000 * 60 * 60 * 24, // 1 día
-});
-
-return res.json(user);
-}; //* HECHO
 
 export const signup = async (req, res, next) => {
   const {
@@ -154,9 +154,9 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-export const getUserById = async (req, res) => {
-  const { id } = req.params;
-
+export const getUser = async (req, res) => {
+  const { id, email } = req.params;
+  
   try {
     const query = `
       SELECT id, name, last_name, country, city, address, gender, birth_date, 
@@ -313,10 +313,6 @@ export const payment = (req,res) =>{
   return successResponse(res,"Precio calculado exitosamente",{"price":price})
 }
 
-export const profile = async (req, res) => {
-  const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.userId]);
-  return res.json(result.rows[0]);
-}; //* HECHO
 
 export const processPayment = async (req, res) => {
   try {
@@ -327,7 +323,7 @@ export const processPayment = async (req, res) => {
       return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
     }
 
-    const responseToken = await fetch("https://dev.cobru.co/token/refresh/", {
+    const responseToken = await fetch("https://${process.env.cobru_url}/token/refresh/", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -353,7 +349,7 @@ export const processPayment = async (req, res) => {
       platform: "API",
     };
 
-    const responseCobro = await fetch("https://dev.cobru.co/cobru/", {
+    const responseCobro = await fetch("https://${process.env.cobru_url}/cobru/", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -372,7 +368,7 @@ export const processPayment = async (req, res) => {
     const cobroResponse = await responseCobro.json();
 
     return successResponse(res,"Cobro creado exitosamente",
-      {accesToken:access,cobro: cobroResponse,checkoutURL: `https://dev.cobru.co/${cobroResponse.url}`},200)
+      {accesToken:access,cobro: cobroResponse,checkoutURL: `https://${process.env.cobru_url}/${cobroResponse.url}`},200)
     
   } catch (error) {
     console.error("Error en el proceso de pago:", error);
@@ -389,7 +385,7 @@ export const checkPaymentStatus = async (req, res) => {
       return errorResponse(res,"Falta la URL del cobro",400)
     }
 
-    const response = await fetch(`https://dev.cobru.co/cobru_detail/${paymentUrl}`, {
+    const response = await fetch(`https://${process.env.cobru_url}/cobru_detail/${paymentUrl}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
