@@ -1,4 +1,14 @@
+// eslint-disable-next-line no-unused-vars
+import { useEffect, useState } from "react";
+
 function AboutPage() {
+
+  useEffect(() => {
+    document.body.classList.add("about-page");
+    return () => {
+      document.body.classList.remove("about-page");
+    };
+  }, []);
   return (
     <div>
       <h1 className="text-3xl- font-bold my-4"> About Us </h1>

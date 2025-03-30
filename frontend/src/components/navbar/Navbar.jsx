@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Link, useLocation } from "react-router-dom";
 import { publicRoutes, privateRoutes } from "./navigation";
 import { Container } from "../ui";
@@ -11,60 +12,32 @@ function Navbar() {
   const { isAuth, signout, user } = useAuth();
 
   return (
-    <nav className="bg-zinc-950 ">
-      <Container className="flex justify-between py-3">
-        <Link to="./">
-          <h1 className="font-bold text-2xl">Congress IEEE</h1>
-        </Link>
-
-        <ul className="flex items-center justify-center md:gap-x-1">
-          {isAuth ? (
-            <>
-              {privateRoutes.map(({ path, name, icon }) => (
-                <li key={path}>
-                  <Link
-                    to={path}
-                    className={twMerge(
-                      "text-slate-300 flex items-center px-3 py-1 gap-x-1",
-                      location.pathname === path && "bg-sky-500"
-                    )}
-                  >
-                    {icon}
-                    <span className="hidden sm:block">{name}</span>
-                  </Link>
-                </li>
-              ))}
-
-              <li
-                className="text-slate-300 flex items-center px-3 py-1 
-                hover:cursor-pointer"
-                onClick={() => {
-                  signout();
-                }}
-              >
-                <MdLogout className="w-5 h-5" />
-                <span className="hidden sm:block">Logout</span>
-              </li>
-
-              <li className="flex gap-x-1 items-center justify-center">
-                <LuUserPen className="w-5 h-5" />
-                <span className="font-medium">{user.name}</span>
-              </li>
-            </>
-          ) : (
-            publicRoutes.map(({ path, name }) => (
-              <li
+    <nav className="bg-white shadow-md border-b border-gray-200"> 
+      <Container className="flex justify-between items-center py-4">
+        <div className="flex items-center space-x-3">
+          <Link to="./" className="flex items-center">
+            <img src="/assets/logo-temscon.png" alt="TEMSCon Logo" className="h-12" />
+          </Link>
+          <Link to="https://www.ieee.org/" className="flex items-left">
+            <img src="/assets/logo-ieee.svg" alt="IEEE Logo" className="h-8" />
+          </Link>
+        </div>
+        <ul className="hidden md:flex items-center space-x-6">
+          {(isAuth ? privateRoutes : publicRoutes).map(({ path, name }) => (
+            <li key={path}>
+              <Link
+                to={path}
                 className={twMerge(
-                  "text-slate-300 flex items-center px-3 py-1",
-                  location.pathname === path && "bg-sky-500"
+                  "text-gray-700 font-medium hover:text-blue-600 transition",
+                  location.pathname === path && "border-b-2 border-blue-600"
                 )}
-                key={path}
               >
-                <Link to={path}>{name}</Link>
-              </li>
-            ))
-          )}
+                {name}
+              </Link>
+            </li>
+          ))}
         </ul>
+
       </Container>
     </nav>
   );

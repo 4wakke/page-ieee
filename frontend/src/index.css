@@ -6,3 +6,31 @@ body {
   background: #101010;
   color: white;
 }
+
+.home-page { 
+  background-image: url('/assets/fondo-barranquilla2.jpeg');
+  background-size: cover;
+  background-position: center;
+  height:100vh; /* Ajusta la altura restando el navbar */
+}
+
+.login-page { 
+  background-image: url('/assets/fondo-barranquilla2.jpeg');
+  background-size: cover;
+  background-position: center;
+  height:100vh; /* Ajusta la altura restando el navbar */
+}
+
+.register-page { 
+  background-image: url('/assets/fondo-barranquilla2.jpeg');
+  background-size: cover;
+  background-position: center;
+  height:100vh; /* Ajusta la altura restando el navbar */
+}
+
+.about-page { 
+  background-image: url('/assets/fondo-barranquilla2.jpeg');
+  background-size: cover;
+  background-position: center;
+  height:100vh; /* Ajusta la altura restando el navbar */
+}

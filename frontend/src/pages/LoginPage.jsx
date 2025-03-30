@@ -2,8 +2,18 @@ import { Card, Input, Button, Label, Container } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+// eslint-disable-next-line no-unused-vars
+import { useEffect, useState } from "react";
+
 
 function LoginPage() {
+  useEffect(() => {
+    document.body.classList.add("login-page");
+    return () => {
+      document.body.classList.remove("login-page");
+    };
+  }, []);
+
   const {
     register,
     handleSubmit,
