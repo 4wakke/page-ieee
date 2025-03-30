@@ -85,8 +85,8 @@ function RegisterPage() {
 
     const formattedData = {
       occupation: data.occupation,
-      isIeeeMember: data.isIeeeMember === "yes",
-      isTems: data.isTems === "yes",
+      isIeeeMember: data.isIeeeMember,  // Ya es booleano
+      isTems: data.isTems,   
       participationType: data.participationType,
       attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
       qtyArticles: data.qtyArticles,
