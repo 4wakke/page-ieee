@@ -1,14 +1,11 @@
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { CardHomeAbout} from "../components/ui";
-import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom";
 
 
 function HomePage() {
   // eslint-disable-next-line no-unused-vars
   const data = useAuth();
-  const navigate = useNavigate();
-
 
   useEffect(() => {
     document.body.classList.add("home-page");
@@ -18,34 +15,36 @@ function HomePage() {
     };
   }, []);
 
+  // para card w-[60vw] h-[65vh] en vez de w-full max-w-[600px] h-auto
   return (
-    <div className="relative flex items-center justify-center h-screen">
-      <CardHomeAbout>
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+    <div className="home flex items-center justify-center min-h-[83vh] min-w-[70vw] mx-auto">
+      <div className="bg-[#327ca0] bg-opacity-75 w-full max-w-[850px] h-[500px] rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center text-center">
+      <h2 className="text-4xl font-bold text-white-500 mb-6">
           Bienvenido a TEMSCON LATAM 2025
         </h2>
-        <p className="text-lg text-gray-800">
-          Regístrese para nuestro próximo evento
-        </p>
-        <p className="text-xl font-semibold my-4">20/04/2025</p>
-
-        <button
-          onClick={() => navigate("/register")}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-transform transform hover:scale-105"
-        >
-          Registrarse
+        <h3 className="text-3xl text-white-500 mb-6 font-medium">
+        Regístrese para nuestro próximo evento 
+        </h3>
+        <h3 className="text-2xl text-white-500 mb-6 font-medium">
+        20/04/2025
+        </h3>
+        <Link to="/register">
+        <button className="bg-white text-[#0073AE] font-medium py-2 px-6 rounded-lg border-2 border-[#327CA0] hover:bg-[#f0f0f0] hover:border-[#005b7f] text-lg mb-4">
+        Registrarse
         </button>
-
-        <p className="text-gray-700 text-lg mt-4">¿Ya está registrado?</p>
-
-        <button
-          onClick={() => navigate("/login")}
-          className="bg-white border border-blue-500 text-blue-500 hover:bg-blue-100 font-bold py-3 px-8 rounded-xl shadow-lg transition-transform transform hover:scale-105 mt-2"
-        >
-          Iniciar sesión
+        </Link>
+        <h3 className="text-2xl text-white-500 mb-6 font-medium">
+          ¿Ya está registrado?
+        </h3>
+        <Link to="/login">
+        <button className="bg-white text-[#0073AE] font-medium py-2 px-6 rounded-lg border-2 border-[#327CA0] hover:bg-[#f0f0f0] hover:border-[#005b7f] text-lg mb-4">
+          Iniciar sección
         </button>
-      </CardHomeAbout>
+        </Link>
+
+      </div>
     </div>
+
   );
 }
 
