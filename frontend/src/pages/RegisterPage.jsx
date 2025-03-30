@@ -1,3 +1,4 @@
+
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
@@ -20,14 +21,21 @@ function RegisterPage() {
     handleSubmit,
     formState: { errors },
     watch,
+    setValue, //* Correción isIeeeMember
   } = useForm();
 
   const qtyArticles = watch("qtyArticles", 0);
-
+  const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
   const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => { //* nuevo
+      if (isIeeeMember === "no") {
+        setValue("isTems", "no"); // Se establece automáticamente en "no"
+        setValue("membershipNumber", ""); // Limpia el campo de membresía
+      }
+    }, [isIeeeMember, setValue]);
 
   // Función para procesar el pago cuando el usuario haga clic en "Pagar"
   const handlePayment = async () => {
@@ -57,9 +65,14 @@ function RegisterPage() {
   };
 
   const onSubmit = handleSubmit(async (data) => {
+    data.isIeeeMember = data.isIeeeMember === "yes";
+    data.isTems = data.isTems === "yes";
     const filteredArticles = data.articles?.filter(
       (article) => article?.number && article?.pages
     ) || [];
+    
+    console.log(data);
+    
 
     const formattedData = {
       occupation: data.occupation,
@@ -78,7 +91,10 @@ function RegisterPage() {
 
     const resp = await fetch("http://192.168.1.10:3000/api/signup", {
       method: "POST",
-      body: JSON.stringify({ ...data, articles: filteredArticles }),
+      body: JSON.stringify({ 
+        ...data,
+        articles: filteredArticles 
+      }),
       headers: { "Content-Type": "application/json" },
     });
 
@@ -329,46 +345,42 @@ function RegisterPage() {
             </div>
                 
             <div>
-              <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
-              <SelectReg
-              {...register("isIeeeMember", {
-              required: true,
-              setValueAs: (value) => value === "yes", 
-              })}>
-                <option value="">Selecciona</option>
-                <option value="yes">Sí</option>
-                <option value="no">No</option>
-              </SelectReg>
-              {errors.isIeeeMember && (
-              <p className="text-red-500 font-medium">Este campo es requerido</p>
-              )}
-              {watch("isIeeeMember") && (
-                <>
-                  <Label htmlFor="membershipNumber" >Número de membresía IEEE</Label>
-                  <Input type="text" placeholder="Ingresa tu número de membresía"
-                  {...register("membershipNumber", { required: true })}/>
-                  {errors.membershipNumber && (
-                  <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
-                  )}
-                  <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
-                  <SelectReg
-                  {...register("isTems", {
-                  required: true,
-                  setValueAs: (value) => value === "yes",
-                  })}>
-                    <option value="">Selecciona</option>
-                    <option value="yes">Sí</option>
-                    <option value="no">No</option>
-                    
-                  </SelectReg>
-                  {errors.isTems && (
-              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
-              )}
-                  
-                </>
-                
-              )}
-            </div>
+                          <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
+                          <SelectReg
+                            {...register("isIeeeMember", { required: true })}
+                          >
+                            <option value="">Selecciona</option>
+                            <option value="yes">Sí</option>
+                            <option value="no">No</option>
+                          </SelectReg>
+                          {errors.isIeeeMember && (
+                            <p className="text-red-500 font-medium">Este campo es requerido</p>
+                          )}
+            
+                          {isIeeeMember === "yes" && (
+                            <>
+                              <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+                              <Input 
+                                type="text" 
+                                placeholder="Ingresa tu número de membresía"
+                                {...register("membershipNumber", { required: true })}
+                              />
+                              {errors.membershipNumber && (
+                                <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
+                              )}
+            
+                              <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
+                              <SelectReg {...register("isTems", { required: true })}>
+                                <option value="">Selecciona</option>
+                                <option value="yes">Sí</option>
+                                <option value="no">No</option>
+                              </SelectReg>
+                              {errors.isTems && (
+                                <p className="text-red-500 font-medium">Este campo es requerido</p>
+                              )}
+                            </>
+                          )}
+                        </div>
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center">

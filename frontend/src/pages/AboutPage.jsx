@@ -24,11 +24,13 @@ function AboutPage() {
         </p>
 
         <div className="mb-6 bg-[#ffffff] p-8 rounded-2xl mx-auto max-w-[250px] h-[6px] flex justify-center items-center shadow-lg ">
-          <img
-            src="/assets/logo-temscon.png"
-            alt="Logo TEMSCON LATAM"
-            className="max-w-[250px] h-auto "
-          />
+          <Link to="https://attend.ieee.org/temscon-latam/" target="_blank">
+            <img
+              src="/assets/logo-temscon.png"
+              alt="Logo TEMSCON LATAM"
+              className="max-w-[250px] h-auto "
+            />
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">

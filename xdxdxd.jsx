@@ -1,138 +1,413 @@
-import { Input, Button, CardReg, Label, Container } from "../components/ui";
+// eslint-disable-next-line no-unused-vars
+import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
 function RegisterPage() {
   useEffect(() => {
     document.body.classList.add("login-page");
-    return () => document.body.classList.remove("login-page");
+    return () => {
+      document.body.classList.remove("login-page");
+    };
   }, []);
 
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
-  const qtyArticles = watch("qtyArticles", 0);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue, //* Agregar
+  } = useForm();
+
+  const qtyArticles = watch("qtyArticles", 0); 
+  const isIeeeMember = watch("isIeeeMember"); //* NUEVO
+  // const [price, setPrice] = useState(""); // Estado para almacenar el precio
+  // const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => { //* nuevo
+    if (isIeeeMember === "no") {
+      setValue("isTems", "no"); // Se establece automáticamente en "no"
+      setValue("membershipNumber", ""); // Limpia el campo de membresía
+    }
+  }, [isIeeeMember, setValue]);
+
+
+  // Función para procesar el pago cuando el usuario haga clic en "Pagar"
+  // const handlePayment = async () => {
+  //   try {
+  //     const processPaymentResp = await fetch("http://192.168.1.10:3000/api/processPayment", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         amount: price,
+  //         dollarRate: 4300,
+  //         description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
+  //       }),
+  //     });
+
+  //     const processPaymentData = await processPaymentResp.json();
+  //     console.log("Respuesta de proceso de pago:", processPaymentData);
+
+  //     if (processPaymentData.success && processPaymentData.results.checkoutURL) {
+  //       setPaymentUrl(processPaymentData.results.checkoutURL);
+  //       window.location.href = processPaymentData.results.checkoutURL; // Redirigir al usuario
+  //     } else {
+  //       console.error("Error al obtener la URL de pago", processPaymentData);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error en el proceso de pago:", error);
+  //   }
+  // };
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
+    const filteredArticles = data.articles?.filter(
+      (article) => article?.number && article?.pages
+    ) || [];
+
+    const formattedData = {
+      occupation: data.occupation,
+      isIeeeMember: data.isIeeeMember === "yes",
+      isTems: data.isTems === "yes",
+      participationType: data.participationType,
+      attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
+      qtyArticles: data.qtyArticles,
+      articles: filteredArticles.map((article) => ({
+        number: article.number,
+        pages: parseInt(article.pages, 10),
+      })),
+    };
+
+    console.log("Datos enviados a signup:", formattedData);
+
+    const resp = await fetch("http://192.168.1.10:3000/api/signup", {
+      method: "POST",
+      body: JSON.stringify({ ...data, articles: filteredArticles }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const dataSignup = await resp.json();
+    console.log("Respuesta de signup:", dataSignup);
+
+    // if (dataSignup.success) {
+    //   // Enviar datos transformados al endpoint /payment
+    //   const response = await fetch("http://192.168.1.10:3000/api/payment", {
+    //     method: "POST",
+    //     body: JSON.stringify(formattedData),
+    //     headers: { "Content-Type": "application/json" },
+    //   });
+
+    //   const responseData = await response.json();
+    //   console.log("Respuesta de payment:", responseData);
+
+    //   if (responseData.success && responseData.results?.price !== undefined) {
+    //     setPrice(responseData.results.price); // Se guarda el precio en el estado
+    //   }
+    // }
   });
 
+
   return (
-    <Container className="flex items-center justify-center min-h-screen">
-      <CardReg className="bg-blue-900 bg-opacity-80 p-6 rounded-lg max-w-5xl mx-auto">
-        <h3 className="text-white text-3xl font-bold text-center mb-4">Registro</h3>
-        <form onSubmit={onSubmit} autoComplete="off">
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> {/* Grid */}
+    <Container className=" flex items-center justify-center min-h-screen">
+      <CardReg>
+        
+          {/* 
+          {signupErrors &&
+          signupErrors.map((err) => (
+            // eslint-disable-next-line react/jsx-key
+            <p className="text-red-500 font-bold"> {err}</p>
+          ))} 
+            */}
             
-            {/* Nombre */}
-            <div>
-              <Label htmlFor="name" className="text-white">Nombre</Label>
-              <Input type="text" placeholder="Ingresa tu nombre" {...register("name", { required: true })} />
-              {errors.name && <p className="text-red-500 text-sm">El nombre es requerido</p>}
+
+        <h3 className="text-3xl font-bold text-center mb-2">Registro</h3>
+        <form onSubmit={onSubmit} autoComplete="off">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+
+            <div> 
+              <Label htmlFor="name">Nombre</Label>
+              <Input type="text" placeholder="Ingresa tu nombre"
+              {...register("name", { required: true })}/>
+              {errors.name && (
+              <p className="text-red-500 font-medium">El nombre es requerido</p>
+              )}
             </div>
 
-            {/* Apellidos */}
             <div>
-              <Label htmlFor="lastName" className="text-white">Apellidos</Label>
-              <Input type="text" placeholder="Ingresa tus apellidos" {...register("lastName", { required: true })} />
-              {errors.lastName && <p className="text-red-500 text-sm">El apellido es requerido</p>}
+              <Label htmlFor="birthDate">Fecha de nacimiento</Label>
+              <Input type="date"
+              {...register("birthDate", { required: true })}/>
+              {errors.birthDate && (
+              <p className="text-red-500 font-medium">La fecha es requerida</p>
+              )}
             </div>
 
-            {/* Contraseña */}
             <div>
-              <Label htmlFor="password" className="text-white">Contraseña</Label>
-              <Input type="password" placeholder="Ingresa tu contraseña" {...register("password", { required: true })} />
-              {errors.password && <p className="text-red-500 text-sm">La contraseña es requerida</p>}
+              <Label htmlFor="occupation">Ocupación</Label>
+              <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
+              {...register("occupation", { required: true })}>
+                <option value="">Selecciona el tipo de ocupación</option>
+                <option value="student">Estudiante</option>
+                <option value="professional">Profesional</option>
+              </SelectReg>
+              {errors.birthDate && (
+              <p className="text-red-500 font-medium">La ocupación es requerida</p>
+              )}
             </div>
 
-            {/* País */}
             <div>
-              <Label htmlFor="country" className="text-white">País</Label>
+              <Label htmlFor="lastName">Apellidos</Label>
+              <Input type="text" placeholder="Ingresa tus apellidos"
+              {...register("lastName", { required: true })}/>
+              {errors.lastName && (
+              <p className="text-red-500 font-medium">El apellido es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="docType">Tipo de documento</Label>
+              <SelectReg
+              {...register("docType", { required: true })}>
+                <option value="">Selecciona el tipo de documento</option>
+                <option value="civilRegistry">Registro civil</option>
+                <option value="identityCard">Tarjeta de identidad</option>
+                <option value="citizenshipIdCard">Cédula de ciudadanía</option>
+                <option value="foreignResidentCard">Tarjeta de extranjería</option>
+                <option value="passport">Pasaporte</option>
+                <option value="specialStayPermit">Permiso especial de permanencia</option>
+                <option value="nationalIdentityDocument">Documento Nacional de identidad</option>
+                <option value="safeConduct
+                Pass">Salvoconducto</option>
+              </SelectReg>
+              {errors.docType && (
+              <p className="text-red-500 font-medium">El tipo de documento es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="participationType">Tipo de participación</Label>
+              <SelectReg {...register("participationType", { required: true })}>
+                <option value="">Selecciona el tipo de participación</option>
+                <option value="author">Autor</option>
+                <option value="attendee">Asistente</option>
+              </SelectReg>
+              {errors.participationType && (
+              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+              )}
+            </div>
+
+            <div>
+      <Label htmlFor="password">Contraseña</Label>
+      <div className="relative">
+        <Input
+          id="password"
+          type={showPassword ? "text" : "password"}
+          placeholder="Ingresa tu contraseña"
+          {...register("password", { required: true })}
+        />
+        {errors.password && (
+        <p className="text-red-500 font-medium">La contraseña es requerida</p>
+      )}
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute inset-y-0 right-3 flex items-center text-gray-600"
+        >
+          {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+        </button>
+        
+      </div>
+      
+    </div>
+
+            <div>
+              <Label htmlFor="docNumber">
+                Número de documento
+              </Label>
+              <Input type="text" placeholder="Ingresa el número de documento"
+              {...register("docNumber", { required: true })}/>
+              {errors.docNumber && (
+              <p className="text-red-500 font-medium">El número de documento es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="attendanceType">Tipo de asistencia</Label>
+              <SelectReg {...register("attendanceType", { required: true })}>
+                <option value="">Selecciona el tipo de asistencia</option>
+                <option value="inPerson">Presencial</option>
+                <option value="online">En línea</option>
+              </SelectReg>
+              {errors.attendanceType && (
+              <p className="text-red-500 font-medium">El tipo de asistencia es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="country">País</Label>
               <CountriesSelect register={register} errors={errors} />
             </div>
 
-            {/* Ciudad */}
             <div>
-              <Label htmlFor="city" className="text-white">Ciudad</Label>
-              <Input type="text" placeholder="Ingresa tu ciudad" {...register("city", { required: true })} />
-              {errors.city && <p className="text-red-500 text-sm">La ciudad es requerida</p>}
+              <Label htmlFor="email">Correo</Label>
+              <Input type="email" placeholder="Ingresa tu correo electrónico"
+              {...register("email", { required: true })}
+              />
+              {errors.email && (
+              <p className="text-red-500 font-medium">El correo es requerido</p>
+              )}
             </div>
 
-            {/* Dirección */}
             <div>
-              <Label htmlFor="address" className="text-white">Dirección</Label>
-              <Input type="text" placeholder="Ingresa tu dirección" {...register("address", { required: true })} />
-              {errors.address && <p className="text-red-500 text-sm">La dirección es requerida</p>}
+              <Label htmlFor="affiliation">Afiliación</Label>
+              <Input type="text" placeholder="Ingresa tu afiliación"
+              {...register("affiliation", { required: true })}/>
+              {errors.affiliation && (
+              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
+              )}
+            </div>
+              
+            <div>
+              <Label htmlFor="city">Ciudad</Label>
+              <Input type="text" placeholder="Ingresa tu ciudad"
+                {...register("city", { required: true })}/>
+              {errors.city && (
+              <p className="text-red-500 font-medium">La ciudad es requerida</p>
+              )}
             </div>
 
-            {/* Género */}
             <div>
-              <Label htmlFor="gender" className="text-white">Género</Label>
-              <select className="w-full p-2 rounded bg-white text-black" {...register("gender", { required: true })}>
+              <Label htmlFor="phoneNumber">Número de teléfono</Label>
+              <Input type="tel" placeholder="Ingresa tu número de teléfono"
+              {...register("phoneNumber", { required: true })}/>
+              {errors.phoneNumber && (
+              <p className="text-red-500 font-medium">La número de teléfono es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="taxAmount">Pago por impuesto</Label>
+              <Input type="number" step="0.01" placeholder="Ingresa el porcentaje de impuesto"
+              {...register("taxAmount", { required: true })}/>
+              {errors.taxAmount && (
+              <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="gender">Género</Label>
+              <SelectReg 
+                {...register("gender", { required: true })}>
                 <option value="">Selecciona tu género</option>
                 <option value="Male">Masculino</option>
                 <option value="Female">Femenino</option>
                 <option value="Other">Otro</option>
-              </select>
-              {errors.gender && <p className="text-red-500 text-sm">El género es requerido</p>}
+              </SelectReg>
+              {errors.gender && (
+              <p className="text-red-500 font-medium">El género es requerido</p>
+              )}
             </div>
 
-            {/* Fecha de nacimiento */}
             <div>
-              <Label htmlFor="birthDate" className="text-white">Fecha de nacimiento</Label>
-              <Input type="date" {...register("birthDate", { required: true })} />
-              {errors.birthDate && <p className="text-red-500 text-sm">La fecha de nacimiento es requerida</p>}
+              <Label htmlFor="address">Dirección</Label>
+              <Input type="text" placeholder="Ingresa tu dirección"
+              {...register("address", { required: true })}/>
+              {errors.address && (
+              <p className="text-red-500 font-medium">La dirección es requerida</p>
+              )}
             </div>
 
-            {/* Tipo de documento */}
+          </div> {/* FIN GRID */}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mt-6">  {/* Inicio GRID 2 */}
             <div>
-              <Label htmlFor="docType" className="text-white">Tipo de documento</Label>
-              <select className="w-full p-2 rounded bg-white text-black" {...register("docType", { required: true })}>
-                <option value="">Selecciona el tipo de documento</option>
-                <option value="passport">Pasaporte</option>
-                <option value="identityCard">Tarjeta de identidad</option>
-                <option value="citizenshipIdCard">Cédula de ciudadanía</option>
-              </select>
-              {errors.docType && <p className="text-red-500 text-sm">El tipo de documento es requerido</p>}
+              <Label htmlFor="qtyArticles">Número de artículos</Label>
+              <Input type="number" placeholder="Ingresa el número de artículos"
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })}/>
+              {qtyArticles > 0 && (
+                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
+                {errors.qtyArticles && (
+              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
+              )}
             </div>
-
-            {/* Número de documento */}
+                
             <div>
-              <Label htmlFor="docNumber" className="text-white">Número de documento</Label>
-              <Input type="text" placeholder="Ingresa el número de documento" {...register("docNumber", { required: true })} />
-              {errors.docNumber && <p className="text-red-500 text-sm">El número de documento es requerido</p>}
-            </div>
+              <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
+              <SelectReg
+                {...register("isIeeeMember", { required: true })}
+              >
+                <option value="">Selecciona</option>
+                <option value="yes">Sí</option>
+                <option value="no">No</option>
+              </SelectReg>
+              {errors.isIeeeMember && (
+                <p className="text-red-500 font-medium">Este campo es requerido</p>
+              )}
 
-            {/* Número de artículos */}
-            <div>
-              <Label htmlFor="qtyArticles" className="text-white">Número de artículos</Label>
-              <Input type="number" placeholder="Ingresa el número de artículos" {...register("qtyArticles", { required: true, min: 1 })} />
-              {errors.qtyArticles && <p className="text-red-500 text-sm">Debe ingresar al menos 1 artículo</p>}
-              {qtyArticles > 0 && <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />}
-            </div>
-          </div>
+              {isIeeeMember === "yes" && (
+                <>
+                  <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+                  <Input 
+                    type="text" 
+                    placeholder="Ingresa tu número de membresía"
+                    {...register("membershipNumber", { required: true })}
+                  />
+                  {errors.membershipNumber && (
+                    <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
+                  )}
 
-          {/* Botón de registro */}
+                  <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
+                  <SelectReg {...register("isTems", { required: true })}>
+                    <option value="">Selecciona</option>
+                    <option value="yes">Sí</option>
+                    <option value="no">No</option>
+                  </SelectReg>
+                  {errors.isTems && (
+                    <p className="text-red-500 font-medium">Este campo es requerido</p>
+                  )}
+                </>
+              )}
+            </div>
+          </div> {/* FIN GRID 2 */}
+
           <div className="mt-4 text-center">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Registrarse</Button>
+            <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-bold hover:text-[#fff] ">Registrarse</button>
           </div>
 
-          {/* Link a Login */}
-          <div className="flex justify-between my-4 text-white">
-            <p>¿Ya tienes una cuenta?</p>
-            <Link to="/login" className="font-bold">Iniciar sesión</Link>
+          <div className="mt-4 text-center">
+            <div className="flex justify-center"> 
+            <p className="mr-4">Ya tienes una cuenta?</p>
+            <Link to="/login" className="font-bold">
+              Login
+            </Link>
+            </div>
+            
           </div>
-
-          {/* Mensaje de éxito */}
-          <div className="mt-4 p-2 border border-gray-300 rounded-lg bg-green-200 text-center">
-            <h4 className="text-xl font-bold">¡Registro exitoso!</h4>
-            <p className="mt-2">El registro fue completado exitosamente.</p>
-            <Button onClick={() => alert("Redirigiendo a la página de pago...")} className="mt-4">Haz clic aquí para pagar</Button>
-          </div>
-
         </form>
+{/* 
+        <div>
+          {price && (
+          <div className="mt-2 p-2">
+            <h4 className="text-xl font-bold">¡Registro exitoso!</h4>
+            <p className="mt-2">
+              El precio a pagar es: <span className="font-bold">${price}</span>
+            </p>
+
+            <div className="mt-4 text-center">
+              <button onClick={handlePayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Pagar
+              </button>
+            </div>
+          </div>
+        )}
+        </div>
+        */}
+        
       </CardReg>
     </Container>
   );
