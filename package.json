@@ -1,7 +1,7 @@
 {
   "name": "pag-ieee",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "backend/index.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon .",
