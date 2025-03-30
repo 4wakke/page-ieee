@@ -5,13 +5,27 @@ import cors from "cors";
 
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
 // Middlewares
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://192.168.1.19  :5173'
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );
