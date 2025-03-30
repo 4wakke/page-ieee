@@ -85,7 +85,7 @@ function RegisterPage() {
 
     const formattedData = {
       occupation: data.occupation,
-      isIeeeMember: data.isIeeeMember,  // Ya es booleano
+      isIeeeMember: data.isIeeeMember,  
       isTems: data.isTems,   
       participationType: data.participationType,
       attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
@@ -391,6 +391,7 @@ function RegisterPage() {
                   step="0.01" 
                   placeholder="Ingresa el pago por impuesto"
                   {...register("taxAmount", { required: true })}
+                  onWheel={(e) => e.target.blur()}
                 />
                 {errors.taxAmount && (
                   <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>
@@ -402,7 +403,7 @@ function RegisterPage() {
             <div>
               <Label htmlFor="qtyArticles">Número de artículos</Label>
               <Input type="number" placeholder="Ingresa el número de artículos"
-              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })}/>
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
               {qtyArticles > 0 && (
                 <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
                 {errors.qtyArticles && (
