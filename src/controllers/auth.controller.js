@@ -321,9 +321,8 @@ export const processPayment = async (req, res) => {
     const missingFields = requiredFields.filter(field => !(field in req.body));
     if (missingFields.length > 0) {
       return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
-    }
-
-    const responseToken = await fetch("https://${process.env.cobru_url}/token/refresh/", {
+    } 
+    const responseToken = await fetch(`https://${process.env.cobru_url}/token/refresh/`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -349,7 +348,7 @@ export const processPayment = async (req, res) => {
       platform: "API",
     };
 
-    const responseCobro = await fetch("https://${process.env.cobru_url}/cobru/", {
+    const responseCobro = await fetch(`https://${process.env.cobru_url}/cobru/`, {
       method: "POST",
       headers: {
         Accept: "application/json",

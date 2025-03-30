@@ -3,7 +3,6 @@ import {
   signin,
   signup,
   signout,
-  profile,
   payment,
   processPayment,
   checkPaymentStatus,
