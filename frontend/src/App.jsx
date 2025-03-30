@@ -3,7 +3,7 @@ import { useAuth } from "./context/AuthContext";
 
 import Navbar from "./components/navbar/Navbar";
 import { Container } from "./components/ui";
-import { ProtectedRoute } from "./components/protectedRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
