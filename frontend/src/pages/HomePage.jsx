@@ -17,7 +17,7 @@ function HomePage() {
 
   // para card w-[60vw] h-[65vh] en vez de w-full max-w-[600px] h-auto
   return (
-    <div className="home flex items-center justify-center min-h-[83vh] min-w-[70vw] mx-auto">
+    <div className="home flex items-center justify-center min-h-[85vh] min-w-[70vw] mx-auto">
       <div className="bg-[#2e5ca6] bg-opacity-75 w-full max-w-[850px] h-[500px] rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center text-center">
       <h2 className="text-4xl font-bold text-white-500 mb-6">
           Bienvenido a TEMSCON LATAM 2025
