@@ -1,9 +1,19 @@
-import { Card, Input, Button, Label, Container } from "../components/ui";
+import { Card, Input,  Label, Container } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+// eslint-disable-next-line no-unused-vars
+import { useEffect, useState } from "react";
+
 
 function LoginPage() {
+  useEffect(() => {
+    document.body.classList.add("login-page");
+    return () => {
+      document.body.classList.remove("login-page");
+    };
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -21,7 +31,7 @@ function LoginPage() {
   });
 
   return (
-    <Container className="h-[calc(100vh-10rem)] flex items-center justify-center">
+    <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center ">
       <Card>
         {loginErrors &&
           loginErrors.map((err) => (
@@ -29,39 +39,41 @@ function LoginPage() {
             <p className="text-red-500 font-bold"> {err}</p>
           ))}
 
-        <h1 className="text-4xl font-bold my-2 text-center">Sign in</h1>
+        <h1 className="text-4xl font-bold my-2 text-center mb-4 tracking-wide">Inicio sesión</h1>
 
         <form onSubmit={onSubmit}>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">Correo electrónico</Label>
           <Input
             type="email"
-            placeholder="Email"
+            placeholder="Correo electrónico"
             {...register("email", {
               required: true,
             })}
           />
 
-          {errors.email && <p className="text-red-700">Email is required</p>}
+          {errors.email && <p className="text-red-700">El correo es requerido</p>}
 
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Contraseña</Label>
           <Input
             type="password"
-            placeholder="Password"
+            placeholder="Contraseña"
             {...register("password", {
               required: true,
             })}
           />
 
           {errors.password && (
-            <p className="text-red-700">Password is required</p>
+            <p className="text-red-700">La contraseña es requerida</p>
           )}
+          
+          <div className="mt-4">
+          <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Iniciar sesión</button>
+          </div>
 
-          <Button>Sign in</Button>
-
-          <div className="flex justify-between my-4">
-            <p className="mr-4">Do not have an account?</p>
-            <Link to="/register" className="font-bold ">
-              Register
+          <div className="flex justify-between my-4 tracking-wide">
+            <p className="mr-4">No tienes una cuenta?</p>
+            <Link to="/register" className="font-bold tracking-wide ">
+              Registro
             </Link>
           </div>
         </form>

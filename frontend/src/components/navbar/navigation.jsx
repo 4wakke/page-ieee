@@ -3,15 +3,15 @@ import { LuCircleUserRound } from "react-icons/lu";
 
 export const publicRoutes = [
   {
-    name: "About",
+    name: "Sobre nosotros",
     path: "/about",
   },
   {
-    name: "Login",
+    name: "Iniciar sesión",
     path: "/login",
   },
   {
-    name: "Register",
+    name: "Registrarse",
     path: "/register",
   },
 ];

@@ -1,3 +1,4 @@
+
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
@@ -9,9 +10,9 @@ import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
 function RegisterPage() {
   useEffect(() => {
-    document.body.classList.add("login-page");
+    document.body.classList.add("register-page");
     return () => {
-      document.body.classList.remove("login-page");
+      document.body.classList.remove("register-page");
     };
   }, []);
 
@@ -20,14 +21,29 @@ function RegisterPage() {
     handleSubmit,
     formState: { errors },
     watch,
+    setValue, //* Correción isIeeeMember
   } = useForm();
 
+  const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
-
+  const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
   const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
 
+
+  useEffect(() => {
+    if (isTaxRequired === "no") {
+      setValue("taxAmount", "");
+    }
+  }, [isTaxRequired, setValue]);
+
+  useEffect(() => { //* nuevo
+      if (isIeeeMember === "no") {
+        setValue("isTems", "no"); // Se establece automáticamente en "no"
+        setValue("membershipNumber", ""); // Limpia el campo de membresía
+      }
+    }, [isIeeeMember, setValue]);
 
   // Función para procesar el pago cuando el usuario haga clic en "Pagar"
   const handlePayment = async () => {
@@ -57,14 +73,20 @@ function RegisterPage() {
   };
 
   const onSubmit = handleSubmit(async (data) => {
+    data.isIeeeMember = data.isIeeeMember === "yes";
+    data.isTems = data.isTems === "yes";
+    data.taxAmount = data.isTaxRequired === "no" ? "" : data.taxAmount;
     const filteredArticles = data.articles?.filter(
       (article) => article?.number && article?.pages
     ) || [];
+    
+    console.log(data);
+    
 
     const formattedData = {
       occupation: data.occupation,
-      isIeeeMember: data.isIeeeMember === "yes",
-      isTems: data.isTems === "yes",
+      isIeeeMember: data.isIeeeMember,  
+      isTems: data.isTems,   
       participationType: data.participationType,
       attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
       qtyArticles: data.qtyArticles,
@@ -78,7 +100,10 @@ function RegisterPage() {
 
     const resp = await fetch("http://192.168.1.10:3000/api/signup", {
       method: "POST",
-      body: JSON.stringify({ ...data, articles: filteredArticles }),
+      body: JSON.stringify({ 
+        ...data,
+        articles: filteredArticles 
+      }),
       headers: { "Content-Type": "application/json" },
     });
 
@@ -116,17 +141,17 @@ function RegisterPage() {
             */}
             
 
-        <h3 className="text-3xl font-bold text-center mb-2">Registro</h3>
+        <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide">
 
             <div> 
               <Label htmlFor="name">Nombre</Label>
               <Input type="text" placeholder="Ingresa tu nombre"
               {...register("name", { required: true })}/>
               {errors.name && (
-              <p className="text-red-500 font-medium">El nombre es requerido</p>
+              <p className="text-red-500 font-medium tracking-wide">El nombre es requerido</p>
               )}
             </div>
 
@@ -140,16 +165,12 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="occupation">Ocupación</Label>
-              <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
-              {...register("occupation", { required: true })}>
-                <option value="">Selecciona el tipo de ocupación</option>
-                <option value="student">Estudiante</option>
-                <option value="professional">Profesional</option>
-              </SelectReg>
-              {errors.birthDate && (
-              <p className="text-red-500 font-medium">La ocupación es requerida</p>
-              )}
+              <Label htmlFor="address">Dirección</Label>
+                  <Input type="text" placeholder="Ingresa tu dirección"
+                  {...register("address", { required: true })}/>
+                  {errors.address && (
+                  <p className="text-red-500 font-medium">La dirección es requerida</p>
+                  )}
             </div>
 
             <div>
@@ -256,11 +277,15 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="affiliation">Afiliación</Label>
-              <Input type="text" placeholder="Ingresa tu afiliación"
-              {...register("affiliation", { required: true })}/>
-              {errors.affiliation && (
-              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
+            <Label htmlFor="occupation">Ocupación</Label>
+              <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
+              {...register("occupation", { required: true })}>
+                <option value="">Selecciona el tipo de ocupación</option>
+                <option value="student">Estudiante</option>
+                <option value="professional">Profesional</option>
+              </SelectReg>
+              {errors.birthDate && (
+              <p className="text-red-500 font-medium">La ocupación es requerida</p>
               )}
             </div>
               
@@ -283,16 +308,16 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="taxAmount">Pago por impuesto</Label>
-              <Input type="number" step="0.01" placeholder="Ingresa el porcentaje de impuesto"
-              {...register("taxAmount", { required: true })}/>
-              {errors.taxAmount && (
-              <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>
+            <Label htmlFor="affiliation">Afiliación</Label>
+              <Input type="text" placeholder="Ingresa tu afiliación"
+              {...register("affiliation", { required: true })}/>
+              {errors.affiliation && (
+              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="gender">Género</Label>
+            <Label htmlFor="gender">Género</Label>
               <SelectReg 
                 {...register("gender", { required: true })}>
                 <option value="">Selecciona tu género</option>
@@ -305,22 +330,80 @@ function RegisterPage() {
               )}
             </div>
 
-            <div>
-              <Label htmlFor="address">Dirección</Label>
-              <Input type="text" placeholder="Ingresa tu dirección"
-              {...register("address", { required: true })}/>
-              {errors.address && (
-              <p className="text-red-500 font-medium">La dirección es requerida</p>
-              )}
-            </div>
-
           </div> {/* FIN GRID */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mt-6">  {/* Inicio GRID 2 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide mt-6">  {/* Inicio GRID 2 */}
+
+          <div>
+                <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
+                <SelectReg
+                  {...register("isIeeeMember", { required: true })}
+                >
+                  <option value="">Selecciona</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </SelectReg>
+                {errors.isIeeeMember && (
+                  <p className="text-red-500 font-medium">Este campo es requerido</p>
+                )}
+  
+                {isIeeeMember === "yes" && (
+                  <>
+                    <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+                    <Input 
+                      type="text" 
+                      placeholder="Ingresa tu número de membresía"
+                      {...register("membershipNumber", { required: true })}
+                    />
+                    {errors.membershipNumber && (
+                      <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
+                    )}
+  
+                    <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
+                    <SelectReg {...register("isTems", { required: true })}>
+                      <option value="">Selecciona</option>
+                      <option value="yes">Sí</option>
+                      <option value="no">No</option>
+                    </SelectReg>
+                    {errors.isTems && (
+                      <p className="text-red-500 font-medium">Este campo es requerido</p>
+                    )}
+                  </>
+                )}
+              </div>
+
+            <div>
+                <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
+                <SelectReg {...register("isTaxRequired", { required: true })}>
+                  <option value="">Selecciona</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </SelectReg>
+                {errors.isTaxRequired && (
+                  <p className="text-red-500 font-medium">Este campo es requerido</p>
+                )}
+
+              {isTaxRequired === "yes" && (
+              <div>
+                <Label htmlFor="taxAmount">Pago por impuesto</Label>
+                <Input 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="Ingresa el pago por impuesto"
+                  {...register("taxAmount", { required: true })}
+                  onWheel={(e) => e.target.blur()}
+                />
+                {errors.taxAmount && (
+                  <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>
+                )}
+              </div>
+                )}
+            </div>
+
             <div>
               <Label htmlFor="qtyArticles">Número de artículos</Label>
               <Input type="number" placeholder="Ingresa el número de artículos"
-              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })}/>
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
               {qtyArticles > 0 && (
                 <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
                 {errors.qtyArticles && (
@@ -328,58 +411,19 @@ function RegisterPage() {
               )}
             </div>
                 
-            <div>
-              <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
-              <SelectReg
-              {...register("isIeeeMember", {
-              required: true,
-              setValueAs: (value) => value === "yes", 
-              })}>
-                <option value="">Selecciona</option>
-                <option value="yes">Sí</option>
-                <option value="no">No</option>
-              </SelectReg>
-              {errors.isIeeeMember && (
-              <p className="text-red-500 font-medium">Este campo es requerido</p>
-              )}
-              {watch("isIeeeMember") && (
-                <>
-                  <Label htmlFor="membershipNumber" >Número de membresía IEEE</Label>
-                  <Input type="text" placeholder="Ingresa tu número de membresía"
-                  {...register("membershipNumber", { required: true })}/>
-                  {errors.membershipNumber && (
-                  <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
-                  )}
-                  <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
-                  <SelectReg
-                  {...register("isTems", {
-                  required: true,
-                  setValueAs: (value) => value === "yes",
-                  })}>
-                    <option value="">Selecciona</option>
-                    <option value="yes">Sí</option>
-                    <option value="no">No</option>
-                    
-                  </SelectReg>
-                  {errors.isTems && (
-              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
-              )}
-                  
-                </>
-                
-              )}
-            </div>
+            
+                        
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center">
-            <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-bold hover:text-[#fff] ">Registrarse</button>
+            <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Registrarse</button>
           </div>
 
           <div className="mt-4 text-center">
-            <div className="flex justify-center"> 
+            <div className="flex justify-center tracking-wide"> 
             <p className="mr-4">Ya tienes una cuenta?</p>
             <Link to="/login" className="font-bold">
-              Login
+              Iniciar sesión
             </Link>
             </div>
             
@@ -395,7 +439,7 @@ function RegisterPage() {
             </p>
 
             <div className="mt-4 text-center">
-              <button onClick={handlePayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+              <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                 Pagar
               </button>
             </div>

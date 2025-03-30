@@ -6,8 +6,8 @@ const ArticlesSpaces = ({ register, errors, qtyArticles }) => {
     let fields = [];
     for (let i = 0; i < qtyArticles; i++) {
       fields.push(
-        <div key={i} className="flex gap-4 mb-4">
-          <div className="w-1/2 mt-2">
+        <div key={i} className="grid grid-cols-2 gap-2">
+          <div>
             <Label htmlFor={`articles[${i}].number`}>Nombre del Artículo {i + 1}</Label>
             <Input
               type="text"
@@ -18,13 +18,15 @@ const ArticlesSpaces = ({ register, errors, qtyArticles }) => {
               <p className="text-red-500 font-medium">{errors.articles[i]?.number?.message}</p>
             )}
           </div>
-          <div className="w-1/2 mt-2" >
+          <div>
             <Label htmlFor={`articles[${i}].pages`}>Número de Páginas</Label>
             <Input
               type="number"
               placeholder="Número de páginas"
               {...register(`articles[${i}].pages`, { required: "El número de páginas es obligatorio" })}
+              onWheel={(e) => e.target.blur()}
             />
+            
             {errors?.articles?.[i]?.pages && (
               <p className="text-red-500 font-medium">{errors.articles[i]?.pages?.message}</p>
             )}
