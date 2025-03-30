@@ -39,7 +39,7 @@ function LoginPage() {
             <p className="text-red-500 font-bold"> {err}</p>
           ))}
 
-        <h1 className="text-4xl font-bold my-2 text-center mb-4">Inicio sesión</h1>
+        <h1 className="text-4xl font-bold my-2 text-center mb-4 tracking-wide">Inicio sesión</h1>
 
         <form onSubmit={onSubmit}>
           <Label htmlFor="email">Correo electrónico</Label>
@@ -67,12 +67,12 @@ function LoginPage() {
           )}
           
           <div className="mt-4">
-          <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-bold hover:text-[#fff] ">Iniciar sesión</button>
+          <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Iniciar sesión</button>
           </div>
 
-          <div className="flex justify-between my-4">
+          <div className="flex justify-between my-4 tracking-wide">
             <p className="mr-4">No tienes una cuenta?</p>
-            <Link to="/register" className="font-bold ">
+            <Link to="/register" className="font-bold tracking-wide ">
               Registro
             </Link>
           </div>

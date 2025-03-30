@@ -116,17 +116,17 @@ function RegisterPage() {
             */}
             
 
-        <h3 className="text-3xl font-bold text-center mb-2">Registro</h3>
+        <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide">
 
             <div> 
               <Label htmlFor="name">Nombre</Label>
               <Input type="text" placeholder="Ingresa tu nombre"
               {...register("name", { required: true })}/>
               {errors.name && (
-              <p className="text-red-500 font-medium">El nombre es requerido</p>
+              <p className="text-red-500 font-medium tracking-wide">El nombre es requerido</p>
               )}
             </div>
 
@@ -372,11 +372,11 @@ function RegisterPage() {
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center">
-            <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-bold hover:text-[#fff] ">Registrarse</button>
+            <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Registrarse</button>
           </div>
 
           <div className="mt-4 text-center">
-            <div className="flex justify-center"> 
+            <div className="flex justify-center tracking-wide"> 
             <p className="mr-4">Ya tienes una cuenta?</p>
             <Link to="/login" className="font-bold">
               Iniciar sesión
@@ -395,7 +395,7 @@ function RegisterPage() {
             </p>
 
             <div className="mt-4 text-center">
-              <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-bold hover:text-[#fff] ">
+              <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                 Pagar
               </button>
             </div>
