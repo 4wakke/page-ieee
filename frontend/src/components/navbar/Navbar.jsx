@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Link, useLocation } from "react-router-dom";
 import { publicRoutes, privateRoutes } from "./navigation";
 import { Container } from "../ui";
@@ -11,33 +10,66 @@ function Navbar() {
   const location = useLocation();
   const { isAuth, signout, user } = useAuth();
 
-  return (
-    <nav className="bg-white shadow-md border-b border-gray-200"> 
-      <Container className="flex justify-between items-center py-4">
+  return ( 
+    // falta borde
+    <nav className="bg-[#e5eff5] shadow-md border-b-2 border-[#006699] rounded-b-lg "> 
+      <Container className="flex justify-between py-3">
         <div className="flex items-center space-x-3">
-          <Link to="./" className="flex items-center">
+          <Link to="./" className="flex">
             <img src="/assets/logo-temscon.png" alt="TEMSCon Logo" className="h-12" />
           </Link>
-          <Link to="https://www.ieee.org/" className="flex items-left">
+          <Link to="https://www.ieee.org/" className="flex items-left  ">
             <img src="/assets/logo-ieee.svg" alt="IEEE Logo" className="h-8" />
           </Link>
         </div>
-        <ul className="hidden md:flex items-center space-x-6">
-          {(isAuth ? privateRoutes : publicRoutes).map(({ path, name }) => (
-            <li key={path}>
-              <Link
-                to={path}
-                className={twMerge(
-                  "text-gray-700 font-medium hover:text-blue-600 transition",
-                  location.pathname === path && "border-b-2 border-blue-600"
-                )}
-              >
-                {name}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <ul className="flex items-center justify-center md:gap-x-1">
+          {isAuth ? (
+            <>
+              {privateRoutes.map(({ path, name, icon }) => (
+                <li key={path}>
+                  <Link
+                    to={path}
+                    className={twMerge(
+                      "text-slate-300 flex items-center px-3 py-1 gap-x-1",
+                      location.pathname === path && "bg-sky-500"
+                    )}
+                  >
+                    {icon}
+                    <span className="hidden sm:block">{name}</span>
+                  </Link>
+                </li>
+              ))}
 
+              <li
+                className="text-slate-300 flex items-center px-3 py-1 
+                hover:cursor-pointer"
+                onClick={() => {
+                  signout();
+                }}
+              >
+                <MdLogout className="w-5 h-5" />
+                <span className="hidden sm:block">Logout</span>
+              </li>
+
+              <li className="flex gap-x-1 items-center justify-center">
+                <LuUserPen className="w-5 h-5" />
+                <span className="font-medium">{user.name}</span>
+              </li>
+            </>
+          ) : (
+            publicRoutes.map(({ path, name }) => (
+              <li
+                className={twMerge(
+                  "text-white-500 flex items-center px-3 py-1 font-medium text text-[#006699]",
+                  location.pathname === path && "bg-[#f9f8f8] border-2"
+                )}
+                key={path}
+              >
+                <Link to={path}>{name}</Link>
+              </li>
+            ))
+          )}
+        </ul>
       </Container>
     </nav>
   );
