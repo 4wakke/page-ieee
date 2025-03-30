@@ -1,25 +1,38 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 
 function ProfilePage() {
   // eslint-disable-next-line no-unused-vars
-  const { user } = useAuth(); // Obtenemos el usuario autenticado del contexto de Auth
   const [isEditing, setIsEditing] = useState(false); // Estado para controlar si estamos editando
   const [profileData, setProfileData] = useState({
     name: "",
+    birthDate: "",
+    address: "",
     lastName: "",
+    docType: "",
     email: "",
+    participationType: "",
+    password: "",
+    docNumber: "",
+    attendanceType: "",
     country: "",
     city: "",
     occupation: "",
-    gender: ""
+    gender: "",
+    phoneNumber: "",
+    affiliation: "",
+    isIeeeMember: "",
+    membershipNumber: "",
+    isTems: "",
+    isTaxRequired: "",
+    taxAmount: "",
+    qtyArticles: "",
   }); // Estado para almacenar los datos del perfil
 
   // Función para cargar los datos del perfil usando GET
   const fetchUserData = async () => {
     try {
-      const response = await fetch("http://192.168.1.10:3000/api/signup", {
+      const response = await fetch("http://back_route/api/signup", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -48,7 +61,7 @@ function ProfilePage() {
   // Función para guardar los cambios en el perfil usando PUT
   const handleSave = async () => {
     try {
-      const response = await fetch("http://192.168.1.10:3000/api/signup", {
+      const response = await fetch("http://back_route/api/signup", {
         method: "PUT", // Usamos PUT para actualizar los datos
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profileData), // Enviamos los datos actualizados

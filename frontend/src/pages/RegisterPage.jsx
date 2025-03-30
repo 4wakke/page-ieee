@@ -27,8 +27,9 @@ function RegisterPage() {
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
+  const [dollarRate, setDollarRate] = useState(null); // Estado para la tasa del dólar
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
-  const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
+  const [setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
 
 
@@ -45,15 +46,43 @@ function RegisterPage() {
       }
     }, [isIeeeMember, setValue]);
 
-  // Función para procesar el pago cuando el usuario haga clic en "Pagar"
+    // Función para obtener la tasa de cambio en tiempo real de Fixer.io
+  useEffect(() => {
+    const fetchDollarRate = async () => {
+      try {
+        const response = await fetch('https://api.apilayer.com/fixer/latest?base=USD&symbols=COP', {
+          method: 'GET',
+          headers: {
+            'apikey': 'f5e8f15a876372190ad19caab642bf21' // Reemplaza con tu clave API de Fixer.io
+          }
+        });
+        const data = await response.json();
+        if (data.success) {
+          const rate = data.rates["COP"];
+          setDollarRate(rate); // Guarda la tasa de cambio
+        } else {
+          console.error("Error al obtener la tasa de cambio", data.error);
+        }
+      } catch (error) {
+        console.error("Error al obtener la tasa de cambio", error);
+      }
+    };
+  
+    fetchDollarRate();
+  }, []);
+
   const handlePayment = async () => {
+    if (!dollarRate) {
+      console.error("No se pudo obtener la tasa de cambio");
+      return;
+    }
     try {
-      const processPaymentResp = await fetch("http://192.168.1.10:3000/api/processPayment", {
+      const processPaymentResp = await fetch("http://back_route/api/processPayment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: price,
-          dollarRate: 4300,
+          dollarRate: dollarRate,
           description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
         }),
       });
@@ -98,7 +127,7 @@ function RegisterPage() {
 
     console.log("Datos enviados a signup:", formattedData);
 
-    const resp = await fetch("http://192.168.1.10:3000/api/signup", {
+    const resp = await fetch("http://back_route/api/signup", {
       method: "POST",
       body: JSON.stringify({ 
         ...data,
@@ -112,7 +141,7 @@ function RegisterPage() {
 
     if (dataSignup.success) {
       // Enviar datos transformados al endpoint /payment
-      const response = await fetch("http://192.168.1.10:3000/api/payment", {
+      const response = await fetch("http://back_route/api/payment", {
         method: "POST",
         body: JSON.stringify(formattedData),
         headers: { "Content-Type": "application/json" },
