@@ -35,7 +35,7 @@ function AboutPage() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <div>
-            <h2 className="text-2xl font-semibold text-[#ffffff] mb-4 tracking-wide">Nuestra Misión</h2>
+            <h2 className="text-2xl font-bold text-[#ffffff] mb-4 tracking-wide">Nuestra Misión</h2>
             <p className="text-[#e5eff5] text-lg tracking-wide">
               Nuestra misión es fomentar la educación, la innovación y la
               colaboración en tecnología a través de conferencias, talleres y
@@ -45,7 +45,7 @@ function AboutPage() {
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold text-[#ffffff] mb-4 tracking-wide">Nuestra Visión</h2>
+            <h2 className="text-2xl font-bold text-[#ffffff] mb-4 tracking-wide">Nuestra Visión</h2>
             <p className="text-[#e5eff5] text-lg tracking-wide">
               Ser el principal evento en América Latina para estudiantes y
               profesionales interesados en las últimas tendencias en tecnología,
