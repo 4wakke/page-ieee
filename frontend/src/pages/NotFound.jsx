@@ -1,18 +1,29 @@
 import { Link } from "react-router-dom";
-import { Card } from "../components/ui";
+import { useEffect } from "react";
 
 function NotFound() {
-  return (
-    <div className="h-[calc(100vh-64px)] flex items-center justify-center">
-      <Card>
-        <h1 className="text-4xl font-bold my-2"> Page Not Found</h1>
-        <h3 className="text-2xl">404</h3>
+  useEffect(() => {
+    document.body.classList.add("not-page");
 
-        <Link to="/" className="font-bold text-gray-100">
-          Go back to home, CLICK HERE
-        </Link>
-      </Card>
-    </div>
+    return () => {
+      document.body.classList.remove("not-page");
+    };
+  }, []);
+
+  return (
+    <div className="w-screen h-screen flex items-center justify-center">
+  <div className="bg-[#2e5ca6] bg-opacity-85 w-full max-w-[450px] h-auto p-8 rounded-2xl shadow-2xl flex flex-col items-center justify-center text-center mb-16">
+    <h1 className="text-5xl font-extrabold text-white mb-4">Página no encontrada</h1>
+    <h3 className="text-xl text-white mb-4">Error 404</h3>
+    <p className="text-white text-lg mb-6">Para volver al inicio, presiona el botón:</p>
+    <Link
+      to="/"
+      className="bg-white text-[#0073AE] font-medium py-2 px-6 rounded-lg  hover:bg-[#0073ae] text-lg mb-4 hover:text-[#fff]"
+    >
+      Inicio
+    </Link>
+  </div>
+</div>
   );
 }
 

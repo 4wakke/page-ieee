@@ -11,27 +11,38 @@ body {
   background-image: url('/assets/fondo-barranquilla2.jpeg');
   background-size: cover;
   background-position: center;
-  height:100vh; /* Ajusta la altura restando el navbar */
+  height: 100vh;
 }
 
 .login-page { 
   background-image: url('/assets/fondo-barranquilla2.jpeg');
   background-size: cover;
   background-position: center;
-  height:100vh; /* Ajusta la altura restando el navbar */
+  height: 100vh;
 }
 
 .register-page { 
   background-image: url('/assets/fondo-barranquilla2.jpeg');
   background-size: cover;
   background-position: center;
-  height:100vh; /* Ajusta la altura restando el navbar */
+  height: 100vh;
+  
 }
 
 .about-page { 
   background-image: url('/assets/fondo-barranquilla2.jpeg');
   background-size: cover;
   background-position: center;
-  height:100vh; /* Ajusta la altura restando el navbar */
+  height: 100vh;
 }
 
+.not-page { 
+  background-image: url('/assets/fondo-barranquilla2.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}

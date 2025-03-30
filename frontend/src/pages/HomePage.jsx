@@ -18,7 +18,7 @@ function HomePage() {
   // para card w-[60vw] h-[65vh] en vez de w-full max-w-[600px] h-auto
   return (
     <div className="home flex items-center justify-center min-h-[83vh] min-w-[70vw] mx-auto">
-      <div className="bg-[#327ca0] bg-opacity-75 w-full max-w-[850px] h-[500px] rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center text-center">
+      <div className="bg-[#2e5ca6] bg-opacity-75 w-full max-w-[850px] h-[500px] rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center text-center">
       <h2 className="text-4xl font-bold text-white-500 mb-6">
           Bienvenido a TEMSCON LATAM 2025
         </h2>
@@ -29,7 +29,7 @@ function HomePage() {
         20/04/2025
         </h3>
         <Link to="/register">
-        <button className="bg-white text-[#0073AE] font-medium py-2 px-6 rounded-lg border-2 border-[#327CA0] hover:bg-[#f0f0f0] hover:border-[#005b7f] text-lg mb-4">
+        <button className="bg-white text-[#0073AE] font-medium py-2 px-6 rounded-lg  hover:bg-[#0073ae] text-lg mb-4 hover:text-[#fff]">
         Registrarse
         </button>
         </Link>
@@ -37,7 +37,7 @@ function HomePage() {
           ¿Ya está registrado?
         </h3>
         <Link to="/login">
-        <button className="bg-white text-[#0073AE] font-medium py-2 px-6 rounded-lg border-2 border-[#327CA0] hover:bg-[#f0f0f0] hover:border-[#005b7f] text-lg mb-4">
+        <button className="bg-white text-[#0073AE] font-medium py-2 px-6 rounded-lg  hover:bg-[#0073ae] text-lg mb-4 hover:text-[#fff]">
           Iniciar sección
         </button>
         </Link>

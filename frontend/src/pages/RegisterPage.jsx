@@ -395,7 +395,7 @@ function RegisterPage() {
             </p>
 
             <div className="mt-4 text-center">
-              <button onClick={handlePayment} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+              <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-bold hover:text-[#fff] ">
                 Pagar
               </button>
             </div>

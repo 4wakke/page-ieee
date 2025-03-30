@@ -31,7 +31,7 @@ function LoginPage() {
   });
 
   return (
-    <Container className="h-[calc(100vh-10rem)] flex items-center justify-center">
+    <Container className="h-[calc(100vh-10rem)] flex items-center justify-center mt-40">
       <Card>
         {loginErrors &&
           loginErrors.map((err) => (
