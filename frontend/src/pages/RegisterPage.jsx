@@ -379,7 +379,7 @@ function RegisterPage() {
             <div className="flex justify-center"> 
             <p className="mr-4">Ya tienes una cuenta?</p>
             <Link to="/login" className="font-bold">
-              Login
+              Iniciar sesión
             </Link>
             </div>
             
