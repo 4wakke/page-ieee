@@ -24,11 +24,19 @@ function RegisterPage() {
     setValue, //* Correción isIeeeMember
   } = useForm();
 
+  const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
   const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
+
+
+  useEffect(() => {
+    if (isTaxRequired === "no") {
+      setValue("taxAmount", "");
+    }
+  }, [isTaxRequired, setValue]);
 
   useEffect(() => { //* nuevo
       if (isIeeeMember === "no") {
@@ -67,6 +75,7 @@ function RegisterPage() {
   const onSubmit = handleSubmit(async (data) => {
     data.isIeeeMember = data.isIeeeMember === "yes";
     data.isTems = data.isTems === "yes";
+    data.taxAmount = data.isTaxRequired === "no" ? "" : data.taxAmount;
     const filteredArticles = data.articles?.filter(
       (article) => article?.number && article?.pages
     ) || [];
@@ -156,16 +165,12 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="occupation">Ocupación</Label>
-              <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
-              {...register("occupation", { required: true })}>
-                <option value="">Selecciona el tipo de ocupación</option>
-                <option value="student">Estudiante</option>
-                <option value="professional">Profesional</option>
-              </SelectReg>
-              {errors.birthDate && (
-              <p className="text-red-500 font-medium">La ocupación es requerida</p>
-              )}
+              <Label htmlFor="address">Dirección</Label>
+                  <Input type="text" placeholder="Ingresa tu dirección"
+                  {...register("address", { required: true })}/>
+                  {errors.address && (
+                  <p className="text-red-500 font-medium">La dirección es requerida</p>
+                  )}
             </div>
 
             <div>
@@ -272,11 +277,15 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="affiliation">Afiliación</Label>
-              <Input type="text" placeholder="Ingresa tu afiliación"
-              {...register("affiliation", { required: true })}/>
-              {errors.affiliation && (
-              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
+            <Label htmlFor="occupation">Ocupación</Label>
+              <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
+              {...register("occupation", { required: true })}>
+                <option value="">Selecciona el tipo de ocupación</option>
+                <option value="student">Estudiante</option>
+                <option value="professional">Profesional</option>
+              </SelectReg>
+              {errors.birthDate && (
+              <p className="text-red-500 font-medium">La ocupación es requerida</p>
               )}
             </div>
               
@@ -299,16 +308,16 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="taxAmount">Pago por impuesto</Label>
-              <Input type="number" step="0.01" placeholder="Ingresa el porcentaje de impuesto"
-              {...register("taxAmount", { required: true })}/>
-              {errors.taxAmount && (
-              <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>
+            <Label htmlFor="affiliation">Afiliación</Label>
+              <Input type="text" placeholder="Ingresa tu afiliación"
+              {...register("affiliation", { required: true })}/>
+              {errors.affiliation && (
+              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="gender">Género</Label>
+            <Label htmlFor="gender">Género</Label>
               <SelectReg 
                 {...register("gender", { required: true })}>
                 <option value="">Selecciona tu género</option>
@@ -321,18 +330,75 @@ function RegisterPage() {
               )}
             </div>
 
-            <div>
-              <Label htmlFor="address">Dirección</Label>
-              <Input type="text" placeholder="Ingresa tu dirección"
-              {...register("address", { required: true })}/>
-              {errors.address && (
-              <p className="text-red-500 font-medium">La dirección es requerida</p>
-              )}
-            </div>
-
           </div> {/* FIN GRID */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mt-6">  {/* Inicio GRID 2 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide mt-6">  {/* Inicio GRID 2 */}
+
+          <div>
+                <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
+                <SelectReg
+                  {...register("isIeeeMember", { required: true })}
+                >
+                  <option value="">Selecciona</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </SelectReg>
+                {errors.isIeeeMember && (
+                  <p className="text-red-500 font-medium">Este campo es requerido</p>
+                )}
+  
+                {isIeeeMember === "yes" && (
+                  <>
+                    <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+                    <Input 
+                      type="text" 
+                      placeholder="Ingresa tu número de membresía"
+                      {...register("membershipNumber", { required: true })}
+                    />
+                    {errors.membershipNumber && (
+                      <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
+                    )}
+  
+                    <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
+                    <SelectReg {...register("isTems", { required: true })}>
+                      <option value="">Selecciona</option>
+                      <option value="yes">Sí</option>
+                      <option value="no">No</option>
+                    </SelectReg>
+                    {errors.isTems && (
+                      <p className="text-red-500 font-medium">Este campo es requerido</p>
+                    )}
+                  </>
+                )}
+              </div>
+
+            <div>
+                <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
+                <SelectReg {...register("isTaxRequired", { required: true })}>
+                  <option value="">Selecciona</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </SelectReg>
+                {errors.isTaxRequired && (
+                  <p className="text-red-500 font-medium">Este campo es requerido</p>
+                )}
+
+              {isTaxRequired === "yes" && (
+              <div>
+                <Label htmlFor="taxAmount">Pago por impuesto</Label>
+                <Input 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="Ingresa el pago por impuesto"
+                  {...register("taxAmount", { required: true })}
+                />
+                {errors.taxAmount && (
+                  <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>
+                )}
+              </div>
+                )}
+            </div>
+
             <div>
               <Label htmlFor="qtyArticles">Número de artículos</Label>
               <Input type="number" placeholder="Ingresa el número de artículos"
@@ -344,43 +410,8 @@ function RegisterPage() {
               )}
             </div>
                 
-            <div>
-                          <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
-                          <SelectReg
-                            {...register("isIeeeMember", { required: true })}
-                          >
-                            <option value="">Selecciona</option>
-                            <option value="yes">Sí</option>
-                            <option value="no">No</option>
-                          </SelectReg>
-                          {errors.isIeeeMember && (
-                            <p className="text-red-500 font-medium">Este campo es requerido</p>
-                          )}
             
-                          {isIeeeMember === "yes" && (
-                            <>
-                              <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
-                              <Input 
-                                type="text" 
-                                placeholder="Ingresa tu número de membresía"
-                                {...register("membershipNumber", { required: true })}
-                              />
-                              {errors.membershipNumber && (
-                                <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
-                              )}
-            
-                              <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
-                              <SelectReg {...register("isTems", { required: true })}>
-                                <option value="">Selecciona</option>
-                                <option value="yes">Sí</option>
-                                <option value="no">No</option>
-                              </SelectReg>
-                              {errors.isTems && (
-                                <p className="text-red-500 font-medium">Este campo es requerido</p>
-                              )}
-                            </>
-                          )}
-                        </div>
+                        
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center">
