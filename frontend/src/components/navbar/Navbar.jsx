@@ -43,14 +43,14 @@ function Navbar() {
                 ))}
 
                 <li
-                  className="text-slate-300 flex items-center px-3 py-1 
-                  hover:cursor-pointer"
+                  className="text-[#c01d0f] flex items-center px-3 py-1 
+                  hover:cursor-pointer font-medium"
                   onClick={() => {
                     signout();
                   }}
                 >
                   <MdLogout className="w-5 h-5" />
-                  <span className="hidden sm:block">Logout</span>
+                  <span className="hidden sm:block">Salir</span>
                 </li>
 
                 <li className="flex gap-x-1 items-center justify-center">

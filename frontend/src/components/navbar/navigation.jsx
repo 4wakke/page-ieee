@@ -18,8 +18,8 @@ export const publicRoutes = [
 
 export const privateRoutes = [
   {
-    name: "Profile",
+    name: "Perfil",
     path: "/profile",
-    icon: <LuCircleUserRound className="w-5 h-5 text-white" />,
+    icon: <LuCircleUserRound className="w-5 h-5 text-[white]" />,
   },
 ];
