@@ -14,7 +14,8 @@ const app = express();
 // Middlewares
 const allowedOrigins = [
   'http://localhost:5173', 
-  'http://192.168.1.19  :5173'
+  'http://192.168.1.19  :5173',
+  'http://18.209.168.40:5173'
 ];
 
 app.use(
