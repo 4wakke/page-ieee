@@ -3,6 +3,7 @@ import {
   signin,
   signup,
   signout,
+  profile,
   payment,
   processPayment,
   checkPaymentStatus,
@@ -24,7 +25,7 @@ router.post("/signout", signout);
 
 router.post("/payment", payment);
 
-//router.get("/profile", isAuth, profile);
+router.get("/profile", isAuth, profile);
 
 router.post("/processPayment", processPayment);
 
@@ -32,7 +33,7 @@ router.get("/checkPaymentStatus",checkPaymentStatus);
 
 router.get('/users', getAllUsers);
 
-router.get('/profile', getUser);
+router.get('/userDetail', getUser);
 
 router.put('/users/:id', updateUser);
 

@@ -155,8 +155,8 @@ export const getAllUsers = async (req, res) => {
 };
 
 export const getUser = async (req, res) => {
-  const { id, email } = req.params;
-  
+  const { id } = req.params;
+  const email = req.query.email
   try {
     const query = `
       SELECT id, name, last_name, country, city, address, gender, birth_date, 
@@ -164,10 +164,10 @@ export const getUser = async (req, res) => {
              is_ieee_member, is_tems, membership_number, participation_type, 
              attendance_type, tax_amount, qty_articles, created_at 
       FROM users 
-      WHERE id = ?;
+      WHERE id = ? OR email = ?;
     `;
 
-    const [users] = await pool.query(query, [id]);
+    const [users] = await pool.query(query, [id, email]);
 
     if (users.length === 0) {
       return errorResponse(res, 'Usuario no encontrado', 404);
@@ -263,6 +263,10 @@ export const updateUser = async (req, res) => {
   }
 };
 
+export const profile = async (req, res) => {
+  const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.userId]);
+  return res.json(result.rows[0]);
+}; //* HECHO
 export const signout = (req, res) => {
   res.clearCookie('token');
   res.sendStatus(200);
