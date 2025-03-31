@@ -38,7 +38,7 @@ function HomePage() {
         </h3>
         <Link to="/login">
         <button className="bg-white text-[#0073AE] font-semibold py-3 px-7 rounded-full hover:bg-[#005f95] text-lg mb-4 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg tracking-wide">
-          Iniciar sección
+          Iniciar sesión
         </button>
         </Link>
 
