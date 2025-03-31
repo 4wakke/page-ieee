@@ -1,7 +1,8 @@
+const backRoute = import.meta.env.REACT_APP_BACK_ROUTE;
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: "http://back_route/api",
+  baseURL: `${backRoute}/api`,
   withCredentials: true,
 });
 

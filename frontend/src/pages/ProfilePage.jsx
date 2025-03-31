@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 
 function ProfilePage() {
-  // eslint-disable-next-line no-unused-vars
   const [isEditing, setIsEditing] = useState(false); // Estado para controlar si estamos editando
   const [profileData, setProfileData] = useState({
     name: "",

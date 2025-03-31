@@ -27,9 +27,8 @@ function RegisterPage() {
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
-  const [dollarRate, setDollarRate] = useState(null); // Estado para la tasa del dólar
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
-  const [setPaymentUrl] = useState(""); // Estado para la URL de pago
+  const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
 
 
@@ -46,43 +45,15 @@ function RegisterPage() {
       }
     }, [isIeeeMember, setValue]);
 
-    // Función para obtener la tasa de cambio en tiempo real de Fixer.io
-  useEffect(() => {
-    const fetchDollarRate = async () => {
-      try {
-        const response = await fetch('https://api.apilayer.com/fixer/latest?base=USD&symbols=COP', {
-          method: 'GET',
-          headers: {
-            'apikey': 'f5e8f15a876372190ad19caab642bf21' // Reemplaza con tu clave API de Fixer.io
-          }
-        });
-        const data = await response.json();
-        if (data.success) {
-          const rate = data.rates["COP"];
-          setDollarRate(rate); // Guarda la tasa de cambio
-        } else {
-          console.error("Error al obtener la tasa de cambio", data.error);
-        }
-      } catch (error) {
-        console.error("Error al obtener la tasa de cambio", error);
-      }
-    };
-  
-    fetchDollarRate();
-  }, []);
-
+  // Función para procesar el pago cuando el usuario haga clic en "Pagar"
   const handlePayment = async () => {
-    if (!dollarRate) {
-      console.error("No se pudo obtener la tasa de cambio");
-      return;
-    }
     try {
-      const processPaymentResp = await fetch("http://back_route/api/processPayment", {
+      const processPaymentResp = await fetch("http://192.168.1.10:3000/api/processPayment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: price,
-          dollarRate: dollarRate,
+          dollarRate: 4300,
           description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
         }),
       });
@@ -104,7 +75,7 @@ function RegisterPage() {
   const onSubmit = handleSubmit(async (data) => {
     data.isIeeeMember = data.isIeeeMember === "yes";
     data.isTems = data.isTems === "yes";
-    data.taxAmount = data.isTaxRequired === "no" ? "" : data.taxAmount;
+    data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
     const filteredArticles = data.articles?.filter(
       (article) => article?.number && article?.pages
     ) || [];
@@ -127,7 +98,7 @@ function RegisterPage() {
 
     console.log("Datos enviados a signup:", formattedData);
 
-    const resp = await fetch("http://back_route/api/signup", {
+    const resp = await fetch("http://192.168.1.10:3000/api/signup", {
       method: "POST",
       body: JSON.stringify({ 
         ...data,
@@ -141,7 +112,7 @@ function RegisterPage() {
 
     if (dataSignup.success) {
       // Enviar datos transformados al endpoint /payment
-      const response = await fetch("http://back_route/api/payment", {
+      const response = await fetch("http://192.168.1.10:3000/api/payment", {
         method: "POST",
         body: JSON.stringify(formattedData),
         headers: { "Content-Type": "application/json" },
@@ -459,22 +430,22 @@ function RegisterPage() {
           </div>
         </form>
 
-        <div>
-          {price && (
-          <div className="mt-2 p-2">
-            <h4 className="text-xl font-bold">¡Registro exitoso!</h4>
-            <p className="mt-2">
-              El precio a pagar es: <span className="font-bold">${price}</span>
-            </p>
-
-            <div className="mt-4 text-center">
-              <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
-                Pagar
-              </button>
-            </div>
+          <div>
+            {price && (
+              <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
+                <h4 className="text-xl font-bold">¡Registro exitoso!</h4>
+                <p className="mt-2">
+                  El precio a pagar es: <span className="font-bold">${price}</span>
+                </p>
+            
+                <div className="mt-4 text-center">
+                  <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                    Pagar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        </div>
         
       </CardReg>
     </Container>
