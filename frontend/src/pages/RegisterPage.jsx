@@ -8,6 +8,9 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
+const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
+
+
 function RegisterPage() {
   useEffect(() => {
     document.body.classList.add("register-page");
@@ -48,7 +51,7 @@ function RegisterPage() {
   // Función para procesar el pago cuando el usuario haga clic en "Pagar"
   const handlePayment = async () => {
     try {
-      const processPaymentResp = await fetch("http://192.168.1.10:3000/api/processPayment", {
+      const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -98,7 +101,7 @@ function RegisterPage() {
 
     console.log("Datos enviados a signup:", formattedData);
 
-    const resp = await fetch("http://192.168.1.10:3000/api/signup", {
+    const resp = await fetch(`${backRoute}/api/signup`, {
       method: "POST",
       body: JSON.stringify({ 
         ...data,
@@ -112,7 +115,7 @@ function RegisterPage() {
 
     if (dataSignup.success) {
       // Enviar datos transformados al endpoint /payment
-      const response = await fetch("http://192.168.1.10:3000/api/payment", {
+      const response = await fetch(`${backRoute}/api/payment`, {
         method: "POST",
         body: JSON.stringify(formattedData),
         headers: { "Content-Type": "application/json" },
