@@ -8,6 +8,9 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
+const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
+
+
 function RegisterPage() {
   useEffect(() => {
     document.body.classList.add("register-page");
@@ -30,6 +33,7 @@ function RegisterPage() {
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
   const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
+  
 
 
   useEffect(() => {
@@ -48,7 +52,7 @@ function RegisterPage() {
   // Función para procesar el pago cuando el usuario haga clic en "Pagar"
   const handlePayment = async () => {
     try {
-      const processPaymentResp = await fetch("http://192.168.1.10:3000/api/processPayment", {
+      const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -75,7 +79,7 @@ function RegisterPage() {
   const onSubmit = handleSubmit(async (data) => {
     data.isIeeeMember = data.isIeeeMember === "yes";
     data.isTems = data.isTems === "yes";
-    data.taxAmount = data.isTaxRequired === "no" ? "" : data.taxAmount;
+    data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
     const filteredArticles = data.articles?.filter(
       (article) => article?.number && article?.pages
     ) || [];
@@ -98,7 +102,7 @@ function RegisterPage() {
 
     console.log("Datos enviados a signup:", formattedData);
 
-    const resp = await fetch("http://192.168.1.10:3000/api/signup", {
+    const resp = await fetch(`${backRoute}/api/signup`, {
       method: "POST",
       body: JSON.stringify({ 
         ...data,
@@ -112,7 +116,7 @@ function RegisterPage() {
 
     if (dataSignup.success) {
       // Enviar datos transformados al endpoint /payment
-      const response = await fetch("http://192.168.1.10:3000/api/payment", {
+      const response = await fetch(`${backRoute}/api/payment`, {
         method: "POST",
         body: JSON.stringify(formattedData),
         headers: { "Content-Type": "application/json" },
@@ -430,22 +434,22 @@ function RegisterPage() {
           </div>
         </form>
 
-        <div>
-          {price && (
-          <div className="mt-2 p-2">
-            <h4 className="text-xl font-bold">¡Registro exitoso!</h4>
-            <p className="mt-2">
-              El precio a pagar es: <span className="font-bold">${price}</span>
-            </p>
-
-            <div className="mt-4 text-center">
-              <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
-                Pagar
-              </button>
-            </div>
+          <div>
+            {price && (
+              <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
+                <h4 className="text-xl font-bold">¡Registro exitoso!</h4>
+                <p className="mt-2">
+                  El precio a pagar es: <span className="font-bold">${price}</span>
+                </p>
+            
+                <div className="mt-4 text-center">
+                  <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                    Pagar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        </div>
         
       </CardReg>
     </Container>
