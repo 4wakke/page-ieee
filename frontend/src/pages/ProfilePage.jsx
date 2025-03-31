@@ -1,214 +1,107 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+// eslint-disable-next-line no-unused-vars
+import { Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; 
+// eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 
+const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
+
 function ProfilePage() {
-  const [isEditing, setIsEditing] = useState(false); // Estado para controlar si estamos editando
-  const [profileData, setProfileData] = useState({
-    name: "",
-    birthDate: "",
-    address: "",
-    lastName: "",
-    docType: "",
-    email: "",
-    participationType: "",
-    password: "",
-    docNumber: "",
-    attendanceType: "",
-    country: "",
-    city: "",
-    occupation: "",
-    gender: "",
-    phoneNumber: "",
-    affiliation: "",
-    isIeeeMember: "",
-    membershipNumber: "",
-    isTems: "",
-    isTaxRequired: "",
-    taxAmount: "",
-    qtyArticles: "",
-  }); // Estado para almacenar los datos del perfil
 
-  // Función para cargar los datos del perfil usando GET
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch("http://back_route/api/signup", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await response.json();
-      if (data.success) {
-        setProfileData(data.user); // Actualizamos el estado con los datos del usuario
-      } else {
-        console.error("Error al obtener los datos del perfil:", data.message);
-      }
-    } catch (error) {
-      console.error("Error al hacer la petición:", error);
-    }
-  };
-
-  // Cargar los datos cuando el componente se monte
   useEffect(() => {
-    fetchUserData(); // Llamamos a la función para obtener los datos
+    document.body.classList.add("profile-page");
+    return () => {
+      document.body.classList.remove("profile-page");
+    };
   }, []);
 
-  // Manejar cambios en los inputs
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setProfileData({ ...profileData, [name]: value }); // Actualizamos el estado con los nuevos valores
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const [userDetails, setUserDetails] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Obtener correo almacenado en el login
+  const userEmail = localStorage.getItem("userEmail");
+
+  useEffect(() => {
+    if (!userEmail) return;
+    
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}`);
+        const data = await response.json();
+        if (data.success) {
+          setUserDetails(data.results);
+          for (const key in data.results) {
+            if (data.results[key]) {
+              setValue(key, data.results[key]);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    fetchUserDetails();
+  }, [setValue, userEmail]);
+
+  const handleEdit = () => {
+    setIsEditing(true);
   };
 
-  // Función para guardar los cambios en el perfil usando PUT
-  const handleSave = async () => {
+  const handleSave = async (data) => {
     try {
-      const response = await fetch("http://back_route/api/signup", {
-        method: "PUT", // Usamos PUT para actualizar los datos
+      const response = await fetch(`${backRoute}/api/detail`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profileData), // Enviamos los datos actualizados
+        body: JSON.stringify(data),
       });
-
-      const data = await response.json();
-      if (data.success) {
-        setIsEditing(false); // Salimos del modo de edición
+      const result = await response.json();
+      if (result.success) {
+        setIsEditing(false);
+        alert("Datos guardados exitosamente");
       } else {
-        console.error("Error al guardar los datos del perfil:", data.message);
+        alert("Error al guardar los datos");
       }
     } catch (error) {
-      console.error("Error al enviar los datos al servidor:", error);
+      console.error("Error saving user details:", error);
     }
   };
+
+  if (!userDetails) {
+    return <p>Cargando...</p>;
+  }
 
   return (
     <Container className="flex items-center justify-center min-h-screen">
       <CardReg>
-        <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Perfil</h3>
-
-        <form className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide" autoComplete="off">
-          {/* Nombre */}
-          <div>
-            <Label htmlFor="name">Nombre</Label>
-            {isEditing ? (
-              <Input
-                type="text"
-                name="name"
-                value={profileData.name}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <p>{profileData.name}</p>
-            )}
+        <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Perfil de Usuario</h3>
+        <form onSubmit={handleSubmit(handleSave)} autoComplete="off">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide">
+            <div>
+              <Label htmlFor="name">Nombre</Label>
+              <Input type="text" placeholder="Nombre" {...register("name", { required: true })} disabled={!isEditing} />
+              {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>}
+            </div>
+            <div>
+              <Label htmlFor="password">Contraseña</Label>
+              <div className="relative">
+                <Input type={showPassword ? "text" : "password"} placeholder="Contraseña" {...register("password", { required: true })} disabled={!isEditing} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-3 flex items-center text-gray-600">
+                  {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-500 font-medium">La contraseña es requerida</p>}
+            </div>
           </div>
-
-          {/* Apellido */}
-          <div>
-            <Label htmlFor="lastName">Apellido</Label>
+          <div className="mt-4 text-center">
             {isEditing ? (
-              <Input
-                type="text"
-                name="lastName"
-                value={profileData.lastName}
-                onChange={handleInputChange}
-              />
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Guardar</button>
             ) : (
-              <p>{profileData.lastName}</p>
-            )}
-          </div>
-
-          {/* Correo */}
-          <div>
-            <Label htmlFor="email">Correo</Label>
-            {isEditing ? (
-              <Input
-                type="email"
-                name="email"
-                value={profileData.email}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <p>{profileData.email}</p>
-            )}
-          </div>
-
-          {/* País */}
-          <div>
-            <Label htmlFor="country">País</Label>
-            {isEditing ? (
-              <Input
-                type="text"
-                name="country"
-                value={profileData.country}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <p>{profileData.country}</p>
-            )}
-          </div>
-
-          {/* Ciudad */}
-          <div>
-            <Label htmlFor="city">Ciudad</Label>
-            {isEditing ? (
-              <Input
-                type="text"
-                name="city"
-                value={profileData.city}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <p>{profileData.city}</p>
-            )}
-          </div>
-
-          {/* Ocupación */}
-          <div>
-            <Label htmlFor="occupation">Ocupación</Label>
-            {isEditing ? (
-              <SelectReg
-                name="occupation"
-                value={profileData.occupation}
-                onChange={handleInputChange}
-              >
-                <option value="student">Estudiante</option>
-                <option value="professional">Profesional</option>
-              </SelectReg>
-            ) : (
-              <p>{profileData.occupation}</p>
-            )}
-          </div>
-
-          {/* Género */}
-          <div>
-            <Label htmlFor="gender">Género</Label>
-            {isEditing ? (
-              <SelectReg
-                name="gender"
-                value={profileData.gender}
-                onChange={handleInputChange}
-              >
-                <option value="Male">Masculino</option>
-                <option value="Female">Femenino</option>
-                <option value="Other">Otro</option>
-              </SelectReg>
-            ) : (
-              <p>{profileData.gender}</p>
-            )}
-          </div>
-
-          {/* Botón de Editar y Guardar */}
-          <div className="mt-4 text-center col-span-full">
-            {isEditing ? (
-              <Button
-                className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
-                onClick={handleSave}
-              >
-                Guardar
-              </Button>
-            ) : (
-              <Button
-                className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
-                onClick={() => setIsEditing(true)}
-              >
-                Editar
-              </Button>
+              <button type="button" onClick={handleEdit} className="bg-blue-500 text-white px-4 py-2 rounded">Editar</button>
             )}
           </div>
         </form>

@@ -33,6 +33,7 @@ function RegisterPage() {
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
   const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
+  
 
 
   useEffect(() => {

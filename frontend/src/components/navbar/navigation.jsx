@@ -20,6 +20,6 @@ export const privateRoutes = [
   {
     name: "Profile",
     path: "/profile",
-    icon: <LuCircleUserRound className="w-5 h-5" />,
+    icon: <LuCircleUserRound className="w-5 h-5 text-white" />,
   },
 ];
