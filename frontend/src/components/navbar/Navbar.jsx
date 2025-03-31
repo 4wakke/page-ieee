@@ -33,7 +33,7 @@ function Navbar() {
                       to={path}
                       className={twMerge(
                         "text-slate-300 flex items-center px-3 py-1 gap-x-1",
-                        location.pathname === path && "bg-sky-500"
+                        location.pathname === path && "bg-[#0073ae]"
                       )}
                     >
                       {icon}
@@ -43,8 +43,8 @@ function Navbar() {
                 ))}
 
                 <li
-                  className="text-[#c01d0f] flex items-center px-3 py-1 
-                  hover:cursor-pointer font-medium"
+                  className="text-[#2e5ca6] flex items-center px-3 py-1 
+                  hover:cursor-pointer font-bold"
                   onClick={() => {
                     signout();
                   }}

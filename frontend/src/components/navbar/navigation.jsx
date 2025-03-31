@@ -18,7 +18,7 @@ export const publicRoutes = [
 
 export const privateRoutes = [
   {
-    name: "Perfil",
+    name: <span className="font-medium text-[white]">Perfil</span>,
     path: "/profile",
     icon: <LuCircleUserRound className="w-5 h-5 text-[white]" />,
   },
