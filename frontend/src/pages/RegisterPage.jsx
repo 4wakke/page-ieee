@@ -2,15 +2,14 @@
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link, useNavigate } from "react-router-dom"; //?
+import { useAuth} from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
-
 
 function RegisterPage() {
   useEffect(() => {
@@ -27,15 +26,17 @@ function RegisterPage() {
     watch,
     setValue, //* Correción isIeeeMember
   } = useForm();
-  const { signup, errors: signupErrors, successMessage } = useAuth(); //*
+
+  const { signup, errors: signupErrors } = useAuth(); //*
+  const navigate = useNavigate();
+
 
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
-  const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
-  const [userId, setUserId] = useState(null); // Agregar estado para almacenar el userId //*
+  const [userId, setUserId] = useState(null); //?
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -50,6 +51,33 @@ function RegisterPage() {
       }
     }, [isIeeeMember, setValue]);
 
+  const handlePayment = async () => {
+    try {
+      const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: price,
+          dollarRate: 4300,
+          description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
+          userId,
+        }),
+      });
+
+      const processPaymentData = await processPaymentResp.json();
+      console.log("Respuesta de proceso de pago:", processPaymentData);
+
+      if (processPaymentData.success && processPaymentData.results.checkoutURL) {
+        navigate("/");
+        window.location.href = processPaymentData.results.checkoutURL;
+      } else {
+        console.error("Error al obtener la URL de pago", processPaymentData);
+      }
+    } catch (error) {
+      console.error("Error en el proceso de pago:", error);
+    }
+  };
+
     const onSubmit = handleSubmit(async (data) => {
       data.isIeeeMember = data.isIeeeMember === "yes";
       data.isTems = data.isTems === "yes";
@@ -60,7 +88,6 @@ function RegisterPage() {
       
       console.log(data);
       
-  
       const formattedData = {
         occupation: data.occupation,
         isIeeeMember: data.isIeeeMember,  
@@ -89,8 +116,8 @@ function RegisterPage() {
       console.log("Respuesta de signup:", dataSignup);
   
       if (dataSignup.success) {
-      const userId = dataSignup.results[0]?.userId; //* Extraer el userId
-      setUserId(userId); //* Guardar el userId en el estado
+      const userId = dataSignup.results[0]?.userId;
+      setUserId(userId);
       await signup(dataSignup); //*
         // Enviar datos transformados al endpoint /payment
         const response = await fetch(`${backRoute}/api/payment`, {
@@ -108,58 +135,25 @@ function RegisterPage() {
       }
     });
 
-  // Función para procesar el pago cuando el usuario haga clic en "Pagar"
-  const handlePayment = async () => {
-    try {
-      const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: price,
-          dollarRate: 4300,
-          description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
-          userId, //*
-        }),
-      });
-
-      const processPaymentData = await processPaymentResp.json();
-      console.log("Respuesta de proceso de pago:", processPaymentData);
-
-      if (processPaymentData.success && processPaymentData.results.checkoutURL) {
-        setPaymentUrl(processPaymentData.results.checkoutURL);
-          window.location.href = processPaymentData.results.checkoutURL;
-      } else {
-        console.error("Error al obtener la URL de pago", processPaymentData);
-      }
-    } catch (error) {
-      console.error("Error en el proceso de pago:", error);
-    }
-  };
-
-  
-
-
   return (
     <Container className=" flex items-center justify-center min-h-screen">
       <CardReg>
-        
-          
-        {successMessage && (
-          <div className="bg-green-200 text-green-800 p-4 rounded-md shadow-md mb-4">
-            <p>{successMessage}</p>
+
+      {errors && (
+          <div className=" text-red-800 ">
+            <p>{errors[0]}</p>
           </div>
         )}
 
         {signupErrors && signupErrors.map((err, index) => (
-          <div key={index} className="bg-red-200 text-red-800 p-4 rounded-md shadow-md mb-4">
+          <div key={index} className=" text-red-800 ">
             <p>{err}</p>
           </div>
         ))}
             
-            
-
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
+
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide">
 
@@ -456,7 +450,7 @@ function RegisterPage() {
                 </div>
             
                 <div className="mt-4 text-center">
-                  <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                  <button onClick={handlePayment} disabled={!price} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                     Pagar
                   </button>
                 </div>
