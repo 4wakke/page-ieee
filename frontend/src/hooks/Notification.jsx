@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect } from "react";
+import PropTypes from "prop-types"; // Importa PropTypes
 
 const Notification = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -19,6 +21,13 @@ const Notification = ({ message, type, onClose }) => {
       </div>
     )
   );
+};
+
+// Agregar validación de propiedades
+Notification.propTypes = {
+  message: PropTypes.string.isRequired, // La propiedad 'message' debe ser una cadena de texto y es requerida
+  type: PropTypes.oneOf(["success", "error"]).isRequired, // 'type' debe ser 'success' o 'error', y es requerida
+  onClose: PropTypes.func.isRequired, // 'onClose' debe ser una función y es requerida
 };
 
 export default Notification;
