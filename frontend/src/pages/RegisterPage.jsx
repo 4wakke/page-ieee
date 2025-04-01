@@ -2,14 +2,14 @@
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; //?
+import { useAuth} from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
-
 
 function RegisterPage() {
   useEffect(() => {
@@ -27,14 +27,19 @@ function RegisterPage() {
     setValue, //* Correción isIeeeMember
   } = useForm();
 
+  // eslint-disable-next-line no-unused-vars
+  const { signup, errors: signupErrors } = useAuth(); //*
+  const navigate = useNavigate();
+
+
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
-  const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
-  
-
+  const [userId, setUserId] = useState(null); //?
+  const [serverErrors, setServerErrors] = useState([]);
+  const [serverMessage, setServerMessage] = useState(null);
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -49,7 +54,17 @@ function RegisterPage() {
       }
     }, [isIeeeMember, setValue]);
 
-  // Función para procesar el pago cuando el usuario haga clic en "Pagar"
+    // Eliminar los mensajes después de 5 segundos
+  useEffect(() => {
+    if (serverMessage || serverErrors.length > 0) {
+      const timer = setTimeout(() => {
+        setServerMessage(null);
+        setServerErrors([]);
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [serverMessage, serverErrors]);
+
   const handlePayment = async () => {
     try {
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
@@ -59,6 +74,7 @@ function RegisterPage() {
           amount: price,
           dollarRate: 4300,
           description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
+          userId,
         }),
       });
 
@@ -66,8 +82,8 @@ function RegisterPage() {
       console.log("Respuesta de proceso de pago:", processPaymentData);
 
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
-        setPaymentUrl(processPaymentData.results.checkoutURL);
-        window.location.href = processPaymentData.results.checkoutURL; // Redirigir al usuario
+        navigate("/");
+        window.location.href = processPaymentData.results.checkoutURL;
       } else {
         console.error("Error al obtener la URL de pago", processPaymentData);
       }
@@ -76,77 +92,88 @@ function RegisterPage() {
     }
   };
 
-  const onSubmit = handleSubmit(async (data) => {
-    data.isIeeeMember = data.isIeeeMember === "yes";
-    data.isTems = data.isTems === "yes";
-    data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
-    const filteredArticles = data.articles?.filter(
-      (article) => article?.number && article?.pages
-    ) || [];
-    
-    console.log(data);
-    
-
-    const formattedData = {
-      occupation: data.occupation,
-      isIeeeMember: data.isIeeeMember,  
-      isTems: data.isTems,   
-      participationType: data.participationType,
-      attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
-      qtyArticles: data.qtyArticles,
-      articles: filteredArticles.map((article) => ({
-        number: article.number,
-        pages: parseInt(article.pages, 10),
-      })),
-    };
-
-    console.log("Datos enviados a signup:", formattedData);
-
-    const resp = await fetch(`${backRoute}/api/signup`, {
-      method: "POST",
-      body: JSON.stringify({ 
-        ...data,
-        articles: filteredArticles 
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const dataSignup = await resp.json();
-    console.log("Respuesta de signup:", dataSignup);
-
-    if (dataSignup.success) {
-      // Enviar datos transformados al endpoint /payment
-      const response = await fetch(`${backRoute}/api/payment`, {
+    const onSubmit = handleSubmit(async (data) => {
+      data.isIeeeMember = data.isIeeeMember === "yes";
+      data.isTems = data.isTems === "yes";
+      data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
+      const filteredArticles = data.articles?.filter(
+        (article) => article?.number && article?.pages
+      ) || [];
+      
+      console.log(data);
+      
+      const formattedData = {
+        occupation: data.occupation,
+        isIeeeMember: data.isIeeeMember,  
+        isTems: data.isTems,   
+        participationType: data.participationType,
+        attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
+        qtyArticles: data.qtyArticles,
+        articles: filteredArticles.map((article) => ({
+          number: article.number,
+          pages: parseInt(article.pages, 10),
+        })),
+      };
+  
+      console.log("Datos enviados a signup:", formattedData);
+  
+      const resp = await fetch(`${backRoute}/api/signup`, {
         method: "POST",
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify({ 
+          ...data,
+          articles: filteredArticles 
+        }),
         headers: { "Content-Type": "application/json" },
       });
-
-      const responseData = await response.json();
-      console.log("Respuesta de payment:", responseData);
-
-      if (responseData.success && responseData.results?.price !== undefined) {
-        setPrice(responseData.results.price); // Se guarda el precio en el estado
-      }
-    }
-  });
-
+  
+      const dataSignup = await resp.json();
+      console.log("Respuesta de signup:", dataSignup);
+  
+      if (dataSignup.success) {
+      setServerMessage(dataSignup.message);
+      const userId = dataSignup.results[0]?.userId;
+      setUserId(userId);
+      await signup(dataSignup); //*
+        // Enviar datos transformados al endpoint /payment
+        const response = await fetch(`${backRoute}/api/payment`, {
+          method: "POST",
+          body: JSON.stringify(formattedData), 
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        const responseData = await response.json();
+        console.log("Respuesta de payment:", responseData);
+  
+        if (responseData.success && responseData.results?.price !== undefined) {
+          setPrice(responseData.results.price); // Se guarda el precio en el estado
+        }
+      } else {    
+        // Si la respuesta tiene error, guarda los mensajes de error
+    setServerErrors([dataSignup.message]);
+}
+    });
 
   return (
     <Container className=" flex items-center justify-center min-h-screen">
       <CardReg>
-        
-          {/* 
-          {signupErrors &&
-          signupErrors.map((err) => (
-            // eslint-disable-next-line react/jsx-key
-            <p className="text-red-500 font-bold"> {err}</p>
-          ))} 
-            */}
-            
 
+        {/* Mensajes de error o éxito */}
+        {serverErrors.length > 0 && (
+          <div className="text-red-500 font-medium">
+            {serverErrors.map((err, index) => (
+              <p key={index} className="font-bold text-center">{err}</p>
+            ))}
+          </div>
+        )}
+        {serverMessage && (
+          <div className="text-green-500 p-3 bg-green-100 rounded-md shadow-md mb-4">
+            <p className="font-bold text-center">{serverMessage}</p>
+          </div>
+        )}
+            
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
+
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide">
 
@@ -435,13 +462,15 @@ function RegisterPage() {
           <div>
             {price && (
               <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
-                <h4 className="text-xl font-bold">¡Registro exitoso!</h4>
-                <p className="mt-2">
-                  El precio a pagar es: <span className="font-bold">${price}</span>
-                </p>
+                <div className="text-center">
+                  <h4 className="text-xl font-bold">Registro exitoso</h4>
+                  <p className="mt-2">
+                    El precio a pagar es: <span className="font-bold">${price}</span>
+                  </p>
+                </div>
             
                 <div className="mt-4 text-center">
-                  <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                  <button onClick={handlePayment} disabled={!price} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                     Pagar
                   </button>
                 </div>

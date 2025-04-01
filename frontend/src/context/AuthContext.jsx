@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import Cookie from "js-cookie";
 import axios from "../api/axios";
+const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
@@ -27,10 +28,9 @@ export function AuthProvider({ children }) {
 
   const signup = async (data) => {
     try {
-      const response = await axios.post("/signup", data);
-      setUser(response.data);
-      setIsAuth(true);
-      return response.data;
+      setUser(data);
+      // setIsAuth(true); //!
+      return data;
     } catch (error) {
       console.log(error);
       if (Array.isArray(error.response.data)) {
@@ -42,24 +42,32 @@ export function AuthProvider({ children }) {
 
   const signin = async (data) => {
     try {
-      const response = await axios.post("/signin", data);
+      const response = await axios.post(`${backRoute}/api/signin`, data);
+
+      if(response.data.success){
+        setErrors({ message: response.data.message, success: true }); //?
+      }else {
+        // Si la respuesta es un error, lo gestionamos
+        setErrors({ message: response.data.message, success: false }); //?
+      }
+
       setUser(response.data);
       setIsAuth(true);
       // clearErrors(); //! LIMPIAR ERRORES
-
       return response.data;
     } catch (error) {
+          // Si ocurre un error con Axios, lo capturamos y mostramos el mensaje del backend //?
       console.log(error);
-      if (Array.isArray(error.response.data)) {
-        return setErrors(error.response.data);
+      if (error.response) {
+        setErrors({ message: error.response.data.message || 'Error desconocido', success: false });
+      } else {
+        setErrors({ message: 'Error en la solicitud', success: false });
       }
-
-      setErrors([error.response.data.message]);
     }
   };
 
   const signout = async () => {
-    await axios.post("/signout");
+    await axios.post(`${backRoute}/api/signout`);
     setUser(null);
     setIsAuth(false);
   };
@@ -68,7 +76,7 @@ export function AuthProvider({ children }) {
     setLoading(true); //! LOADING
     if (Cookie.get("token")) {
       axios
-        .get("/profile")
+        .get(`${backRoute}/profile`)
         .then((res) => {
           setUser(res.data);
           setIsAuth(true);

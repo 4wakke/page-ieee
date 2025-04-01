@@ -34,10 +34,17 @@ function LoginPage() {
   return (
     <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center ">
       <Card>
-        {loginErrors &&
-          loginErrors.map((err, index) => (
-            <p key={index} className="text-red-500 font-bold">{err}</p>
-          ))}
+        
+        {/* Mostrar el mensaje de éxito o error */}
+        {loginErrors && loginErrors.message && (
+          <p
+            className={`${
+              loginErrors.success ? "text-green-500" : "text-red-500"
+            } font-bold text-center my-4`}
+          >
+            {loginErrors.message}
+          </p>
+        )}
 
         <h1 className="text-4xl font-bold my-2 text-center mb-4 tracking-wide">Inicio sesión</h1>
 

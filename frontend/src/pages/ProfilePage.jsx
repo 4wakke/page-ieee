@@ -36,11 +36,30 @@ function ProfilePage() {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}`);
         const data = await response.json();
         console.log("Datos recibidos del backend:", data.results)
+
         if (data.success) {
-          setUserDetails(data.results);
-          for (const key in data.results) {
-            if (data.results[key]) {
-              setValue(key, data.results[key]);
+          const userData = data.results;
+
+          // Convertir valores 0 y 1 a 'No' y 'Sí'
+        if (userData.isIeeeMember !== undefined) {
+          userData.isIeeeMember = userData.isIeeeMember === 1 ? "yes" : "no";
+        }
+        if (userData.isTems !== undefined) {
+          userData.isTems = userData.isTems === 1 ? "yes" : "no";
+        }
+        
+
+        // Verificar si el pago por impuesto es mayor a 0
+        if (userData.taxAmount > 0) {
+          userData.isTaxRequired = "yes";  // Establecer "sí" si el pago por impuesto es mayor a 0
+        } else {
+            userData.isTaxRequired = "no";
+        }
+        setUserDetails(userData);
+
+          for (const key in userData) {
+            if (userData[key]) {
+              setValue(key, userData[key]);
             }
           }
         }
@@ -56,14 +75,26 @@ function ProfilePage() {
     setIsEditing(true);
   };
 
+  console.log
+
   const handleSave = async (data) => {
+
+    console.log("Datos que se van a enviar:", data);
+
+    if (!userDetails || !userDetails.id) {
+      console.error("ID de usuario no disponible");
+      return;
+    } //?
+
     try {
-      const response = await fetch(`${backRoute}/api/detail`, {
+      const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
       const result = await response.json();
+      
+      console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
       if (result.success) {
         setIsEditing(false);
         alert("Datos guardados exitosamente");
@@ -342,21 +373,23 @@ function ProfilePage() {
                 )} */}
             </div>
 
+{/* 
             <div> 
             <Label htmlFor="pages">Número de páginas articulo 1</Label>
               <Input type="number" placeholder="Editar número de páginas artículo 1"
               {...register("pages", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
-            </div>
-            
+            </div> */}
+{/*             
             <div> 
             <Label htmlFor="number">Editar número articulo 1</Label>
               <Input type="text" placeholder="Editar número artículo 1"
               {...register("number", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
             </div>
-            
+             */}
             <div> {/* numero pagina articulo */}
               
             </div>
+            
             
 
 
