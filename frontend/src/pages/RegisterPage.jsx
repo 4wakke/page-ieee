@@ -219,28 +219,26 @@ function RegisterPage() {
             </div>
 
             <div>
-      <Label htmlFor="password">Contraseña</Label>
-      <div className="relative">
-        <Input
-          id="password"
-          type={showPassword ? "text" : "password"}
-          placeholder="Ingresa tu contraseña"
-          {...register("password", { required: true })}
-        />
-        {errors.password && (
-        <p className="text-red-500 font-medium">La contraseña es requerida</p>
-      )}
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute inset-y-0 right-3 flex items-center text-gray-600"
-        >
-          {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-        </button>
-        
-      </div>
-      
-    </div>
+              <Label htmlFor="password">Contraseña</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Ingresa tu contraseña"
+                    {...register("password", { required: true })}
+                    />
+                    {errors.password && (
+                    <p className="text-red-500 font-medium">La contraseña es requerida</p>
+                      )}      
+                    <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-600"
+                    >
+                    {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                    </button>
+                </div>
+            </div>
 
             <div>
               <Label htmlFor="docNumber">
