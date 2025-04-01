@@ -2,7 +2,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
@@ -27,8 +27,7 @@ function RegisterPage() {
     watch,
     setValue, //* Correción isIeeeMember
   } = useForm();
-  const { signup, errors: signupErrors } = useAuth();
-  const navigate = useNavigate();
+  const { signup, errors: signupErrors, successMessage } = useAuth(); //*
 
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
@@ -36,8 +35,7 @@ function RegisterPage() {
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
   const [, setPaymentUrl] = useState(""); // Estado para la URL de pago
   const [showPassword, setShowPassword] = useState(false);
-  
-
+  const [userId, setUserId] = useState(null); // Agregar estado para almacenar el userId //*
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -52,6 +50,64 @@ function RegisterPage() {
       }
     }, [isIeeeMember, setValue]);
 
+    const onSubmit = handleSubmit(async (data) => {
+      data.isIeeeMember = data.isIeeeMember === "yes";
+      data.isTems = data.isTems === "yes";
+      data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
+      const filteredArticles = data.articles?.filter(
+        (article) => article?.number && article?.pages
+      ) || [];
+      
+      console.log(data);
+      
+  
+      const formattedData = {
+        occupation: data.occupation,
+        isIeeeMember: data.isIeeeMember,  
+        isTems: data.isTems,   
+        participationType: data.participationType,
+        attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
+        qtyArticles: data.qtyArticles,
+        articles: filteredArticles.map((article) => ({
+          number: article.number,
+          pages: parseInt(article.pages, 10),
+        })),
+      };
+  
+      console.log("Datos enviados a signup:", formattedData);
+  
+      const resp = await fetch(`${backRoute}/api/signup`, {
+        method: "POST",
+        body: JSON.stringify({ 
+          ...data,
+          articles: filteredArticles 
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      const dataSignup = await resp.json();
+      console.log("Respuesta de signup:", dataSignup);
+  
+      if (dataSignup.success) {
+      const userId = dataSignup.results[0]?.userId; //* Extraer el userId
+      setUserId(userId); //* Guardar el userId en el estado
+      await signup(dataSignup); //*
+        // Enviar datos transformados al endpoint /payment
+        const response = await fetch(`${backRoute}/api/payment`, {
+          method: "POST",
+          body: JSON.stringify(formattedData), 
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        const responseData = await response.json();
+        console.log("Respuesta de payment:", responseData);
+  
+        if (responseData.success && responseData.results?.price !== undefined) {
+          setPrice(responseData.results.price); // Se guarda el precio en el estado
+        }
+      }
+    });
+
   // Función para procesar el pago cuando el usuario haga clic en "Pagar"
   const handlePayment = async () => {
     try {
@@ -62,6 +118,7 @@ function RegisterPage() {
           amount: price,
           dollarRate: 4300,
           description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
+          userId, //*
         }),
       });
 
@@ -70,10 +127,7 @@ function RegisterPage() {
 
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
         setPaymentUrl(processPaymentData.results.checkoutURL);
-        navigate("/");
-        setTimeout(() => {
           window.location.href = processPaymentData.results.checkoutURL;
-        }, 1000);// Redirigir al usuario
       } else {
         console.error("Error al obtener la URL de pago", processPaymentData);
       }
@@ -82,63 +136,7 @@ function RegisterPage() {
     }
   };
 
-  const onSubmit = handleSubmit(async (data) => {
-    data.isIeeeMember = data.isIeeeMember === "yes";
-    data.isTems = data.isTems === "yes";
-    data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
-    const filteredArticles = data.articles?.filter(
-      (article) => article?.number && article?.pages
-    ) || [];
-    
-    console.log(data);
-    
-
-    const formattedData = {
-      occupation: data.occupation,
-      isIeeeMember: data.isIeeeMember,  
-      isTems: data.isTems,   
-      participationType: data.participationType,
-      attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
-      qtyArticles: data.qtyArticles,
-      articles: filteredArticles.map((article) => ({
-        number: article.number,
-        pages: parseInt(article.pages, 10),
-      })),
-    };
-
-    console.log("Datos enviados a signup:", formattedData);
-
-    const resp = await fetch(`${backRoute}/api/signup`, {
-      method: "POST",
-      body: JSON.stringify({ 
-        ...data,
-        articles: filteredArticles 
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const dataSignup = await resp.json();
-    console.log("Respuesta de signup:", dataSignup);
-
-    // eslint-disable-next-line no-unused-vars
-    const dataAuth = await signup(dataSignup);
-
-    if (dataSignup.success) {
-      // Enviar datos transformados al endpoint /payment
-      const response = await fetch(`${backRoute}/api/payment`, {
-        method: "POST",
-        body: JSON.stringify(formattedData),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      const responseData = await response.json();
-      console.log("Respuesta de payment:", responseData);
-
-      if (responseData.success && responseData.results?.price !== undefined) {
-        setPrice(responseData.results.price); // Se guarda el precio en el estado
-      }
-    }
-  });
+  
 
 
   return (
@@ -146,11 +144,17 @@ function RegisterPage() {
       <CardReg>
         
           
-          {signupErrors &&
-          signupErrors.map((err) => (
-            // eslint-disable-next-line react/jsx-key
-            <p className="text-red-500 font-bold"> {err}</p>
-          ))} 
+        {successMessage && (
+          <div className="bg-green-200 text-green-800 p-4 rounded-md shadow-md mb-4">
+            <p>{successMessage}</p>
+          </div>
+        )}
+
+        {signupErrors && signupErrors.map((err, index) => (
+          <div key={index} className="bg-red-200 text-red-800 p-4 rounded-md shadow-md mb-4">
+            <p>{err}</p>
+          </div>
+        ))}
             
             
 
