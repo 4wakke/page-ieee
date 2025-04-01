@@ -2,7 +2,8 @@
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 import CountriesSelect from "../hooks/CountrySelect";
@@ -26,6 +27,8 @@ function RegisterPage() {
     watch,
     setValue, //* Correción isIeeeMember
   } = useForm();
+  const { signup, errors: signupErrors } = useAuth();
+  const navigate = useNavigate();
 
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
@@ -67,7 +70,10 @@ function RegisterPage() {
 
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
         setPaymentUrl(processPaymentData.results.checkoutURL);
-        window.location.href = processPaymentData.results.checkoutURL; // Redirigir al usuario
+        navigate("/");
+        setTimeout(() => {
+          window.location.href = processPaymentData.results.checkoutURL;
+        }, 1000);// Redirigir al usuario
       } else {
         console.error("Error al obtener la URL de pago", processPaymentData);
       }
@@ -114,6 +120,9 @@ function RegisterPage() {
     const dataSignup = await resp.json();
     console.log("Respuesta de signup:", dataSignup);
 
+    // eslint-disable-next-line no-unused-vars
+    const dataAuth = await signup(dataSignup);
+
     if (dataSignup.success) {
       // Enviar datos transformados al endpoint /payment
       const response = await fetch(`${backRoute}/api/payment`, {
@@ -136,13 +145,13 @@ function RegisterPage() {
     <Container className=" flex items-center justify-center min-h-screen">
       <CardReg>
         
-          {/* 
+          
           {signupErrors &&
           signupErrors.map((err) => (
             // eslint-disable-next-line react/jsx-key
             <p className="text-red-500 font-bold"> {err}</p>
           ))} 
-            */}
+            
             
 
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
@@ -435,10 +444,12 @@ function RegisterPage() {
           <div>
             {price && (
               <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
-                <h4 className="text-xl font-bold">¡Registro exitoso!</h4>
-                <p className="mt-2">
-                  El precio a pagar es: <span className="font-bold">${price}</span>
-                </p>
+                <div className="text-center">
+                  <h4 className="text-xl font-bold">Registro exitoso</h4>
+                  <p className="mt-2">
+                    El precio a pagar es: <span className="font-bold">${price}</span>
+                  </p>
+                </div>
             
                 <div className="mt-4 text-center">
                   <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">

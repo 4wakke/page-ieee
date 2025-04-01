@@ -1,6 +1,8 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import Cookie from "js-cookie";
 import axios from "../api/axios";
+const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
+
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
@@ -27,10 +29,9 @@ export function AuthProvider({ children }) {
 
   const signup = async (data) => {
     try {
-      const response = await axios.post("/signup", data);
-      setUser(response.data);
-      setIsAuth(true);
-      return response.data;
+      setUser(data);
+      // setIsAuth(true); //!
+      return data;
     } catch (error) {
       console.log(error);
       if (Array.isArray(error.response.data)) {
@@ -42,7 +43,7 @@ export function AuthProvider({ children }) {
 
   const signin = async (data) => {
     try {
-      const response = await axios.post("/signin", data);
+      const response = await axios.post(`${backRoute}/api/signin`, data);
       setUser(response.data);
       setIsAuth(true);
       // clearErrors(); //! LIMPIAR ERRORES
@@ -59,7 +60,7 @@ export function AuthProvider({ children }) {
   };
 
   const signout = async () => {
-    await axios.post("/signout");
+    await axios.post(`${backRoute}/api/signout`);
     setUser(null);
     setIsAuth(false);
   };
@@ -68,7 +69,7 @@ export function AuthProvider({ children }) {
     setLoading(true); //! LOADING
     if (Cookie.get("token")) {
       axios
-        .get("/profile")
+        .get(`${backRoute}/profile`)
         .then((res) => {
           setUser(res.data);
           setIsAuth(true);
