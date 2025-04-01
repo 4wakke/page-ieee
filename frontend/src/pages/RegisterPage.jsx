@@ -139,12 +139,6 @@ function RegisterPage() {
     <Container className=" flex items-center justify-center min-h-screen">
       <CardReg>
 
-      {errors && (
-          <div className=" text-red-800 ">
-            <p>{errors[0]}</p>
-          </div>
-        )}
-
         {signupErrors && signupErrors.map((err, index) => (
           <div key={index} className=" text-red-800 ">
             <p>{err}</p>
