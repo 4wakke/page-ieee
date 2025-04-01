@@ -27,6 +27,7 @@ function RegisterPage() {
     setValue, //* Correción isIeeeMember
   } = useForm();
 
+  // eslint-disable-next-line no-unused-vars
   const { signup, errors: signupErrors } = useAuth(); //*
   const navigate = useNavigate();
 
@@ -37,6 +38,8 @@ function RegisterPage() {
   const [price, setPrice] = useState(""); // Estado para almacenar el precio
   const [showPassword, setShowPassword] = useState(false);
   const [userId, setUserId] = useState(null); //?
+  const [serverErrors, setServerErrors] = useState([]);
+  const [serverMessage, setServerMessage] = useState(null);
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -50,6 +53,17 @@ function RegisterPage() {
         setValue("membershipNumber", ""); // Limpia el campo de membresía
       }
     }, [isIeeeMember, setValue]);
+
+    // Eliminar los mensajes después de 5 segundos
+  useEffect(() => {
+    if (serverMessage || serverErrors.length > 0) {
+      const timer = setTimeout(() => {
+        setServerMessage(null);
+        setServerErrors([]);
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [serverMessage, serverErrors]);
 
   const handlePayment = async () => {
     try {
@@ -116,6 +130,7 @@ function RegisterPage() {
       console.log("Respuesta de signup:", dataSignup);
   
       if (dataSignup.success) {
+      setServerMessage(dataSignup.message);
       const userId = dataSignup.results[0]?.userId;
       setUserId(userId);
       await signup(dataSignup); //*
@@ -132,18 +147,29 @@ function RegisterPage() {
         if (responseData.success && responseData.results?.price !== undefined) {
           setPrice(responseData.results.price); // Se guarda el precio en el estado
         }
-      }
+      } else {    
+        // Si la respuesta tiene error, guarda los mensajes de error
+    setServerErrors([dataSignup.message]);
+}
     });
 
   return (
     <Container className=" flex items-center justify-center min-h-screen">
       <CardReg>
 
-        {signupErrors && signupErrors.map((err, index) => (
-          <div key={index} className=" text-red-800 ">
-            <p>{err}</p>
+        {/* Mensajes de error o éxito */}
+        {serverErrors.length > 0 && (
+          <div className="text-red-500 font-medium">
+            {serverErrors.map((err, index) => (
+              <p key={index} className="font-bold text-center">{err}</p>
+            ))}
           </div>
-        ))}
+        )}
+        {serverMessage && (
+          <div className="text-green-500 p-3 bg-green-100 rounded-md shadow-md mb-4">
+            <p className="font-bold text-center">{serverMessage}</p>
+          </div>
+        )}
             
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
