@@ -184,7 +184,7 @@ export const getUser = async (req, res) => {
               )
             ) AS articles
       FROM users u
-      INNER JOIN articles a ON a.user_id = u.id
+      LEFT JOIN articles a ON a.user_id = u.id
       WHERE u.id = ? OR email = ?
       GROUP BY u.id;
     `;
