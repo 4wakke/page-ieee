@@ -9,7 +9,8 @@ import {
   checkPaymentStatus,
   getAllUsers,
   getUser,
-  updateUser
+  updateUser,
+  forgotPassword
 } from "../controllers/auth.controller.js";
 import { isAuth } from "../middlewares/auth.middleware.js";
 import { validateSchema } from "../middlewares/validate.middleware.js";
@@ -36,5 +37,7 @@ router.get('/users', getAllUsers);
 router.get('/userDetail', getUser);
 
 router.put('/users/:id', updateUser);
+
+router.post('/forgotPassword', forgotPassword);
 
 export default router;
