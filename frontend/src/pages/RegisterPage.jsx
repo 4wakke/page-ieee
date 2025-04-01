@@ -157,19 +157,7 @@ function RegisterPage() {
     <Container className=" flex items-center justify-center min-h-screen">
       <CardReg>
 
-        {/* Mensajes de error o éxito */}
-        {serverErrors.length > 0 && (
-          <div className="text-red-500 font-medium">
-            {serverErrors.map((err, index) => (
-              <p key={index} className="font-bold text-center">{err}</p>
-            ))}
-          </div>
-        )}
-        {serverMessage && (
-          <div className="text-green-500 p-3 bg-green-100 rounded-md shadow-md mb-4">
-            <p className="font-bold text-center">{serverMessage}</p>
-          </div>
-        )}
+        
             
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
@@ -444,8 +432,24 @@ function RegisterPage() {
                         
           </div> {/* FIN GRID 2 */}
 
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center mb-6">
             <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Registrarse</button>
+          </div>
+
+          <div>
+            {/* Mensajes de error o éxito */}
+            {serverErrors.length > 0 && (
+              <div className="text-red-500 font-medium bg-red-100 rounded-md shadow-md mb-4 mx-60 p-3">
+                {serverErrors.map((err, index) => (
+                  <p key={index} className="font-bold text-center">{err}</p>
+                ))}
+              </div>
+            )}
+            {serverMessage && (
+              <div className="text-green-500 font-medium p-3 bg-green-100 rounded-md shadow-md mb-4 mx-60">
+                <p className="font-bold text-center">{serverMessage}</p>
+              </div>
+            )}
           </div>
 
           <div className="mt-4 text-center">
