@@ -135,14 +135,7 @@ export const signupSchema = z.object({
       invalid_type_error: 'El valor del impuesto debe ser un número'
     })
     .min(0)
-    .max(100),
-  qtyArticles: z
-    .string({
-      required_error: 'El número de artículo es requerido',
-      invalid_type_error: 'El número de artículo debe ser un número'
-    })
-    .min(1)
-    .max(50)
+    .max(100)
 });
 
 export const signinSchema = z.object({

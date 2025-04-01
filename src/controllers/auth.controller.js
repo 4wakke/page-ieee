@@ -1,12 +1,26 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db.js";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
 import { createAccessToken } from "../libs/jwt.js";
+import fetch from 'node-fetch';
 import {isValidEmail,isValidPassword,isValidDocType,
   isValidPhoneNumber,isValidBirthDate,isValidName,
   isValidMembershipNumber,isValidGender,isValidTaxAmount,
   successResponse,errorResponse} from "./helpers.js"
-import fetch from 'node-fetch';
+import {forgotPasswordTemplate} from "./templates.js"
+import { access } from "fs";
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+let cobruToken = ''
 export const signin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -64,14 +78,12 @@ export const signup = async (req, res, next) => {
 
   try {
   
-    if (!isValidEmail(email))  return errorResponse(res,"Correo inválido",400);
-    if (!isValidPassword(password)) return errorResponse(res,"Contraseña inválida",400);
-    //if (!isValidDocType(docType)) return errorResponse(res,"Tipo de documento inválido'",400);
+    if (!isValidEmail(email))  return errorResponse(res,"Correo electrónico inválido.",400);
+    if (!isValidPassword(password)) return errorResponse(res,"La contraseña debe contener un mínimo de 8 caracteres, una mayúscula, una minúscula y un número.",400);
     if (!isValidPhoneNumber(phoneNumber)) return errorResponse(res,"Número de teléfono inválido",400);
     if (!isValidBirthDate(birthDate)) return errorResponse(res,"Fecha de nacimiento inválida",400)
     if (!isValidName(name) || !isValidName(lastName)) return errorResponse(res,"Nombre o Apellido inválido",400)
     if (!isValidGender(gender)) return errorResponse(res,"Género inválido",400);
-    if (membershipNumber && !isValidMembershipNumber(membershipNumber)) return errorResponse(res,"Número de membresía inválido",400);
     if (!isValidTaxAmount(taxAmount)) return errorResponse(res,"Impuesto inválido",400)
 
     // Hashear contraseña
@@ -133,7 +145,7 @@ export const signup = async (req, res, next) => {
     return errorResponse(res,"Error al registrar el usuario",400,error.message)
   
   }
-};//* HECHO
+};
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -159,21 +171,35 @@ export const getUser = async (req, res) => {
   const email = req.query.email
   try {
     const query = `
-      SELECT id, name, last_name, country, city, address, gender, birth_date, 
-             doc_type, doc_number, affiliation, email, phone_number, occupation, 
-             is_ieee_member, is_tems, membership_number, participation_type, 
-             attendance_type, tax_amount, qty_articles, created_at 
-      FROM users 
-      WHERE id = ? OR email = ?;
+      SELECT u.id, name, last_name AS lastName, country, city, address, gender,
+             CAST(birth_date AS DATE) AS birthDate, doc_type AS docType, doc_number AS docNumber, 
+             affiliation, email, phone_number AS phoneNumber, occupation, 
+             is_ieee_member AS isIeeeMember, is_tems isTems, membership_number AS membershipNumber,
+              participation_type AS participationType, attendance_type AS attendanceType, 
+              tax_amount AS taxAmount, qty_articles AS qtyArticles ,
+             json_arrayagg(
+              json_object(
+                  'number',a.sequence,
+                  'pages',a.pages
+              )
+            ) AS articles
+      FROM users u
+      INNER JOIN articles a ON a.user_id = u.id
+      WHERE u.id = ? OR email = ?
+      GROUP BY u.id;
     `;
 
     const [users] = await pool.query(query, [id, email]);
-
     if (users.length === 0) {
       return errorResponse(res, 'Usuario no encontrado', 404);
     }
+    
+    const formattedUsers = users.map(user => ({
+      ...user,
+      birthDate: user.birthDate ? user.birthDate.toISOString().split('T')[0] : null
+    }));
 
-    return successResponse(res, 'Usuario obtenido correctamente', users[0]);
+    return successResponse(res, 'Usuario obtenido correctamente', formattedUsers[0]);
   } catch (error) {
     console.error('Error al obtener el usuario:', error);
     return errorResponse(res, 'Error al obtener el usuario', 500, error.message);
@@ -190,20 +216,21 @@ export const updateUser = async (req, res) => {
     city,
     address,
     gender,
-    birth_date,
+    birthDate,
     docType,
-    doc_number,
+    docNumber,
     affiliation,
     email,
-    phone_number,
+    phoneNumber,
     occupation,
-    is_ieee_member,
+    isIeeeMember,
     isTems,
-    membership_number,
-    participation_type,
-    attendance_type,
-    tax_amount,
-    qty_articles
+    membershipNumber,
+    participationType,
+    attendanceType,
+    taxAmount,
+    qtyArticles,
+    articles
   } = req.body;
 
   try {
@@ -237,26 +264,31 @@ export const updateUser = async (req, res) => {
       city || existingUser[0].city,
       address || existingUser[0].address,
       gender || existingUser[0].gender,
-      birth_date || existingUser[0].birth_date,
+      birthDate || existingUser[0].birth_date,
       docType || existingUser[0].doc_type,
-      doc_number || existingUser[0].doc_number,
+      docNumber || existingUser[0].doc_number,
       affiliation || existingUser[0].affiliation,
       email || existingUser[0].email,
-      phone_number || existingUser[0].phone_number,
+      phoneNumber || existingUser[0].phone_number,
       occupation || existingUser[0].occupation,
-      is_ieee_member ?? existingUser[0].is_ieee_member,
+      isIeeeMember ?? existingUser[0].is_ieee_member,
       isTems ?? existingUser[0].is_tems,
-      membership_number || existingUser[0].membership_number,
-      participation_type || existingUser[0].participation_type,
-      attendance_type || existingUser[0].attendance_type,
-      tax_amount || existingUser[0].tax_amount,
-      qty_articles || existingUser[0].qty_articles,
+      membershipNumber || existingUser[0].membership_number,
+      participationType || existingUser[0].participation_type,
+      attendanceType || existingUser[0].attendance_type,
+      taxAmount || existingUser[0].tax_amount,
+      qtyArticles || existingUser[0].qty_articles,
       id
     ];
 
     await pool.query(query, values);
 
+    if (!articles){
+      
+    }
+
     return successResponse(res, 'Usuario actualizado correctamente');
+    
   } catch (error) {
     console.error('Error al actualizar el usuario:', error);
     return errorResponse(res, 'Error al actualizar el usuario', 500, error.message);
@@ -266,11 +298,11 @@ export const updateUser = async (req, res) => {
 export const profile = async (req, res) => {
   const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.userId]);
   return res.json(result.rows[0]);
-}; //* HECHO
+};
 export const signout = (req, res) => {
   res.clearCookie('token');
   res.sendStatus(200);
-}; //* HECHO
+};
 
 export const payment = (req,res) =>{
   const data = req.body
@@ -314,64 +346,89 @@ export const payment = (req,res) =>{
     }
   });
 
-  return successResponse(res,"Precio calculado exitosamente",{"price":price})
-}
+  if (data.taxAmount && data.taxAmount > 0) {
+      price +=price*taxAmount/100
+  }
 
+  return successResponse(res,"Precio calculado exitosamente",{"price":price})
+};
+
+const getRefreshToken = async (res) => {
+
+  const responseToken = await fetch(`https://${process.env.cobru_url}/token/refresh/`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "x-api-key": "process.env.x_api_key",
+    },
+    body: JSON.stringify({ refresh: process.env.refresh_token }),
+  });
+
+  if (!responseToken.ok) {
+    return errorResponse(res,"Error al obtener el token de acceso",400,responseToken.statusText)
+  }
+
+  const { access } = await responseToken.json();
+  cobruToken = access
+}
 
 export const processPayment = async (req, res) => {
   try {
-    // Obtener el access token
-    const requiredFields = ["amount","dollarRate","description"]
+  
+    const requiredFields = ["amount","dollarRate","description","userId"]
     const missingFields = requiredFields.filter(field => !(field in req.body));
+    const data = req.body
     if (missingFields.length > 0) {
       return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
     } 
-    const responseToken = await fetch(`https://${process.env.cobru_url}/token/refresh/`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "x-api-key": "process.env.x_api_key",
-      },
-      body: JSON.stringify({ refresh: process.env.refresh_token }),
-    });
-
-    if (!responseToken.ok) {
-      return errorResponse(res,"Error al obtener el token de acceso",400,responseToken.statusText)
-    }
-
-    const { access } = await responseToken.json();
+      if (cobruToken || isTokenExpired(cobruToken) ){
+        await getRefreshToken(res)
+      }
+      const copAmount = Math.ceil(data.amount * data.dollarRate)
       const newCobru = {
-      amount: Math.ceil(req.body.amount * req.body.dollarRate),
-      description: req.body.description || "Pago por servicio",
-      expiration_days: 7,
-      payment_method_enabled: JSON.stringify({
-        credit_card: true,
-        pse: true,
-      }),
-      platform: "API",
+        amount: copAmount ,
+        description: data.description || "Pago por servicio",
+        expiration_days: 7,
+        payment_method_enabled: JSON.stringify({
+          credit_card: true,  
+          pse: true,
+        }),
+        platform: "API",
     };
 
     const responseCobro = await fetch(`https://${process.env.cobru_url}/cobru/`, {
       method: "POST",
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${access}`,
+        Authorization: `Bearer ${cobruToken}`,
         "Content-Type": "application/json",
         "x-api-key": "process.env.x_api_key",
       },
       body: JSON.stringify(newCobru),
     });
 
-
     if (!responseCobro.ok) {
       return errorResponse(res,"Error al crear el cobro", 500,responseCobro.statusText)
     }
 
     const cobroResponse = await responseCobro.json();
+    
+    const sql = `
+      INSERT INTO payments (user_id, usd, cop, status, url) 
+      VALUES (?, ?, ?,?,?)
+    `;
 
+    const values = [
+        data.userId,
+        data.amount,
+        copAmount,
+        'Creado',
+        cobroResponse.url
+      ];
+    const [result] = await pool.query(sql, values);
     return successResponse(res,"Cobro creado exitosamente",
-      {accesToken:access,cobro: cobroResponse,checkoutURL: `https://${process.env.cobru_url}/${cobroResponse.url}`},200)
+      {cobro: cobroResponse,checkoutURL: `https://${process.env.cobru_url}/${cobroResponse.url}`},200)
     
   } catch (error) {
     console.error("Error en el proceso de pago:", error);
@@ -380,73 +437,123 @@ export const processPayment = async (req, res) => {
   }
 };
 
-export const checkPaymentStatus = async (req, res) => {
-  const { paymentUrl, accessToken, userId, dollarRate } = req.query;
-
+export const checkPaymentStatus = async () => {
   try {
-    if (!paymentUrl) {
-      return errorResponse(res,"Falta la URL del cobro",400)
+    // Consultar todos los pagos activos
+    const [payments] = await pool.query("SELECT * FROM payments WHERE status IN ('Creado','En proceso')");
+
+    if (payments.length === 0) {
+      console.log("No hay pagos pendientes de revisión.");
+      return;
     }
 
-    const response = await fetch(`https://${process.env.cobru_url}/cobru_detail/${paymentUrl}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`, // Usa variable de entorno para el token
-        "Content-Type": "application/json",
-        "x-api-key": process.env.x_api_key,
-      },
-    });
-    if (!response.ok) {
-      return errorResponse(res,"Error al consultar el estado del cobro",400,response.statusText)
+    if (isTokenExpired(cobruToken)) {
+      await getRefreshToken();
     }
+    const results = await Promise.all(
+      payments.map(async (payment) => {
+        if (!payment.url) {
+          console.error(`Falta la URL para el pago con ID ${payment.id}`);
+          return null;
+        }
 
-    const paymentStatus = await response.json();
+        try {
+          const response = await fetch(`https://${process.env.cobru_url}/cobru_detail/${payment.url}`, {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${cobruToken}`,
+              "Content-Type": "application/json",
+              "x-api-key": process.env.x_api_key,
+            },
+          });
 
-    paymentStatus.amountUSD = Math.floor(paymentStatus.amount / dollarRate);
-    const statusMap = {
-      0: 'Creado',
-      1: 'En proceso',
-      2: 'No pagado',
-      3: 'Pagado',
-      4: 'Reembolsado',
-      5: 'Expirado'
-    };
-  
-    paymentStatus.status = statusMap[paymentStatus.state] || 'Estado desconocido'; 
-    
-    const sql = `
-        INSERT INTO payments (user_id, usd, cop, status, url) 
-        VALUES (?, ?, ?,?,?)
-      `;
+          if (!response.ok) {
+            console.error(`Error al consultar estado del pago ${payment.id}: ${response.statusText}`);
+            return null;
+          }
 
-    const values = [
-        userId,
-        Math.floor(paymentStatus.amountUSD / dollarRate),
-        paymentStatus.amountUSD,
-        paymentStatus.status,
-        paymentUrl
-      ];
+          const paymentStatus = await response.json();
 
-    const [result] = await pool.query(sql, values);
+          // Convertir el estado del pago a su correspondiente descripción
+          const statusMap = {
+            0: "Creado",
+            1: "En proceso",
+            2: "No pagado",
+            3: "Pagado",
+            4: "Reembolsado",
+            5: "Expirado",
+          };
 
-    console.log("Pago registrado correctamente:", result);
-    
+          const newStatus = statusMap[paymentStatus.state] || "Estado desconocido";
 
-    return res.json({
-      success: true,
-      message: "Estado del cobro consultado correctamente",
-      results: paymentStatus,
-      statusCode: 200,
-    });
+          // Si el estado cambió, actualizar en la base de datos
+          if (newStatus !== payment.status) {
+            await pool.query("UPDATE payments SET status = ? WHERE id = ?", [newStatus, payment.id]);
+            console.log(`Estado actualizado para el pago ${payment.id}: ${payment.status} -> ${newStatus}`);
+          }
+
+          return { id: payment.id, status: newStatus };
+        } catch (err) {
+          console.error(`Error al procesar pago ${payment.id}:`, err);
+          return null;
+        }
+      })
+    );
+
+    console.log("Proceso de actualización de pagos finalizado.");
+    return results.filter((r) => r !== null);
   } catch (error) {
-    console.error("Error al consultar el estado del cobro:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Error al consultar el estado del cobro",
-      error: error.message,
-      statusCode: 500,
-    });
+    console.error("Error general en la verificación de pagos:", error);
   }
 };
 
+const isTokenExpired = (token) => {
+  try {
+    const decoded = jwt.decode(token);
+    if (!decoded || !decoded.exp) {
+      return true; 
+    }
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    return decoded.exp < currentTime;
+  } catch (error) {
+    console.error("Error decodificando el token:", error);
+    return true;
+  }
+};
+
+export const forgotPassword = async (req,res)=> {
+  const { email } = data;
+
+  try {
+    // Buscar si el usuario existe
+    const query = "SELECT id FROM users WHERE email = ?";
+    const [rows] = await pool.query(query, [email]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+    }
+
+    const userId = rows[0].id;
+
+    const newPassword = crypto.randomBytes(8).toString("hex").slice(0, 8);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const updateQuery = "UPDATE users SET password = ? WHERE id = ?";
+    await pool.query(updateQuery, [hashedPassword, userId]);
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Recuperación de contraseña",
+      html: forgotPasswordTemplate(newPassword),
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({ success: true, message: "Correo de recuperación enviado" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error al restablecer la contraseña", error: error.message });
+  }
+};
