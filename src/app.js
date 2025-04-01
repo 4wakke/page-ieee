@@ -19,7 +19,7 @@ const allowedOrigins = [
   'http://18.209.168.40:5173',
   'http://ieeecolcaribeconference.com:5173/',
   'http://18.209.168.40:80',
-  'http://ieeecolcaribeconference.com:80/'
+  'http://ieeecolcaribeconference.com/'
   
 ];
 
