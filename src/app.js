@@ -16,7 +16,11 @@ checkPayments();
 const allowedOrigins = [
   'http://localhost:5173', 
   'http://192.168.1.19  :5173',
-  'http://18.209.168.40:5173'
+  'http://18.209.168.40:5173',
+  'http://ieeecolcaribeconference.com:5173/',
+  'http://18.209.168.40:80',
+  'http://ieeecolcaribeconference.com:80/'
+  
 ];
 
 app.use(
