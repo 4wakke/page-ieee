@@ -11,6 +11,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPasswordPage";
+import ChangePassword from "./pages/ChangePasswordPage";
 
 function App() {
   const { isAuth, loading } = useAuth(); //! LOADING
@@ -33,12 +35,14 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
           </Route>
 
           <Route
             element={<ProtectedRoute isAllowed={isAuth} redirectTo="/login" />}
           >
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/changepassword" element={<ChangePassword />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

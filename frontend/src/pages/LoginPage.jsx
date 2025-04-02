@@ -89,9 +89,23 @@ function LoginPage() {
           <div className="flex justify-between my-4 tracking-wide">
             <p className="mr-4">¿No tienes una cuenta?</p>
             <Link to="/register" className="font-bold tracking-wide">
-              Registro
+              <div className="flex flex-col justify-center items-center">
+                <span>Registrarse</span>
+              </div>
             </Link>
           </div>
+
+          <div className="flex justify-center items-center my-4 tracking-wide">
+            <p className="mr-4">¿Olvidaste tu contraseña?</p>
+            <Link to="/forgotpassword" className="font-bold tracking-wide">
+              <div className="flex flex-col justify-center items-center">
+                <span>Recuperar</span>
+                <span>contraseña</span>
+              </div>
+            </Link>
+          </div>
+
+          
         </form>
       </Card>
     </Container>

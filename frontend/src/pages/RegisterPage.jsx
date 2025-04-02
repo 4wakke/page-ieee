@@ -449,7 +449,6 @@ function RegisterPage() {
             </div>
             )} 
             
-                        
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center mb-6">
