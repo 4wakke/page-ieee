@@ -35,7 +35,7 @@ function ChangePassword() {
 
       if (response.ok) {
         alert("La contraseña se ha cambiado con éxito");
-        navigate("/home");
+        navigate("/profile");
       } else {
         const result = await response.json();
         alert(result.message || "Hubo un error al cambiar la contraseña");
@@ -52,7 +52,7 @@ function ChangePassword() {
     <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center">
       <Card>
         <h1 className="text-3xl font-bold my-2 text-center mb-4 tracking-wide">
-          Cambiar<br />la contraseña
+          Cambio<br /> contraseña
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>

@@ -394,26 +394,22 @@ function ProfilePage() {
               
             </div>
             
-            
-
-
-
           </div> {/* FIN GRID */}
 
-          <div className="mt-4 text-center flex justify-between items-center">
-            <div className="flex space-x-4">
+          <div className=" flex justify-center space-x-4">
+            <div>
               {isEditing ? (
                 <button type="submit" className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
               ) : (
                 <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
               )}
-
-              {/* Botón de cambiar contraseña */}
-              
+              </div>
+              <div>
                 <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
-                  Cambiar Contraseña
+                    Cambiar Contraseña
                 </button>
-            </div>
+              </div>
+                
           </div>
         </form>
       </div>
