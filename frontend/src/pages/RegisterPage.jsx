@@ -34,7 +34,8 @@ function RegisterPage() {
 
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
-  const isIeeeMember = watch("isIeeeMember"); 
+  const isIeeeMember = watch("isIeeeMember");
+  const participationType = watch("participationType"); //!
   const [price, setPrice] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [userId, setUserId] = useState(null); //?
@@ -64,6 +65,13 @@ function RegisterPage() {
     }
   }, [serverMessage, serverErrors]);
 
+  useEffect(() => { 
+    if (participationType === "attendee") {
+      setValue("qtyArticles", "");
+      setValue("articles", [{ number: "", pages: "" }]);
+    }
+  }, [participationType, setValue]); 
+
   const handlePayment = async () => {
     try {
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
@@ -92,14 +100,28 @@ function RegisterPage() {
   };
 
     const onSubmit = handleSubmit(async (data) => {
+
       data.isIeeeMember = data.isIeeeMember === "yes";
       data.isTems = data.isTems === "yes";
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
-      const filteredArticles = data.articles?.filter(
-        (article) => article?.number && article?.pages
-      ) || [];
+
+      if (data.participationType === "attendee") {
+        data.qtyArticles = "";  
+        data.articles = [{ number: "", pages: "" }];  
+      } else {
+        let formattedArticles = [];
+        if (data.qtyArticles > 0 && data.participationType === "author") {
+          formattedArticles = data.articles?.map(article => ({
+            number: article?.number || "", 
+            pages: article?.pages ? parseInt(article.pages, 10) : ""  
+          })) || [];
+        } else {
+          formattedArticles = [{ number: "", pages: "" }];
+        }
+        data.articles = formattedArticles;
+      }
       
-      console.log(data);
+      console.log("Datos enviados a signup:", data);
       
       const formattedData = {
         occupation: data.occupation,
@@ -108,19 +130,16 @@ function RegisterPage() {
         participationType: data.participationType,
         attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
         qtyArticles: data.qtyArticles,
-        articles: filteredArticles.map((article) => ({
-          number: article.number,
-          pages: parseInt(article.pages, 10),
-        })),
+        articles: data.articles,
       };
   
-      console.log("Datos enviados a signup:", formattedData);
+      console.log("Datos enviados a payment:", formattedData);
   
       const resp = await fetch(`${backRoute}/api/signup`, {
         method: "POST",
         body: JSON.stringify({ 
           ...data,
-          articles: filteredArticles 
+          articles: data.articles
         }),
         headers: { "Content-Type": "application/json" },
       });
@@ -132,8 +151,7 @@ function RegisterPage() {
       setServerMessage(dataSignup.message);
       const userId = dataSignup.results[0]?.userId;
       setUserId(userId);
-      await signup(dataSignup); //*
-        // Enviar datos transformados al endpoint /payment
+      await signup(dataSignup);
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
           body: JSON.stringify(formattedData), 
@@ -146,13 +164,10 @@ function RegisterPage() {
         if (responseData.success && responseData.results?.price !== undefined) {
           setPrice(responseData.results.price); 
         }
-      } else {    
-        // Si la respuesta tiene error, guarda los mensajes de error
+      } else {
     setServerErrors([dataSignup.message]);
 }
     });
-
-    //! EMPIEZAN LOS CAMBIOS.
 
   return (
     <Container className=" flex items-center justify-center min-h-screen">
@@ -334,6 +349,9 @@ function RegisterPage() {
               )}
             </div>
 
+            <div></div> 
+            {/* //! */}
+
             <div>
             <Label htmlFor="gender">Género</Label>
               <SelectReg 
@@ -418,6 +436,7 @@ function RegisterPage() {
                 )}
             </div>
 
+            {participationType === "author" && ( 
             <div>
               <Label htmlFor="qtyArticles">Número de artículos</Label>
               <Input type="number" placeholder="Ingresa el número de artículos"
@@ -428,7 +447,8 @@ function RegisterPage() {
               <p className="text-red-500 font-medium">El número de artículos es requerido</p>
               )}
             </div>
-                
+            )} 
+            {/* //! */}
             
                         
           </div> {/* FIN GRID 2 */}
