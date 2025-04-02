@@ -34,8 +34,8 @@ function RegisterPage() {
 
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
-  const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
-  const [price, setPrice] = useState(""); // Estado para almacenar el precio
+  const isIeeeMember = watch("isIeeeMember"); 
+  const [price, setPrice] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [userId, setUserId] = useState(null); //?
   const [serverErrors, setServerErrors] = useState([]);
@@ -47,14 +47,13 @@ function RegisterPage() {
     }
   }, [isTaxRequired, setValue]);
 
-  useEffect(() => { //* nuevo
+  useEffect(() => { 
       if (isIeeeMember === "no") {
-        setValue("isTems", "no"); // Se establece automáticamente en "no"
-        setValue("membershipNumber", ""); // Limpia el campo de membresía
+        setValue("isTems", "no"); 
+        setValue("membershipNumber", ""); 
       }
     }, [isIeeeMember, setValue]);
 
-    // Eliminar los mensajes después de 5 segundos
   useEffect(() => {
     if (serverMessage || serverErrors.length > 0) {
       const timer = setTimeout(() => {
@@ -145,7 +144,7 @@ function RegisterPage() {
         console.log("Respuesta de payment:", responseData);
   
         if (responseData.success && responseData.results?.price !== undefined) {
-          setPrice(responseData.results.price); // Se guarda el precio en el estado
+          setPrice(responseData.results.price); 
         }
       } else {    
         // Si la respuesta tiene error, guarda los mensajes de error
@@ -153,11 +152,13 @@ function RegisterPage() {
 }
     });
 
+    //! EMPIEZAN LOS CAMBIOS.
+
   return (
     <Container className=" flex items-center justify-center min-h-screen">
-      <CardReg>
+      <CardReg>  
 
-        
+
             
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
