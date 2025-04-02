@@ -49,9 +49,9 @@ function ForgotPassword() {
   };
 
   return (
-    <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center">
+    <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center ">
       <Card>
-        <h1 className="text-3xl font-bold my-2 text-center mb-4 tracking-wide">
+        <h1 className="text-4xl font-bold my-2 text-center mb-4 tracking-wide">
           Recuperar<br />contraseña
         </h1>
 
@@ -59,7 +59,7 @@ function ForgotPassword() {
           <Label htmlFor="email">Correo para recuperación</Label>
           <Input
             type="email"
-            placeholder="Ingrese correo para recuperación de contraseña"
+            placeholder="Ingrese correo para recuperación"
             {...register("email", {
               required: "El correo es requerido",
             })}

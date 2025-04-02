@@ -7,10 +7,10 @@ const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ChangePassword() {
   useEffect(() => {
-    document.body.classList.add("change-password-page");
+    document.body.classList.add("change-page");
 
     return () => {
-      document.body.classList.remove("change-password-page");
+      document.body.classList.remove("change-page");
     };
   }, []);
 

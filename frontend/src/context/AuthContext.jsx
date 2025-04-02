@@ -67,7 +67,7 @@ export function AuthProvider({ children }) {
   };
 
   const signout = async () => {
-    await axios.post(`${backRoute}/signout`);
+    await axios.post(`${backRoute}/api/signout`);
     setUser(null);
     setIsAuth(false);
   };

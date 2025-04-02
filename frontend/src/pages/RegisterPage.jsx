@@ -106,14 +106,14 @@ function RegisterPage() {
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
 
       if (data.participationType === "attendee") {
-        data.qtyArticles = "";  
-        data.articles = [{ sequence: "", pages: "" }];  
+        data.qtyArticles = 0;  
+        data.articles = [];  
       } else {
         let formattedArticles = [];
         if (data.qtyArticles > 0 && data.participationType === "author") {
-          formattedArticles = data.articles?.map(article => ({
-            sequence: article?.sequence || "", 
-            pages: article?.pages ? parseInt(article.pages, 10) : ""  
+          formattedArticles = data.articles?.slice(0, data.qtyArticles).map(article => ({
+            sequence: article?.sequence || "",
+            pages: article?.pages ? parseInt(article.pages, 10) : ""
           })) || [];
         } else {
           formattedArticles = [{ sequence: "", pages: "" }];
