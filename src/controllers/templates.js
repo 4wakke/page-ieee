@@ -57,7 +57,7 @@ export const forgotPasswordTemplate = (password) => {
             </head>
             <body>
                 <div class="container">
-                    <div class="header">Contraseña Provisional/div>
+                    <div class="header">Contraseña Provisional </div>
                     <div class="content">
                         <p class = "text">Has solicitado restablecer tu contraseña. A continuación, te proporcionamos una contraseña temporal:</p>
                         <div class="password-box">${password}</div>
