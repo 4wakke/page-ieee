@@ -68,7 +68,7 @@ function RegisterPage() {
   useEffect(() => { 
     if (participationType === "attendee") {
       setValue("qtyArticles", "");
-      setValue("articles", [{ number: "", pages: "" }]);
+      setValue("articles", [{ sequence: "", pages: "" }]);
     }
   }, [participationType, setValue]); 
 
@@ -107,16 +107,16 @@ function RegisterPage() {
 
       if (data.participationType === "attendee") {
         data.qtyArticles = "";  
-        data.articles = [{ number: "", pages: "" }];  
+        data.articles = [{ sequence: "", pages: "" }];  
       } else {
         let formattedArticles = [];
         if (data.qtyArticles > 0 && data.participationType === "author") {
           formattedArticles = data.articles?.map(article => ({
-            number: article?.number || "", 
+            sequence: article?.sequence || "", 
             pages: article?.pages ? parseInt(article.pages, 10) : ""  
           })) || [];
         } else {
-          formattedArticles = [{ number: "", pages: "" }];
+          formattedArticles = [{ sequence: "", pages: "" }];
         }
         data.articles = formattedArticles;
       }
@@ -448,7 +448,6 @@ function RegisterPage() {
               )}
             </div>
             )} 
-            {/* //! */}
             
                         
           </div> {/* FIN GRID 2 */}
@@ -458,7 +457,6 @@ function RegisterPage() {
           </div>
 
           <div>
-            {/* Mensajes de error o éxito */}
             {serverErrors.length > 0 && (
               <div className="text-red-500 font-medium bg-red-100 rounded-md shadow-md mb-4 mx-60 p-3">
                 {serverErrors.map((err, index) => (

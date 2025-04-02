@@ -8,14 +8,14 @@ const ArticlesSpaces = ({ register, errors, qtyArticles }) => {
       fields.push(
         <div key={i} className="grid grid-cols-2 gap-2">
           <div>
-            <Label htmlFor={`articles[${i}].number`}>Nombre del Artículo {i + 1}</Label>
+            <Label htmlFor={`articles[${i}].sequence`}>Nombre del Artículo {i + 1}</Label>
             <Input
               type="text"
               placeholder="Nombre del artículo" 
-              {...register(`articles[${i}].number`, { required: "El nombre del articulo es obligatorio" })}
+              {...register(`articles[${i}].sequence`, { required: "El nombre del articulo es obligatorio" })}
             />
-            {errors?.articles?.[i]?.number && (
-              <p className="text-red-500 font-medium">{errors.articles[i]?.number?.message}</p>
+            {errors?.articles?.[i]?.sequence && (
+              <p className="text-red-500 font-medium">{errors.articles[i]?.sequence?.message}</p>
             )}
           </div>
           <div>
