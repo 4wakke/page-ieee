@@ -25,7 +25,7 @@ export const signin = async (req, res) => {
   const { email, password } = req.body;
 
   const [result] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
-  const user = result[0]; // ✅ Primer objeto directamente
+  const user = result[0]; 
   if (!user) {
     return res.status(400).json({
       message: "El correo no está registrado",
@@ -283,10 +283,71 @@ export const updateUser = async (req, res) => {
 
     await pool.query(query, values);
 
-    if (!articles){
-      
-    }
+    if (articles){
+      if (!Array.isArray(articles) || articles.some(a => !sequence || !a.pages)) {
+        throw new Error("El campo 'articles' debe ser un array de objetos con 'sequence' y 'pages'");
+      }
+  
+      if (articles.length !== qtyArticles) {
+        throw new Error("La cantidad de artículos no coincide con 'qtyArticles'");
+      }
+  
+      // Obtener artículos actuales del usuario en la base de datos
+      const [existingArticles] = await pool.query(
+        "SELECT sequence, pages FROM articles WHERE user_id = ?",
+        [id]
+      );
+  
+      // Convertir a mapa para comparación rápida
+      const existingMap = new Map(existingArticles.map(a => [a.sequence, a.pages]));
+      const newMap = new Map(articles.map(a => [a.sequence, a.pages]));
+  
+      // Identificar artículos para actualizar, insertar y eliminar
+      const updates = [];
+      const inserts = [];
+      const deletes = [];
+  
+      // Revisar si hay que actualizar o eliminar
+      for (const [sequence, pages] of existingMap.entries()) {
+        if (!newMap.has(sequence)) {
+          deletes.push(sequence); // Si no está en el nuevo array, eliminarlo
+        } else if (newMap.get(sequence) !== pages) {
+          updates.push({ sequence, pages: newMap.get(sequence) }); // Si cambió, actualizarlo
+        }
+      }
+  
+      // Revisar si hay que insertar nuevos artículos
+      for (const [sequence, pages] of newMap.entries()) {
+        if (!existingMap.has(sequence)) {
+          inserts.push({ userId, sequence, pages });
+        }
+      }
+  
+      // Ejecutar consultas
+      if (updates.length > 0) {
+        for (const { sequence, pages } of updates) {
+          await pool.query(
+            "UPDATE user_articles SET pages = ? WHERE userId = ? AND sequence = ?",
+            [pages, userId, sequence]
+          );
+        }
+      }
+  
+      if (deletes.length > 0) {
+        await pool.query(
+          "DELETE FROM user_articles WHERE userId = ? AND sequence IN (?)",
+          [userId, deletes]
+        );
+      }
+  
+      if (inserts.length > 0) {
+        await pool.query(
+          "INSERT INTO user_articles (userId, sequence, pages) VALUES ?",
+          [inserts.map(({ userId, sequence, pages }) => [userId, sequence, pages])]
+        );
+      }
 
+    }
     return successResponse(res, 'Usuario actualizado correctamente');
     
   } catch (error) {
@@ -524,7 +585,7 @@ const isTokenExpired = (token) => {
 };
 
 export const forgotPassword = async (req,res)=> {
-  const { email } = data;
+  const { email } = req.body;
 
   try {
     // Buscar si el usuario existe
@@ -557,3 +618,27 @@ export const forgotPassword = async (req,res)=> {
     return res.status(500).json({ success: false, message: "Error al restablecer la contraseña", error: error.message });
   }
 };
+
+export const changePassword = async(req,res) => {
+  const data = req.body
+  const requiredFields = ["oldPassword","newPassword","userId"]
+  const missingFields = requiredFields.filter(field => !(field in data));
+  if (missingFields.length > 0) {
+    return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
+  }
+
+  const [result] = await pool.query("SELECT password FROM users WHERE email = ?", [email]);
+  const user = result[0]; 
+
+  const validPassword = await bcrypt.compare(data.oldPassword, user.password);
+  if (!validPassword) {
+    return errorResponse(res,"Contraseña Incorrecta",400)
+  }
+
+  const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+  const query = " UPDATE users SET password = ? WHERE id = ?"
+  await pool.query(query, [hashedPassword ,data.userId]);
+
+  return successResponse(res,"Contraseña actualizada correctamente",{"userId":data.userId},200)
+
+}
