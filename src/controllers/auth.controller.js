@@ -125,10 +125,12 @@ export const signup = async (req, res, next) => {
 
     const [result] = await pool.query(query, values);
     const userId = result.insertId;
-
-    const articlesValues = articles.map(article => `(${userId}, '${article.sequence}', ${article.pages})`).join(", ");
-    const articlesQuery = `INSERT INTO articles (user_id, sequence, pages) VALUES ${articlesValues};`;
-    const [resultArticles] = await pool.query(articlesQuery, articlesValues);
+    if (articles.length > 0) {
+      const articlesValues = articles.map(article => `(${userId}, '${article.sequence}', ${article.pages})`).join(", ");
+      const articlesQuery = `INSERT INTO articles (user_id, sequence, pages) VALUES ${articlesValues};`;
+      await pool.query(articlesQuery);
+    }
+    
     const token = await createAccessToken({ id: userId });
 
     res.cookie("token", token, {
