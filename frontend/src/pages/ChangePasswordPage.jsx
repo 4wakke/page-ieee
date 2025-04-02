@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Input, Label, Container } from "../components/ui"; // Asumimos que estos componentes están definidos
 import { useForm } from "react-hook-form";
+import { useAuth } from "../context/AuthContext"; // Importa el hook para acceder al contexto
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
@@ -17,8 +18,17 @@ function ChangePassword() {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth(); // Usamos el hook useAuth para acceder al usuario autenticado
+
+  const userId = user ? user.id : null;
+
+
 
   const onSubmit = async (data) => {
+    if (!userId) {
+      alert("No se pudo obtener el ID del usuario.");
+      return;
+    }
     setLoading(true);
     console.log("Datos enviados:", data);
     try {
@@ -28,6 +38,7 @@ function ChangePassword() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          userId,
           oldPassword: data.oldPassword,
           newPassword: data.newPassword,
         }),

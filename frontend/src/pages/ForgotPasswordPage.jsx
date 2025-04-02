@@ -35,7 +35,7 @@ function ForgotPassword() {
 
       if (response.ok) {
         alert("Se ha enviado a su correo una contraseña de recuperación");
-        navigate("/home");
+        navigate("/");
       } else {
         const result = await response.json();
         alert(result.message || "Hubo un error al enviar el correo de recuperación");
