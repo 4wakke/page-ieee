@@ -34,8 +34,9 @@ function RegisterPage() {
 
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
-  const isIeeeMember = watch("isIeeeMember"); //* Correción isIeeeMember
-  const [price, setPrice] = useState(""); // Estado para almacenar el precio
+  const isIeeeMember = watch("isIeeeMember");
+  const participationType = watch("participationType"); //!
+  const [price, setPrice] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [userId, setUserId] = useState(null); //?
   const [serverErrors, setServerErrors] = useState([]);
@@ -47,14 +48,13 @@ function RegisterPage() {
     }
   }, [isTaxRequired, setValue]);
 
-  useEffect(() => { //* nuevo
+  useEffect(() => { 
       if (isIeeeMember === "no") {
-        setValue("isTems", "no"); // Se establece automáticamente en "no"
-        setValue("membershipNumber", ""); // Limpia el campo de membresía
+        setValue("isTems", "no"); 
+        setValue("membershipNumber", ""); 
       }
     }, [isIeeeMember, setValue]);
 
-    // Eliminar los mensajes después de 5 segundos
   useEffect(() => {
     if (serverMessage || serverErrors.length > 0) {
       const timer = setTimeout(() => {
@@ -64,6 +64,13 @@ function RegisterPage() {
       return () => clearTimeout(timer);
     }
   }, [serverMessage, serverErrors]);
+
+  useEffect(() => { 
+    if (participationType === "attendee") {
+      setValue("qtyArticles", "");
+      setValue("articles", [{ sequence: "", pages: "" }]);
+    }
+  }, [participationType, setValue]); 
 
   const handlePayment = async () => {
     try {
@@ -93,14 +100,28 @@ function RegisterPage() {
   };
 
     const onSubmit = handleSubmit(async (data) => {
+
       data.isIeeeMember = data.isIeeeMember === "yes";
       data.isTems = data.isTems === "yes";
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
-      const filteredArticles = data.articles?.filter(
-        (article) => article?.number && article?.pages
-      ) || [];
+
+      if (data.participationType === "attendee") {
+        data.qtyArticles = 0;  
+        data.articles = [];  
+      } else {
+        let formattedArticles = [];
+        if (data.qtyArticles > 0 && data.participationType === "author") {
+          formattedArticles = data.articles?.slice(0, data.qtyArticles).map(article => ({
+            sequence: article?.sequence || "",
+            pages: article?.pages ? parseInt(article.pages, 10) : ""
+          })) || [];
+        } else {
+          formattedArticles = [{ sequence: "", pages: "" }];
+        }
+        data.articles = formattedArticles;
+      }
       
-      console.log(data);
+      console.log("Datos enviados a signup:", data);
       
       const formattedData = {
         occupation: data.occupation,
@@ -109,19 +130,16 @@ function RegisterPage() {
         participationType: data.participationType,
         attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
         qtyArticles: data.qtyArticles,
-        articles: filteredArticles.map((article) => ({
-          number: article.number,
-          pages: parseInt(article.pages, 10),
-        })),
+        articles: data.articles,
       };
   
-      console.log("Datos enviados a signup:", formattedData);
+      console.log("Datos enviados a payment:", formattedData);
   
       const resp = await fetch(`${backRoute}/api/signup`, {
         method: "POST",
         body: JSON.stringify({ 
           ...data,
-          articles: filteredArticles 
+          articles: data.articles
         }),
         headers: { "Content-Type": "application/json" },
       });
@@ -133,8 +151,7 @@ function RegisterPage() {
       setServerMessage(dataSignup.message);
       const userId = dataSignup.results[0]?.userId;
       setUserId(userId);
-      await signup(dataSignup); //*
-        // Enviar datos transformados al endpoint /payment
+      await signup(dataSignup);
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
           body: JSON.stringify(formattedData), 
@@ -145,31 +162,18 @@ function RegisterPage() {
         console.log("Respuesta de payment:", responseData);
   
         if (responseData.success && responseData.results?.price !== undefined) {
-          setPrice(responseData.results.price); // Se guarda el precio en el estado
+          setPrice(responseData.results.price); 
         }
-      } else {    
-        // Si la respuesta tiene error, guarda los mensajes de error
+      } else {
     setServerErrors([dataSignup.message]);
 }
     });
 
   return (
     <Container className=" flex items-center justify-center min-h-screen">
-      <CardReg>
+      <CardReg>  
 
-        {/* Mensajes de error o éxito */}
-        {serverErrors.length > 0 && (
-          <div className="text-red-500 font-medium">
-            {serverErrors.map((err, index) => (
-              <p key={index} className="font-bold text-center">{err}</p>
-            ))}
-          </div>
-        )}
-        {serverMessage && (
-          <div className="text-green-500 p-3 bg-green-100 rounded-md shadow-md mb-4">
-            <p className="font-bold text-center">{serverMessage}</p>
-          </div>
-        )}
+
             
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
@@ -345,6 +349,9 @@ function RegisterPage() {
               )}
             </div>
 
+            <div></div> 
+            {/* //! */}
+
             <div>
             <Label htmlFor="gender">Género</Label>
               <SelectReg 
@@ -429,6 +436,7 @@ function RegisterPage() {
                 )}
             </div>
 
+            {participationType === "author" && ( 
             <div>
               <Label htmlFor="qtyArticles">Número de artículos</Label>
               <Input type="number" placeholder="Ingresa el número de artículos"
@@ -439,13 +447,27 @@ function RegisterPage() {
               <p className="text-red-500 font-medium">El número de artículos es requerido</p>
               )}
             </div>
-                
+            )} 
             
-                        
           </div> {/* FIN GRID 2 */}
 
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center mb-6">
             <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Registrarse</button>
+          </div>
+
+          <div>
+            {serverErrors.length > 0 && (
+              <div className="text-red-500 font-medium bg-red-100 rounded-md shadow-md mb-4 mx-60 p-3">
+                {serverErrors.map((err, index) => (
+                  <p key={index} className="font-bold text-center">{err}</p>
+                ))}
+              </div>
+            )}
+            {serverMessage && (
+              <div className="text-green-500 font-medium p-3 bg-green-100 rounded-md shadow-md mb-4 mx-60">
+                <p className="font-bold text-center">{serverMessage}</p>
+              </div>
+            )}
           </div>
 
           <div className="mt-4 text-center">

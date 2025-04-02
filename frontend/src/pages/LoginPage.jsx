@@ -57,7 +57,7 @@ function LoginPage() {
               required: "El correo es requerido",
             })}
           />
-          {errors.email && <p className="text-red-700">{errors.email.message}</p>}
+          {errors.email && <p className="text-red-500 font-medium">{errors.email.message}</p>}
 
           <Label htmlFor="password">Contraseña</Label>
           <div className="relative">
@@ -69,12 +69,12 @@ function LoginPage() {
               })}
             />
             {errors.password && (
-              <p className="text-red-700">{errors.password.message}</p>
+              <p className="text-red-500 font-medium">{errors.password.message}</p>
             )}
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-600"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-600 "
             >
               {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
             </button>
@@ -89,9 +89,23 @@ function LoginPage() {
           <div className="flex justify-between my-4 tracking-wide">
             <p className="mr-4">¿No tienes una cuenta?</p>
             <Link to="/register" className="font-bold tracking-wide">
-              Registro
+              <div className="flex flex-col justify-center items-center">
+                <span>Registrarse</span>
+              </div>
             </Link>
           </div>
+
+          <div className="flex justify-center items-center my-4 tracking-wide">
+            <p className="mr-4">¿Olvidaste tu contraseña?</p>
+            <Link to="/forgotpassword" className="font-bold tracking-wide">
+              <div className="flex flex-col justify-center items-center">
+                <span>Recuperar</span>
+                <span>contraseña</span>
+              </div>
+            </Link>
+          </div>
+
+          
         </form>
       </Card>
     </Container>

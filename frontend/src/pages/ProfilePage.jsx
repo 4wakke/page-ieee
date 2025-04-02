@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-// eslint-disable-next-line no-unused-vars
-import { Link } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; 
+import { useNavigate } from "react-router-dom";
+// import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 // import CountriesSelect from "../hooks/CountrySelect";
@@ -23,10 +22,16 @@ function ProfilePage() {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [userDetails, setUserDetails] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
 
   // Obtener correo almacenado en el login
   const userEmail = localStorage.getItem("userEmail");
+
+  const handleChangePassword = () => {
+    navigate("/profile/changepassword");
+  };
 
   useEffect(() => {
     if (!userEmail) return;
@@ -181,6 +186,7 @@ function ProfilePage() {
               )} */}
             </div>
 
+            {/*
             <div>
               <Label htmlFor="password">Contraseña</Label>
                 <div className="relative">
@@ -190,9 +196,6 @@ function ProfilePage() {
                     placeholder="Editar tu contraseña"
                     {...register("password", { required: true })}
                     disabled={!isEditing} />
-                    {/* {errors.password && (
-                    <p className="text-red-500 font-medium">La contraseña es requerida</p>
-                      )}       */}
                     <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -202,6 +205,7 @@ function ProfilePage() {
                     </button>
                 </div>
             </div>
+            */}
 
 
             <div>
@@ -390,18 +394,22 @@ function ProfilePage() {
               
             </div>
             
-            
-
-
-
           </div> {/* FIN GRID */}
 
-          <div className="mt-4 text-center">
-            {isEditing ? (
-              <button type="submit" className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
-            ) : (
-              <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
-            )}
+          <div className=" flex justify-center space-x-4">
+            <div>
+              {isEditing ? (
+                <button type="submit" className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
+              ) : (
+                <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
+              )}
+              </div>
+              <div>
+                <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                    Cambiar Contraseña
+                </button>
+              </div>
+                
           </div>
         </form>
       </div>

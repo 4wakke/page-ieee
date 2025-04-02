@@ -55,3 +55,19 @@ body {
   height: 100vh;
   height: 100%;
 }
+
+.forgot-page { 
+  background-image: url('/assets/fondo-barranquilla2.jpeg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  height: 100%;
+}
+
+.change-page { 
+  background-image: url('/assets/fondo-barranquilla2.jpeg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  
+}
