@@ -232,7 +232,8 @@ export const updateUser = async (req, res) => {
     attendanceType,
     taxAmount,
     qtyArticles,
-    articles
+    articles,
+    dollarRate
   } = req.body;
 
   try {
@@ -287,11 +288,11 @@ export const updateUser = async (req, res) => {
 
     if (articles){
       if (!Array.isArray(articles) || articles.some(a => !sequence || !a.pages)) {
-        throw new Error("El campo 'articles' debe ser un array de objetos con 'sequence' y 'pages'");
+        return errorResponse(res,"El campo 'articles' debe ser un array de objetos con 'sequence' y 'pages'", 400)
       }
   
       if (articles.length !== qtyArticles) {
-        throw new Error("La cantidad de artículos no coincide con 'qtyArticles'");
+        return errorResponse(res,"La cantidad de artículos no coincide con 'qtyArticles'",400)
       }
   
       // Obtener artículos actuales del usuario en la base de datos
@@ -350,6 +351,43 @@ export const updateUser = async (req, res) => {
       }
 
     }
+
+    const dataPayment = [
+      occupation || existingUser[0].occupation,
+      isIeeeMember ?? existingUser[0].is_ieee_member,
+      isTems ?? existingUser[0].is_tems,
+      participationType || existingUser[0].participation_type,
+      taxAmount || existingUser[0].tax_amount,
+      qtyArticles || existingUser[0].qty_articles,
+      articles || []
+    ]
+
+    const newPayment = payment(dataPayment)
+
+    if(!newPayment.success){
+        errorResponse(res,"Error al calcular el nuevo valor de pago",400,newPayment.error)
+    }
+    
+    const paymentQury = "SELECT * FROM payments WHERE user_id = ?"
+    const infoPayment = await pool.query(paymentQury, id);
+    const newPrice = newPayment.results.pric
+    if (infoPayment.length > 0) {
+      if (infoPayment.usd != newPrice) {
+        if (!["En proceso", "Creado"].includes(infoPayment.status)){
+          const processData = [{
+            "amount": newPrice ,
+            "dollarRate":dollarRate,
+            "description": `Pago auxiliar de ${name || existingUser[0].name} ${ lastName || existingUser[0].last_name}`,
+            "userId":id
+          }]
+          processPayment(processData)
+        } else {
+            
+        }
+      }
+      // Validar si se pago o no se pago. Si se pago se crea un nuevo pago con el valor seleccionado y si no se pago se hace un update al campo
+    }
+
     return successResponse(res, 'Usuario actualizado correctamente');
     
   } catch (error) {
