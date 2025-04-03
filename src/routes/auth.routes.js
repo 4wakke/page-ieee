@@ -10,7 +10,8 @@ import {
   getAllUsers,
   getUser,
   updateUser,
-  forgotPassword
+  forgotPassword,
+  changePassword
 } from "../controllers/auth.controller.js";
 import { isAuth } from "../middlewares/auth.middleware.js";
 import { validateSchema } from "../middlewares/validate.middleware.js";
@@ -39,5 +40,7 @@ router.get('/userDetail', getUser);
 router.put('/users/:id', updateUser);
 
 router.post('/forgotPassword', forgotPassword);
+
+router.post('/changePassword', changePassword);
 
 export default router;
