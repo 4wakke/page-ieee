@@ -44,6 +44,8 @@ function ProfilePage() {
 
         if (data.success) {
           const userData = data.results;
+          localStorage.setItem("userId", userData.id);
+          
 
           // Convertir valores 0 y 1 a 'No' y 'Sí'
         if (userData.isIeeeMember !== undefined) {
