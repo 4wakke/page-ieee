@@ -667,7 +667,7 @@ export const changePassword = async(req,res) => {
     return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
   }
 
-  const [result] = await pool.query("SELECT password FROM users WHERE email = ?", [email]);
+  const [result] = await pool.query("SELECT password FROM users WHERE id = ?", [data.userId]);
   const user = result[0]; 
 
   const validPassword = await bcrypt.compare(data.oldPassword, user.password);
