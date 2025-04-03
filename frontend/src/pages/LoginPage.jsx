@@ -26,7 +26,6 @@ function LoginPage() {
     const user = await signin(data);
 
     if (user) {
-      localStorage.setItem("userEmail", data.email); // Guarda el correo en localStorage
       navigate("/profile");
     }
   });

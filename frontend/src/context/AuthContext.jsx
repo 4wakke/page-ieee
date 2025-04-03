@@ -43,7 +43,6 @@ export function AuthProvider({ children }) {
   const signin = async (data) => {
     try {
       const response = await axios.post(`${backRoute}/api/signin`, data);
-
       if(response.data.success){
         setErrors({ message: response.data.message, success: true }); //?
       }else {
@@ -53,8 +52,9 @@ export function AuthProvider({ children }) {
 
       setUser(response.data);
       setIsAuth(true);
+      localStorage.setItem("userEmail", data.email);
       // clearErrors(); //! LIMPIAR ERRORES
-      return response.data;
+      return response.data, response.data.user ;
     } catch (error) {
           // Si ocurre un error con Axios, lo capturamos y mostramos el mensaje del backend //?
       console.log(error);
@@ -70,6 +70,9 @@ export function AuthProvider({ children }) {
     await axios.post(`${backRoute}/api/signout`);
     setUser(null);
     setIsAuth(false);
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userId");
+
   };
 
   useEffect(() => {
