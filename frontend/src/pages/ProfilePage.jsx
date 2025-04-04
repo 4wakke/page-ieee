@@ -25,16 +25,13 @@ function ProfilePage() {
     // eslint-disable-next-line no-unused-vars
     const [error, setError] = useState(""); // Estado para el mensaje de error
 
-
-
-
-  
   const navigate = useNavigate();
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
   if (isEditing && errors.country) {
     delete errors.country;
   }
+  
 
   const isIeeeMemberValue = watch("isIeeeMember"); // Observa cambios en el campo
 
