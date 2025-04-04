@@ -43,6 +43,7 @@ function RegisterPage() {
   const [serverErrors, setServerErrors] = useState([]);
   const [serverMessage, setServerMessage] = useState(null);
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
+  
 
 
   useEffect(() => {
@@ -314,7 +315,7 @@ function RegisterPage() {
 
             <div>
               <Label htmlFor="country">País</Label>
-              <CountriesSelect register={register} errors={errors} />
+              <CountriesSelect register={register} errors={errors} disabled={false} />
             </div>
 
             <div>

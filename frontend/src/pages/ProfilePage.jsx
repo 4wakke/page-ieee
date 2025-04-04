@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import ExchangeDollar from "../hooks/ExchangeRate";
-// import CountriesSelect from "../hooks/CountrySelect";
+import CountriesSelect from "../hooks/CountrySelect";
 // import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
@@ -21,9 +21,9 @@ function ProfilePage() {
   const [userDetails, setUserDetails] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(null); // Almacena el tipo de cambio
+  
   const navigate = useNavigate();
 
-  // eslint-disable-next-line no-unused-vars
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
 
 
@@ -45,13 +45,12 @@ function ProfilePage() {
   }, [exchange]);
 
   useEffect(() => {
-    if (!userEmail || !exchangeRate) return;
+    if (!userEmail || !exchangeRate) return; //! Evita varias peticiones 
     
     const fetchUserDetails = async () => {
 
       console.log("Correo que se está usando:", userEmail);
       console.log("Valor del tipo de cambio (exchangeRate):", exchangeRate);
-
 
       try {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
@@ -70,7 +69,6 @@ function ProfilePage() {
         if (userData.isTems !== undefined) {
           userData.isTems = userData.isTems === 1 ? "yes" : "no";
         }
-        
 
         // Verificar si el pago por impuesto es mayor a 0
         if (userData.taxAmount > 0) {
@@ -85,11 +83,16 @@ function ProfilePage() {
               setValue(key, userData[key]);
             }
           }
+          if (userData.country) {
+            setValue("country", userData.country);  // Establece el valor de 'country'
+          }
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
     };
+
+    
 
     fetchUserDetails();
   }, [setValue, userEmail, exchangeRate]);
@@ -98,35 +101,34 @@ function ProfilePage() {
     setIsEditing(true);
   };
 
-  console.log
 
   const handleSave = async (data) => {
 
     console.log("Datos que se van a enviar:", data);
 
-    if (!userDetails || !userDetails.id) {
-      console.error("ID de usuario no disponible");
-      return;
-    } //?
+    // if (!userDetails || !userDetails.id) { //!
+    //   console.error("ID de usuario no disponible");
+    //   return;
+    // } //?
 
-    try {
-      const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
+    // try {
+    //   const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
+    //     method: "PUT",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(data),
+    //   });
+    //   const result = await response.json();
       
-      console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
-      if (result.success) {
-        setIsEditing(false);
-        alert("Datos guardados exitosamente");
-      } else {
-        alert("Error al guardar los datos");
-      }
-    } catch (error) {
-      console.error("Error saving user details:", error);
-    }
+    //   console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
+    //   if (result.success) {
+    //     setIsEditing(false);
+    //     alert("Datos guardados exitosamente");
+    //   } else {
+    //     alert("Error al guardar los datos");
+    //   }
+    // } catch (error) {
+    //   console.error("Error saving user details:", error);
+    // } //!
   };
 
   if (!userDetails) {
@@ -204,39 +206,6 @@ function ProfilePage() {
               )} */}
             </div>
 
-            {/*
-            <div>
-              <Label htmlFor="password">Contraseña</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Editar tu contraseña"
-                    {...register("password", { required: true })}
-                    disabled={!isEditing} />
-                    <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-600"
-                    >
-                    {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-                    </button>
-                </div>
-            </div>
-            */}
-
-
-            <div>
-              <Label htmlFor="docNumber">
-                Número de documento
-              </Label>
-              <Input type="text" placeholder="Editar número de documento"
-              {...register("docNumber", { required: true })} disabled={!isEditing} />
-              {/* {errors.docNumber && (
-              <p className="text-red-500 font-medium">El número de documento es requerido</p>
-              )} */}
-            </div>
-
             <div>
               <Label htmlFor="attendanceType">Tipo de asistencia</Label>
               <SelectReg {...register("attendanceType", { required: true })}disabled={!isEditing} >
@@ -262,11 +231,20 @@ function ProfilePage() {
             </div>
                 
             <div>
-              <Label htmlFor="country">País</Label>
-              <Input type="text" placeholder="Editar país"
-              {...register("country", { required: true })} disabled={!isEditing} />
+            <Label htmlFor="country">País</Label>
+              {isEditing ? (
+                // Si estamos en modo edición, mostramos el componente `CountriesSelect`
+                <CountriesSelect register={register} errors={errors} disabled={!isEditing} />
+              ) : (
+                // Si no estamos en modo edición, mostramos un `Input` con el valor del país, pero deshabilitado
+                <Input 
+                  type="text" 
+                  value={userDetails?.country || "No especificado"}  // Aquí asignamos el valor del país
+                  disabled 
+                />
+              )}
             </div>
-                
+
             <div>
               <Label htmlFor="email">Correo</Label>
               <Input type="email" placeholder="Editar correo electrónico"
@@ -395,19 +373,18 @@ function ProfilePage() {
                 )} */}
             </div>
 
-{/* 
             <div> 
             <Label htmlFor="pages">Número de páginas articulo 1</Label>
               <Input type="number" placeholder="Editar número de páginas artículo 1"
-              {...register("pages", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
-            </div> */}
-{/*             
+              {...register("pages", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing} />
+            </div> 
+            
             <div> 
-            <Label htmlFor="number">Editar número articulo 1</Label>
+            <Label htmlFor="sequence">Editar número articulo 1</Label>
               <Input type="text" placeholder="Editar número artículo 1"
-              {...register("number", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
+              {...register("sequence", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
             </div>
-             */}
+            
             <div> {/* numero pagina articulo */}
               
             </div>
