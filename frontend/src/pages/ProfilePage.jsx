@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-// import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
+import ExchangeDollar from "../hooks/ExchangeRate";
 // import CountriesSelect from "../hooks/CountrySelect";
 // import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
@@ -18,27 +18,43 @@ function ProfilePage() {
     };
   }, []);
 
-  // eslint-disable-next-line no-unused-vars
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [userDetails, setUserDetails] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  // const [showPassword, setShowPassword] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState(null); // Almacena el tipo de cambio
   const navigate = useNavigate();
 
+  // eslint-disable-next-line no-unused-vars
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+
+
+  // Obtener el tipo de cambio al iniciar
+  const exchange = ExchangeDollar(); 
 
   // Obtener correo almacenado en el login
   const userEmail = localStorage.getItem("userEmail");
+  
 
   const handleChangePassword = () => {
     navigate("/profile/changepassword");
   };
 
   useEffect(() => {
-    if (!userEmail) return;
+    if (exchange) {
+      setExchangeRate(exchange);  // Almacena el tipo de cambio en el estado
+    }
+  }, [exchange]);
+
+  useEffect(() => {
+    if (!userEmail || !exchangeRate) return;
     
     const fetchUserDetails = async () => {
+
+      console.log("Correo que se está usando:", userEmail);
+      console.log("Valor del tipo de cambio (exchangeRate):", exchangeRate);
+
+
       try {
-        const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}`);
+        const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
         console.log("Datos recibidos del backend:", data.results)
 
@@ -76,7 +92,7 @@ function ProfilePage() {
     };
 
     fetchUserDetails();
-  }, [setValue, userEmail]);
+  }, [setValue, userEmail, exchangeRate]);
 
   const handleEdit = () => {
     setIsEditing(true);

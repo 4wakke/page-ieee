@@ -42,7 +42,7 @@ function RegisterPage() {
   const [userId, setUserId] = useState(null); //?
   const [serverErrors, setServerErrors] = useState([]);
   const [serverMessage, setServerMessage] = useState(null);
-  const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINAMICO
+  const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
 
 
   useEffect(() => {
@@ -75,24 +75,21 @@ function RegisterPage() {
     }
   }, [participationType, setValue]); 
 
-  const exchangeRate = ExchangeDollar(); //? PRUEBA DOLLARRATE DINAMICO
+  const exchangeRate = ExchangeDollar(); //? PRUEBA DOLLARRATE DINÁMICO
 
-  useEffect(() => { //? PRUEBA DOLLARRATE DINAMICO
+  useEffect(() => { //? PRUEBA DOLLARRATE DINÁMICO
     setDollarRate(exchangeRate); // Cuando el valor de dollarRate cambia, se actualiza en el estado.
-  }, [exchangeRate]); //? PRUEBA DOLLARRATE DINAMICO
-
-  console.log(dollarRate); //? PRUEBA DOLLARRATE DINAMICO
-  
+  }, [exchangeRate]); //? PRUEBA DOLLARRATE DINÁMICO  
 
   const handlePayment = async () => {
     try {
 
-      if (!dollarRate) { //? PRUEBA DOLLARRATE DINAMICO
+      if (!dollarRate) { //? PRUEBA DOLLARRATE DINÁMICO
         console.error("No se pudo obtener la tasa de cambio del dólar.");
         return;
-      } //? PRUEBA DOLLARRATE DINAMICO
+      } //? PRUEBA DOLLARRATE DINÁMICO
 
-      console.log(dollarRate); //? PRUEBA DOLLARRATE DINAMICO
+      console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
       
 
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
@@ -100,7 +97,7 @@ function RegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: price,
-          dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINAMICO
+          dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINÁMICO
           description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
           userId,
         }),
