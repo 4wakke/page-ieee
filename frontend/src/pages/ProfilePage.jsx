@@ -11,15 +11,17 @@ const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ProfilePage() {
 
-  // useEffect(() => {
-  //   document.body.classList.add("profile-page");
-  //   return () => {
-  //     document.body.classList.remove("profile-page");
-  //   };
-  // }, []);
+  //! Empieza el cambio
+
+  const [isEditing, setIsEditing] = useState(false);
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
+  if (isEditing && errors.country) {
+    delete errors.country;
+  }
+
+  const isTaxRequired = watch("isTaxRequired");
 
   const [userDetails, setUserDetails] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(null); // Almacena el tipo de cambio
     const [isIeeeMemberSelected, setIsIeeeMemberSelected] = useState(false);  //! Nuevo estado
     // eslint-disable-next-line no-unused-vars
@@ -27,11 +29,11 @@ function ProfilePage() {
 
   const navigate = useNavigate();
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
-  if (isEditing && errors.country) {
-    delete errors.country;
-  }
-  
+  useEffect(() => {
+    if (isTaxRequired === "no") {
+      setValue("taxAmount", "");  // Si no se requiere impuesto, vaciar el campo de monto
+    }
+  }, [isTaxRequired, setValue]);
 
   const isIeeeMemberValue = watch("isIeeeMember"); // Observa cambios en el campo
 
@@ -367,18 +369,6 @@ function ProfilePage() {
               </SelectReg>
             </div>
 
-            <div>
-            <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
-                <SelectReg {...register("isTaxRequired", { required: true })} disabled={!isEditing}>
-                  <option value="">Selecciona</option>
-                  <option value="yes">Sí</option>
-                  <option value="no">No</option>
-                </SelectReg>
-                {/* {errors.isTaxRequired && (
-                  <p className="text-red-500 font-medium">Este campo es requerido</p>
-                )} */}
-            </div>
-
             <div> 
             <Label htmlFor="pages">Articulos</Label>
               <Input type="number" placeholder="Editar número de páginas artículo 1"
@@ -400,17 +390,27 @@ function ProfilePage() {
             </div>
 
             <div>
-            <Label htmlFor="taxAmount">Pago por impuesto</Label>
-                <Input 
-                  type="number" 
-                  step="0.01" 
+            <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
+              <SelectReg {...register("isTaxRequired", { required: true })}>
+                <option value="">Selecciona</option>
+                <option value="yes">Sí</option>
+                <option value="no">No</option>
+              </SelectReg>
+              {errors.isTaxRequired && <p className="text-red-500 font-medium">Este campo es requerido</p>}
+
+              {isTaxRequired === "yes" && (
+              <div>
+                <Label htmlFor="taxAmount">Pago por impuesto</Label>
+                <Input
+                  type="number"
+                  step="0.01"
                   placeholder="Ingresa el pago por impuesto"
                   {...register("taxAmount", { required: true })}
                   onWheel={(e) => e.target.blur()}
-                  disabled={!isEditing} />
-                {/* {errors.taxAmount && (
-                  <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>
-                )} */}
+                />
+                {errors.taxAmount && <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>}
+              </div>
+            )}
             </div>
 
 
