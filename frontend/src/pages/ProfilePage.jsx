@@ -31,7 +31,10 @@ function ProfilePage() {
   
   const navigate = useNavigate();
 
-  const { register, handleSubmit, setValue,watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
+  if (isEditing && errors.country) {
+    delete errors.country;
+  }
 
   const isIeeeMemberValue = watch("isIeeeMember"); // Observa cambios en el campo
 
@@ -96,9 +99,6 @@ function ProfilePage() {
               setValue(key, userData[key]);
             }
           }
-          if (userData.country) {
-            setValue("country", userData.country);  // Establece el valor de 'country'
-          }
           // Determina si `isIeeeMember` es "yes" o "no" y ajusta el estado
           if (userData.isIeeeMember === "yes") {
             setIsIeeeMemberSelected(true);
@@ -118,6 +118,9 @@ function ProfilePage() {
 
   const handleEdit = () => {
     setIsEditing(true);
+    if (userDetails?.country) {
+      setValue("country", userDetails.country, { shouldValidate: false, shouldTouch: false });
+    }
   };
 
 
@@ -271,17 +274,21 @@ function ProfilePage() {
               )} */}
             </div>
                 
-            <div>
-            <Label htmlFor="country">País</Label>
+              <div>
+              <Label htmlFor="country">País</Label>
               {isEditing ? (
-                // Si estamos en modo edición, mostramos el componente `CountriesSelect`
-                <CountriesSelect register={register} errors={errors} disabled={!isEditing} />
+                <CountriesSelect
+                  register={register}
+                  errors={errors}
+                  disabled={!isEditing}
+                  selectedCountry={watch("country")}
+                  onChange={(e) => setValue("country", e.target.value)} // <-- Añadido
+                />
               ) : (
-                // Si no estamos en modo edición, mostramos un `Input` con el valor del país, pero deshabilitado
-                <Input 
-                  type="text" 
-                  value={userDetails?.country || "No especificado"}  // Aquí asignamos el valor del país
-                  disabled 
+                <Input
+                  type="text"
+                  value={watch("country") || ""}
+                  disabled
                 />
               )}
             </div>

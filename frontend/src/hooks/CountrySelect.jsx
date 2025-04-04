@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { SelectReg } from "../components/ui";
 
-const CountriesSelect = ({ register, errors, disabled, selectedCountry }) => {
+const CountriesSelect = ({ register, errors, disabled, selectedCountry, onChange }) => {
   const [countries, setCountries] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,6 +38,7 @@ const CountriesSelect = ({ register, errors, disabled, selectedCountry }) => {
         {...register("country", { required: true })}
         disabled={disabled}
         value={selectedCountry}
+        onChange={onChange}
       >
         <option value="">Selecciona un país</option>
         {loading ? (
@@ -53,7 +54,6 @@ const CountriesSelect = ({ register, errors, disabled, selectedCountry }) => {
       {errors.country && (
       <p className="text-red-500 font-medium">El país es requerido</p>
       )}
-      
     </div>
   );
 };
