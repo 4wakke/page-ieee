@@ -21,11 +21,19 @@ function ProfilePage() {
   const [userDetails, setUserDetails] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [exchangeRate, setExchangeRate] = useState(null); // Almacena el tipo de cambio
+    const [isIeeeMemberSelected, setIsIeeeMemberSelected] = useState(false);  //! Nuevo estado
+    // eslint-disable-next-line no-unused-vars
+    const [error, setError] = useState(""); // Estado para el mensaje de error
+
+
+
+
   
   const navigate = useNavigate();
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue,watch, formState: { errors } } = useForm();
 
+  const isIeeeMemberValue = watch("isIeeeMember"); // Observa cambios en el campo
 
   // Obtener el tipo de cambio al iniciar
   const exchange = ExchangeDollar(); 
@@ -33,6 +41,11 @@ function ProfilePage() {
   // Obtener correo almacenado en el login
   const userEmail = localStorage.getItem("userEmail");
   
+  useEffect(() => {
+    if (watch("isIeeeMember") === "no") {
+      setValue("membershipNumber", "");
+    }
+  }, [setValue, watch]);
 
   const handleChangePassword = () => {
     navigate("/profile/changepassword");
@@ -45,7 +58,7 @@ function ProfilePage() {
   }, [exchange]);
 
   useEffect(() => {
-    if (!userEmail || !exchangeRate) return; //! Evita varias peticiones 
+    if (!userEmail || !exchangeRate) return; //? Evita varias peticiones 
     
     const fetchUserDetails = async () => {
 
@@ -58,7 +71,7 @@ function ProfilePage() {
         console.log("Datos recibidos del backend:", data.results)
 
         if (data.success) {
-          const userData = data.results;
+          let userData = {...data.results};
           localStorage.setItem("userId", userData.id);
           
 
@@ -86,6 +99,12 @@ function ProfilePage() {
           if (userData.country) {
             setValue("country", userData.country);  // Establece el valor de 'country'
           }
+          // Determina si `isIeeeMember` es "yes" o "no" y ajusta el estado
+          if (userData.isIeeeMember === "yes") {
+            setIsIeeeMemberSelected(true);
+          } else {
+            setIsIeeeMemberSelected(false);
+          }
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -103,8 +122,20 @@ function ProfilePage() {
 
 
   const handleSave = async (data) => {
+    setError(""); // Limpiamos errores antes de validar
 
-    console.log("Datos que se van a enviar:", data);
+    let updatedData = { ...data };
+
+
+      // Convertimos "yes" a true y "no" a false
+    if (updatedData.isIeeeMember !== undefined) {
+      updatedData.isIeeeMember = updatedData.isIeeeMember === "yes";
+    }
+    if (updatedData.isTems !== undefined) {
+      updatedData.isTems = updatedData.isTems === "yes";
+    }
+
+    console.log("Datos que se van a enviar:", updatedData);
 
     // if (!userDetails || !userDetails.id) { //!
     //   console.error("ID de usuario no disponible");
@@ -115,7 +146,7 @@ function ProfilePage() {
     //   const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
     //     method: "PUT",
     //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(data),
+    //     body: JSON.stringify(updatedData),
     //   });
     //   const result = await response.json();
       
@@ -217,7 +248,6 @@ function ProfilePage() {
                 )} */}
             </div>
 
-
             <div>
               <Label htmlFor="docNumber">
                 Número de documento
@@ -313,40 +343,24 @@ function ProfilePage() {
 
             <div>
               <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
-                <SelectReg
-                  {...register("isIeeeMember", { required: true })}
-                  disabled={!isEditing}>
-                  <option value="">Selecciona</option>
-                  <option value="yes">Sí</option>
-                  <option value="no">No</option>
-                </SelectReg>
-                {/* {errors.isIeeeMember && (
-                  <p className="text-red-500 font-medium">Este campo es requerido</p>
-                )} */}
-            </div>
-
-            <div>
-            <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
-              <Input 
-                type="text" 
-                placeholder="Edita número de membresía"
-                {...register("membershipNumber", { required: true })}
-                disabled={!isEditing}/>
-              {/* {errors.membershipNumber && (
-                <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
-              )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
-                <SelectReg {...register("isTems", { required: true })}disabled={!isEditing}>
-                  <option value="">Selecciona</option>
-                  <option value="yes">Sí</option>
-                  <option value="no">No</option>
-                </SelectReg>
-                {/* {errors.isTems && (
-                  <p className="text-red-500 font-medium">Este campo es requerido</p>
-                )} */}
+              <SelectReg
+                {...register("isIeeeMember", { required: true })}
+                disabled={!isEditing}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setIsIeeeMemberSelected(value === "yes");
+                  setValue("isIeeeMember", value);
+                  if (value === "no") {
+                    setValue("isIeeeMember", value);
+                    setValue("membershipNumber", "");
+                    setValue("isTems", "no");
+                  }
+                }}
+              >
+                <option value="">Selecciona</option>
+                <option value="yes">Sí</option>
+                <option value="no">No</option>
+              </SelectReg>
             </div>
 
             <div>
@@ -359,6 +373,26 @@ function ProfilePage() {
                 {/* {errors.isTaxRequired && (
                   <p className="text-red-500 font-medium">Este campo es requerido</p>
                 )} */}
+            </div>
+
+            <div> 
+            <Label htmlFor="pages">Articulos</Label>
+              <Input type="number" placeholder="Editar número de páginas artículo 1"
+              {...register("pages", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing} />
+            </div> 
+
+
+            <div>
+              <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+              <Input
+                type="text"
+                placeholder="Editar número de membresía"
+                {...register("membershipNumber", {
+                  required: isIeeeMemberValue === "yes" ? "El número de membresía es obligatorio" : false
+                })}
+                disabled={isIeeeMemberValue !== "yes" || !isEditing}
+              />
+              {errors.membershipNumber && <p className="text-red-500 font-medium">{errors.membershipNumber.message}</p>}
             </div>
 
             <div>
@@ -375,11 +409,27 @@ function ProfilePage() {
                 )} */}
             </div>
 
+
+
             <div> 
             <Label htmlFor="pages">Número de páginas articulo 1</Label>
               <Input type="number" placeholder="Editar número de páginas artículo 1"
               {...register("pages", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing} />
             </div> 
+
+            <div>
+              <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
+              <SelectReg
+                {...register("isTems", { required: isIeeeMemberSelected })}
+                disabled={!isIeeeMemberSelected || !isEditing}
+              >
+                <option value="">Selecciona</option>
+                <option value="yes">Sí</option>
+                <option value="no">No</option>
+              </SelectReg>
+            </div>
+            
+            <div></div>
             
             <div> 
             <Label htmlFor="sequence">Editar número articulo 1</Label>
@@ -387,13 +437,13 @@ function ProfilePage() {
               {...register("sequence", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
             </div>
             
-            <div> {/* numero pagina articulo */}
+            <div> {/* espacio medio */}
               
             </div>
             
           </div> {/* FIN GRID */}
 
-          <div className=" flex justify-center space-x-4">
+          <div className=" flex justify-center space-x-4 mt-4">
             <div>
               {isEditing ? (
                 <button type="submit" className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>

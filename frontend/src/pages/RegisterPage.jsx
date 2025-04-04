@@ -32,7 +32,6 @@ function RegisterPage() {
   const { signup, errors: signupErrors } = useAuth(); //*
   const navigate = useNavigate();
 
-
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
