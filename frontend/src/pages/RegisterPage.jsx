@@ -257,14 +257,11 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="participationType">Tipo de participación</Label>
-              <SelectReg {...register("participationType", { required: true })}>
-                <option value="">Selecciona el tipo de participación</option>
-                <option value="author">Autor</option>
-                <option value="attendee">Asistente</option>
-              </SelectReg>
-              {errors.participationType && (
-              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+            <Label htmlFor="affiliation">Afiliación</Label>
+              <Input type="text" placeholder="Ingresa tu afiliación"
+              {...register("affiliation", { required: true })}/>
+              {errors.affiliation && (
+              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
               )}
             </div>
 
@@ -360,13 +357,18 @@ function RegisterPage() {
             </div>
 
             <div>
-            <Label htmlFor="affiliation">Afiliación</Label>
-              <Input type="text" placeholder="Ingresa tu afiliación"
-              {...register("affiliation", { required: true })}/>
-              {errors.affiliation && (
-              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
+              <Label htmlFor="participationType">Tipo de participación</Label>
+              <SelectReg {...register("participationType", { required: true })}>
+                <option value="">Selecciona el tipo de participación</option>
+                <option value="author">Autor</option>
+                <option value="attendee">Asistente</option>
+              </SelectReg>
+              {errors.participationType && (
+              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
               )}
             </div>
+
+            
 
             <div></div> 
             {/* //! */}
