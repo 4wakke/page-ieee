@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
+import ExchangeDollar from "../hooks/ExchangeRate";
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
@@ -24,7 +25,7 @@ function RegisterPage() {
     handleSubmit,
     formState: { errors },
     watch,
-    setValue, //* Correción isIeeeMember
+    setValue,
   } = useForm();
 
   // eslint-disable-next-line no-unused-vars
@@ -35,12 +36,14 @@ function RegisterPage() {
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
-  const participationType = watch("participationType"); //!
+  const participationType = watch("participationType"); 
   const [price, setPrice] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [userId, setUserId] = useState(null); //?
   const [serverErrors, setServerErrors] = useState([]);
   const [serverMessage, setServerMessage] = useState(null);
+  const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINAMICO
+
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -72,14 +75,32 @@ function RegisterPage() {
     }
   }, [participationType, setValue]); 
 
+  const exchangeRate = ExchangeDollar(); //? PRUEBA DOLLARRATE DINAMICO
+
+  useEffect(() => { //? PRUEBA DOLLARRATE DINAMICO
+    setDollarRate(exchangeRate); // Cuando el valor de dollarRate cambia, se actualiza en el estado.
+  }, [exchangeRate]); //? PRUEBA DOLLARRATE DINAMICO
+
+  console.log(dollarRate); //? PRUEBA DOLLARRATE DINAMICO
+  
+
   const handlePayment = async () => {
     try {
+
+      if (!dollarRate) { //? PRUEBA DOLLARRATE DINAMICO
+        console.error("No se pudo obtener la tasa de cambio del dólar.");
+        return;
+      } //? PRUEBA DOLLARRATE DINAMICO
+
+      console.log(dollarRate); //? PRUEBA DOLLARRATE DINAMICO
+      
+
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: price,
-          dollarRate: 4300,
+          dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINAMICO
           description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
           userId,
         }),
