@@ -181,7 +181,7 @@ export const getUser = async (req, res) => {
               tax_amount AS taxAmount, qty_articles AS qtyArticles ,
              json_arrayagg(
               json_object(
-                  'number',a.sequence,
+                  'sequence',a.sequence,
                   'pages',a.pages
               )
             ) AS articles
