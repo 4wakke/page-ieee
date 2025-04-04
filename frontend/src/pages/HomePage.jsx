@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
@@ -7,13 +7,13 @@ function HomePage() {
   // eslint-disable-next-line no-unused-vars
   const data = useAuth();
 
-  useEffect(() => {
-    document.body.classList.add("home-page");
+  // useEffect(() => {
+  //   document.body.classList.add("home-page");
 
-    return () => {
-      document.body.classList.remove("home-page");
-    };
-  }, []);
+  //   return () => {
+  //     document.body.classList.remove("home-page");
+  //   };
+  // }, []);
 
   // para card w-[60vw] h-[65vh] en vez de w-full max-w-[600px] h-auto
   return (

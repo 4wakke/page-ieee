@@ -2,20 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Input, Label, Container } from "../components/ui"; // Asumimos que estos componentes están definidos
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 
 function ForgotPassword() {
 
-  useEffect(() => {
-      document.body.classList.add("forgot-page");
+  // useEffect(() => {
+  //     document.body.classList.add("forgot-page");
   
-      return () => {
-        document.body.classList.remove("forgot-page");
-      };
-    }, []);
+  //     return () => {
+  //       document.body.classList.remove("forgot-page");
+  //     };
+  //   }, []);
 
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();

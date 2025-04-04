@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 function AboutPage() {
-  useEffect(() => {
-    document.body.classList.add("about-page");
+  // useEffect(() => {
+  //   document.body.classList.add("about-page");
 
-    return () => {
-      document.body.classList.remove("home-page");
-    };
-  }, []);
+  //   return () => {
+  //     document.body.classList.remove("home-page");
+  //   };
+  // }, []);
 
   return (
     <div className="flex justify-center items-center bg-cover bg-center">

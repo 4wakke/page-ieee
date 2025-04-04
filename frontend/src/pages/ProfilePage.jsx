@@ -11,12 +11,12 @@ const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ProfilePage() {
 
-  useEffect(() => {
-    document.body.classList.add("profile-page");
-    return () => {
-      document.body.classList.remove("profile-page");
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.body.classList.add("profile-page");
+  //   return () => {
+  //     document.body.classList.remove("profile-page");
+  //   };
+  // }, []);
 
   const [userDetails, setUserDetails] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -195,14 +195,37 @@ function ProfilePage() {
             </div>
 
             <div>
-              <Label htmlFor="participationType">Tipo de participación</Label>
-              <SelectReg {...register("participationType", { required: true })} disabled={!isEditing}>
-                <option value="">Selecciona el tipo de participación</option>
-                <option value="author">Autor</option>
-                <option value="attendee">Asistente</option>
-              </SelectReg>
-              {/* {errors.participationType && (
-              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+              <Label htmlFor="affiliation">Afiliación</Label>
+                <Input type="text" placeholder="Ingresa tu afiliación"
+                {...register("affiliation", { required: true })}disabled={!isEditing}/>
+                {/* {errors.affiliation && (
+                <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
+                )} */}
+            </div>
+
+            <div>
+              <Label htmlFor="gender">Género</Label>
+                <SelectReg 
+                  {...register("gender", { required: true })} disabled={!isEditing}>
+                  <option value="">Selecciona tu género</option>
+                  <option value="Male">Masculino</option>
+                  <option value="Female">Femenino</option>
+                  <option value="Other">Otro</option>
+                </SelectReg>
+                {/* {errors.gender && (
+                <p className="text-red-500 font-medium">El género es requerido</p>
+                )} */}
+            </div>
+
+
+            <div>
+              <Label htmlFor="docNumber">
+                Número de documento
+              </Label>
+              <Input type="text" placeholder="Editar número de documento"
+              {...register("docNumber", { required: true })} disabled={!isEditing} />
+              {/* {errors.docNumber && (
+              <p className="text-red-500 font-medium">El número de documento es requerido</p>
               )} */}
             </div>
 
@@ -215,18 +238,6 @@ function ProfilePage() {
               </SelectReg>
               {/* {errors.attendanceType && (
               <p className="text-red-500 font-medium">El tipo de asistencia es requerido</p>
-              )} */}
-            </div>
-
-            
-            <div>
-              <Label htmlFor="docNumber">
-                Número de documento
-              </Label>
-              <Input type="text" placeholder="Editar número de documento"
-              {...register("docNumber", { required: true })} disabled={!isEditing} />
-              {/* {errors.docNumber && (
-              <p className="text-red-500 font-medium">El número de documento es requerido</p>
               )} */}
             </div>
                 
@@ -287,27 +298,18 @@ function ProfilePage() {
             </div>
 
             <div>
-              <Label htmlFor="affiliation">Afiliación</Label>
-                <Input type="text" placeholder="Ingresa tu afiliación"
-                {...register("affiliation", { required: true })}disabled={!isEditing}/>
-                {/* {errors.affiliation && (
-                <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
-                )} */}
+              <Label htmlFor="participationType">Tipo de participación</Label>
+              <SelectReg {...register("participationType", { required: true })} disabled={!isEditing}>
+                <option value="">Selecciona el tipo de participación</option>
+                <option value="author">Autor</option>
+                <option value="attendee">Asistente</option>
+              </SelectReg>
+              {/* {errors.participationType && (
+              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+              )} */}
             </div>
 
-            <div>
-              <Label htmlFor="gender">Género</Label>
-                <SelectReg 
-                  {...register("gender", { required: true })} disabled={!isEditing}>
-                  <option value="">Selecciona tu género</option>
-                  <option value="Male">Masculino</option>
-                  <option value="Female">Femenino</option>
-                  <option value="Other">Otro</option>
-                </SelectReg>
-                {/* {errors.gender && (
-                <p className="text-red-500 font-medium">El género es requerido</p>
-                )} */}
-            </div>
+            
 
             <div>
               <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>

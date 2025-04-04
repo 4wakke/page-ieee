@@ -13,12 +13,12 @@ import ExchangeDollar from "../hooks/ExchangeRate";
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function RegisterPage() {
-  useEffect(() => {
-    document.body.classList.add("register-page");
-    return () => {
-      document.body.classList.remove("register-page");
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.body.classList.add("register-page");
+  //   return () => {
+  //     document.body.classList.remove("register-page");
+  //   };
+  // }, []);
 
   const {
     register,

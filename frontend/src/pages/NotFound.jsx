@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 function NotFound() {
-  useEffect(() => {
-    document.body.classList.add("not-page");
+  // useEffect(() => {
+  //   document.body.classList.add("not-page");
 
-    return () => {
-      document.body.classList.remove("not-page");
-    };
-  }, []);
+  //   return () => {
+  //     document.body.classList.remove("not-page");
+  //   };
+  // }, []);
 
   return (
     <div className="w-screen h-screen flex items-center justify-center">
