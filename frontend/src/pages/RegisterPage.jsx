@@ -356,23 +356,6 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="participationType">Tipo de participación</Label>
-              <SelectReg {...register("participationType", { required: true })}>
-                <option value="">Selecciona el tipo de participación</option>
-                <option value="author">Autor</option>
-                <option value="attendee">Asistente</option>
-              </SelectReg>
-              {errors.participationType && (
-              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
-              )}
-            </div>
-
-            
-
-            <div></div> 
-            {/* //! */}
-
-            <div>
             <Label htmlFor="gender">Género</Label>
               <SelectReg 
                 {...register("gender", { required: true })}>
@@ -455,6 +438,21 @@ function RegisterPage() {
               </div>
                 )}
             </div>
+
+            <div>
+              <Label htmlFor="participationType">Tipo de participación</Label>
+              <SelectReg {...register("participationType", { required: true })}>
+                <option value="">Selecciona el tipo de participación</option>
+                <option value="author">Autor</option>
+                <option value="attendee">Asistente</option>
+              </SelectReg>
+              {errors.participationType && (
+              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+              )}
+            </div>
+
+            <div></div>
+            <div></div>
 
             {participationType === "author" && ( 
             <div>
