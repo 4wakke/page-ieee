@@ -168,29 +168,29 @@ function ProfilePage() {
 
     console.log("Datos que se van a enviar:", updatedData);
 
-    // if (!userDetails || !userDetails.id) { //!
-    //   console.error("ID de usuario no disponible");
-    //   return;
-    // } //?
+    if (!userDetails || !userDetails.id) { //! 
+      console.error("ID de usuario no disponible");
+      return;
+    } //?
 
-    // try {
-    //   const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
-    //     method: "PUT",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(updatedData),
-    //   });
-    //   const result = await response.json();
+    try {
+      const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+      const result = await response.json();
       
-    //   console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
-    //   if (result.success) {
-    //     setIsEditing(false);
-    //     alert("Datos guardados exitosamente");
-    //   } else {
-    //     alert("Error al guardar los datos");
-    //   }
-    // } catch (error) {
-    //   console.error("Error saving user details:", error);
-    // } //!
+      console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
+      if (result.success) {
+        setIsEditing(false);
+        alert("Datos guardados exitosamente");
+      } else {
+        alert("Error al guardar los datos");
+      }
+    } catch (error) {
+      console.error("Error saving user details:", error);
+    } //!
   };
 
   if (!userDetails) {
