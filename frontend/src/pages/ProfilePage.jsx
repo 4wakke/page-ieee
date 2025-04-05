@@ -5,65 +5,76 @@ import { useNavigate } from "react-router-dom";
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import ExchangeDollar from "../hooks/ExchangeRate";
 import CountriesSelect from "../hooks/CountrySelect";
-// import ArticlesSpaces from "../hooks/ArticlesSpaces";
+import ArticlesSpaces from "../hooks/ArticlesSpaces";
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ProfilePage() {
 
-  //! Empieza el cambio
-
   const [isEditing, setIsEditing] = useState(false);
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
+
+  const { 
+    register, 
+    handleSubmit, 
+    setValue, 
+    watch, 
+    formState: { errors } 
+  } = useForm();
   if (isEditing && errors.country) {
     delete errors.country;
   }
 
-  const isTaxRequired = watch("isTaxRequired");
+  const navigate = useNavigate();
 
+  const isTaxRequired = watch("isTaxRequired");
+  const qtyArticles = watch("qtyArticles", 0);
+  const isIeeeMember = watch("isIeeeMember");
+  const participationType = watch("participationType"); 
+  const [setError] = useState(""); // Estado para el mensaje de error
+  const [serverErrors, setServerErrors] = useState([]);
+  const [membershipNumber, setMembershipNumber] = useState(""); // Controla el número de membresía IEEE
+  const [isTems, setIsTems] = useState(""); // Controla si el usuario es miembro de TEMS
   const [userDetails, setUserDetails] = useState(null);
   const [exchangeRate, setExchangeRate] = useState(null); // Almacena el tipo de cambio
-    const [isIeeeMemberSelected, setIsIeeeMemberSelected] = useState(false);  //! Nuevo estado
-    // eslint-disable-next-line no-unused-vars
-    const [error, setError] = useState(""); // Estado para el mensaje de error
-
-  const navigate = useNavigate();
+  const exchange = ExchangeDollar(); 
+  
+  const userEmail = localStorage.getItem("userEmail");
 
   useEffect(() => {
     if (isTaxRequired === "no") {
-      setValue("taxAmount", "");  // Si no se requiere impuesto, vaciar el campo de monto
+      setValue("taxAmount", "");
     }
   }, [isTaxRequired, setValue]);
-
-  const isIeeeMemberValue = watch("isIeeeMember"); // Observa cambios en el campo
-
-  // Obtener el tipo de cambio al iniciar
-  const exchange = ExchangeDollar(); 
-
-  // Obtener correo almacenado en el login
-  const userEmail = localStorage.getItem("userEmail");
   
-  useEffect(() => {
-    if (watch("isIeeeMember") === "no") {
-      setValue("membershipNumber", "");
+  useEffect(() => { 
+    if (isIeeeMember === "no") {
+      setValue("isTems", "no"); 
+      setValue("membershipNumber", ""); 
     }
-  }, [setValue, watch]);
+  }, [isIeeeMember, setValue]);
 
-  const handleChangePassword = () => {
-    navigate("/profile/changepassword");
-  };
+  useEffect(() => { 
+    if (participationType === "attendee") {
+      setValue("qtyArticles", "");
+      setValue("articles", [{ sequence: "", pages: "" }]);
+    }
+  }, [participationType, setValue]); 
 
   useEffect(() => {
     if (exchange) {
       setExchangeRate(exchange);  // Almacena el tipo de cambio en el estado
     }
   }, [exchange]);
+  
+  const handleChangePassword = () => {
+    navigate("/profile/changepassword");
+  };
 
   useEffect(() => {
     if (!userEmail || !exchangeRate) return; //? Evita varias peticiones 
     
     const fetchUserDetails = async () => {
-
+      
       console.log("Correo que se está usando:", userEmail);
       console.log("Valor del tipo de cambio (exchangeRate):", exchangeRate);
 
@@ -75,15 +86,36 @@ function ProfilePage() {
         if (data.success) {
           let userData = {...data.results};
           localStorage.setItem("userId", userData.id);
-          
 
-          // Convertir valores 0 y 1 a 'No' y 'Sí'
-        if (userData.isIeeeMember !== undefined) {
-          userData.isIeeeMember = userData.isIeeeMember === 1 ? "yes" : "no";
+        data.isIeeeMember = data.isIeeeMember === "yes";
+        data.isTems = data.isTems === "yes";
+        data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
+
+        if (data.participationType === "attendee") {
+          data.qtyArticles = 0;  
+          data.articles = [];  
+        } else {
+          let formattedArticles = [];
+          if (data.qtyArticles > 0 && data.participationType === "author") {
+            formattedArticles = data.articles?.slice(0, data.qtyArticles).map(article => ({
+              sequence: article?.sequence || "",
+              pages: article?.pages ? parseInt(article.pages, 10) : ""
+            })) || [];
+          } else {
+            formattedArticles = [{ sequence: "", pages: "" }];
+          }
+          data.articles = formattedArticles;
         }
-        if (userData.isTems !== undefined) {
-          userData.isTems = userData.isTems === 1 ? "yes" : "no";
-        }
+
+        // const formattedData = {
+        //   occupation: data.occupation,
+        //   isIeeeMember: data.isIeeeMember,  
+        //   isTems: data.isTems,   
+        //   participationType: data.participationType,
+        //   attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
+        //   qtyArticles: data.qtyArticles,
+        //   articles: data.articles,
+        // };
 
         // Verificar si el pago por impuesto es mayor a 0
         if (userData.taxAmount > 0) {
@@ -99,11 +131,11 @@ function ProfilePage() {
             }
           }
           // Determina si `isIeeeMember` es "yes" o "no" y ajusta el estado
-          if (userData.isIeeeMember === "yes") {
-            setIsIeeeMemberSelected(true);
-          } else {
-            setIsIeeeMemberSelected(false);
-          }
+          // if (userData.isIeeeMember === "yes") {
+          //   setIsIeeeMemberSelected(true);
+          // } else {
+          //   setIsIeeeMemberSelected(false);
+          // }
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -124,10 +156,7 @@ function ProfilePage() {
 
 
   const handleSave = async (data) => {
-    setError(""); // Limpiamos errores antes de validar
-
     let updatedData = { ...data };
-
 
       // Convertimos "yes" a true y "no" a false
     if (updatedData.isIeeeMember !== undefined) {
@@ -345,49 +374,56 @@ function ProfilePage() {
               )} */}
             </div>
 
-            
-
             <div>
-              <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
-              <SelectReg
-                {...register("isIeeeMember", { required: true })}
-                disabled={!isEditing}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setIsIeeeMemberSelected(value === "yes");
-                  setValue("isIeeeMember", value);
-                  if (value === "no") {
-                    setValue("isIeeeMember", value);
-                    setValue("membershipNumber", "");
-                    setValue("isTems", "no");
-                  }
-                }}
-              >
-                <option value="">Selecciona</option>
-                <option value="yes">Sí</option>
-                <option value="no">No</option>
-              </SelectReg>
+            <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
+                <SelectReg
+                  {...register("isIeeeMember", { required: true })}
+                >
+                  <option value="">Selecciona</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </SelectReg>
+                {errors.isIeeeMember && (
+                  <p className="text-red-500 font-medium">Este campo es requerido</p>
+                )}
+  
+                {isIeeeMember === "yes" && (
+                  <>
+                    <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+                    <Input 
+                      type="text" 
+                      placeholder="Ingresa tu número de membresía"
+                      {...register("membershipNumber", { required: true })}
+                    />
+                    {errors.membershipNumber && (
+                      <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
+                    )}
+  
+                    <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
+                    <SelectReg {...register("isTems", { required: true })}>
+                      <option value="">Selecciona</option>
+                      <option value="yes">Sí</option>
+                      <option value="no">No</option>
+                    </SelectReg>
+                    {errors.isTems && (
+                      <p className="text-red-500 font-medium">Este campo es requerido</p>
+                    )}
+                  </>
+                )}
             </div>
 
-            <div> 
-            <Label htmlFor="pages">Articulos</Label>
-              <Input type="number" placeholder="Editar número de páginas artículo 1"
-              {...register("pages", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing} />
-            </div> 
-
-
+            {participationType === "author" && ( 
             <div>
-              <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
-              <Input
-                type="text"
-                placeholder="Editar número de membresía"
-                {...register("membershipNumber", {
-                  required: isIeeeMemberValue === "yes" ? "El número de membresía es obligatorio" : false
-                })}
-                disabled={isIeeeMemberValue !== "yes" || !isEditing}
-              />
-              {errors.membershipNumber && <p className="text-red-500 font-medium">{errors.membershipNumber.message}</p>}
+              <Label htmlFor="qtyArticles">Número de artículos</Label>
+              <Input type="number" placeholder="Ingresa el número de artículos"
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
+              {qtyArticles > 0 && (
+                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
+                {errors.qtyArticles && (
+              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
+              )}
             </div>
+            )} 
 
             <div>
             <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
@@ -415,35 +451,10 @@ function ProfilePage() {
 
 
 
-            <div> 
-            <Label htmlFor="pages">Número de páginas articulo 1</Label>
-              <Input type="number" placeholder="Editar número de páginas artículo 1"
-              {...register("pages", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing} />
-            </div> 
 
-            <div>
-              <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
-              <SelectReg
-                {...register("isTems", { required: isIeeeMemberSelected })}
-                disabled={!isIeeeMemberSelected || !isEditing}
-              >
-                <option value="">Selecciona</option>
-                <option value="yes">Sí</option>
-                <option value="no">No</option>
-              </SelectReg>
-            </div>
+
+
             
-            <div></div>
-            
-            <div> 
-            <Label htmlFor="sequence">Editar número articulo 1</Label>
-              <Input type="text" placeholder="Editar número artículo 1"
-              {...register("sequence", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
-            </div>
-            
-            <div> {/* espacio medio */}
-              
-            </div>
             
           </div> {/* FIN GRID */}
 
