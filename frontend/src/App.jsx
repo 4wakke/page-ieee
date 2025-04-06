@@ -45,7 +45,6 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
-            <Route path="/profile/admin" element={<AdminPage />} /> 
 
           </Route>
 
@@ -54,6 +53,8 @@ function App() {
           >
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/changepassword" element={<ChangePassword />} />
+            <Route path="/profile/admin" element={<AdminPage />} /> 
+
             
 
 

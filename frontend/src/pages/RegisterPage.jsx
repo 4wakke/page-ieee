@@ -152,6 +152,16 @@ function RegisterPage() {
 
     const onSubmit = handleSubmit(async (data) => {
       try {
+
+        if (Object.keys(errors).length > 0) {
+          toast.error("Por favor, completa todos los campos requeridos.", {
+            className: "bg-red-600 text-white font-medium",
+            progressClassName: "bg-red-300",
+            autoClose: 5000,
+          });
+          return; // Si hay errores, detenemos el flujo de ejecución
+        }
+
       data.isIeeeMember = data.isIeeeMember === "yes";
       data.isTems = data.isTems === "yes";
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
