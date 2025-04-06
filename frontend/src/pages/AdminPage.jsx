@@ -148,7 +148,7 @@ function AdminPage() {
       <h1 className="text-2xl font-bold mb-4 text-black text-center">
         Tabla de usuarios
       </h1>
-      <div className="mb-4 flex flex-col md:flex-row items-center gap-4">
+      <div className="mb-4 flex flex-col md:flex-row items-center justify-center gap-4">
         <div className="flex flex-col">
           <label htmlFor="nameFilter" className="text-black font-semibold">
             Filtro por nombre
