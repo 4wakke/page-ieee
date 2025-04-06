@@ -190,29 +190,29 @@ function ProfilePage() {
 
     console.log("Datos que se van a enviar:", updatedData);
 
-    // if (!userDetails || !userDetails.id) { //! 
-    //   console.error("ID de usuario no disponible");
-    //   return;
-    // } //?
+    if (!userDetails || !userDetails.id) { //! 
+      console.error("ID de usuario no disponible");
+      return;
+    } //?
 
-    // try {
-    //   const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
-    //     method: "PUT",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(updatedData),
-    //   });
-    //   const result = await response.json();
+    try {
+      const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+      const result = await response.json();
       
-    //   console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
-    //   if (result.success) {
-    //     setIsEditing(false);
-    //     alert("Datos guardados exitosamente");
-    //   } else {
-    //     alert("Error al guardar los datos");
-    //   }
-    // } catch (error) {
-    //   console.error("Error saving user details:", error);
-    // } //!
+      console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
+      if (result.success) {
+        setIsEditing(false);
+        alert("Datos guardados exitosamente");
+      } else {
+        alert("Error al guardar los datos");
+      }
+    } catch (error) {
+      console.error("Error saving user details:", error);
+    } //!
   };
 
   if (!userDetails) {
@@ -465,7 +465,7 @@ function ProfilePage() {
               <Input type="number" placeholder="Ingresa el número de artículos"
               {...register("qtyArticles", { required: "Este campo es obligatorio", min: 0 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
               {qtyArticles > 0 && (
-                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
+                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} isEditing={isEditing} />)}
                 {errors.qtyArticles && (
               <p className="text-red-500 font-medium">El número de artículos es requerido</p>
               )}
