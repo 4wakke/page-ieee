@@ -20,7 +20,7 @@ function ProfilePage() {
     watch, 
     formState: { errors } 
   } = useForm();
-  if (isEditing && errors.country) {
+  if (isEditing && errors.country ) {
     delete errors.country;
   }
 
@@ -55,8 +55,8 @@ function ProfilePage() {
 
   useEffect(() => { 
     if (participationType === "attendee") {
-      setValue("qtyArticles", "");
-      setValue("articles", [{ sequence: "", pages: "" }]);
+      setValue("qtyArticles", 0);
+      setValue("articles", []);
     }
   }, [participationType, setValue]); 
 
@@ -87,25 +87,28 @@ function ProfilePage() {
           let userData = {...data.results};
           localStorage.setItem("userId", userData.id);
 
-        data.isIeeeMember = data.isIeeeMember === "yes";
-        data.isTems = data.isTems === "yes";
-        data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
+        userData.isIeeeMember = userData.isIeeeMember === 1 ? "yes" : "no";
+        userData.isTems = userData.isTems === 1 ? "yes" : "no";
 
-        if (data.participationType === "attendee") {
-          data.qtyArticles = 0;  
-          data.articles = [];  
+        userData.taxAmount = userData.isTaxRequired === "no" ? "0" : userData.taxAmount;
+
+        if (userData.participationType === "attendee") {
+          userData.qtyArticles = 0;  
+          userData.articles = [];  
         } else {
           let formattedArticles = [];
-          if (data.qtyArticles > 0 && data.participationType === "author") {
-            formattedArticles = data.articles?.slice(0, data.qtyArticles).map(article => ({
+          if (userData.qtyArticles > 0 && userData.participationType === "author") {
+            formattedArticles = userData.articles?.slice(0, userData.qtyArticles).map(article => ({
               sequence: article?.sequence || "",
               pages: article?.pages ? parseInt(article.pages, 10) : ""
             })) || [];
           } else {
             formattedArticles = [{ sequence: "", pages: "" }];
           }
-          data.articles = formattedArticles;
+          userData.articles = formattedArticles;
         }
+
+        setUserDetails(userData);
 
         // const formattedData = {
         //   occupation: data.occupation,
@@ -165,6 +168,25 @@ function ProfilePage() {
     if (updatedData.isTems !== undefined) {
       updatedData.isTems = updatedData.isTems === "yes";
     }
+
+    if (updatedData.isTaxRequired === "no") {
+      updatedData.taxAmount = "0";  // Asignamos 0 si no se requiere impuesto
+    }
+
+     // Filtrar los artículos según qtyArticles
+    if (updatedData.qtyArticles && updatedData.qtyArticles > 0) {
+      // Filtramos artículos vacíos o nulos
+      updatedData.articles = updatedData.articles
+        .slice(0, updatedData.qtyArticles) // Limitamos a la cantidad de artículos que el usuario ingresó
+        .filter(article => article.sequence && article.pages); // Filtramos los artículos que tienen datos válidos
+    } else {
+      updatedData.articles = []; // Si no hay artículos, vaciar el array
+    }
+
+    // Si qtyArticles es 0, no enviar artículos vacíos (si no hay artículos)
+  if (updatedData.qtyArticles === 0) {
+    updatedData.articles = [];
+  }
 
     console.log("Datos que se van a enviar:", updatedData);
 
@@ -412,22 +434,9 @@ function ProfilePage() {
                 )}
             </div>
 
-            {participationType === "author" && ( 
-            <div>
-              <Label htmlFor="qtyArticles">Número de artículos</Label>
-              <Input type="number" placeholder="Ingresa el número de artículos"
-              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
-              {qtyArticles > 0 && (
-                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
-                {errors.qtyArticles && (
-              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
-              )}
-            </div>
-            )} 
-
             <div>
             <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
-              <SelectReg {...register("isTaxRequired", { required: true })}>
+              <SelectReg {...register("isTaxRequired", { required: true })} disabled={!isEditing}>
                 <option value="">Selecciona</option>
                 <option value="yes">Sí</option>
                 <option value="no">No</option>
@@ -449,6 +458,21 @@ function ProfilePage() {
             )}
             </div>
 
+            <div>
+            {participationType === "author" && ( 
+            <div>
+              <Label htmlFor="qtyArticles">Número de artículos</Label>
+              <Input type="number" placeholder="Ingresa el número de artículos"
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 0 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
+              {qtyArticles > 0 && (
+                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
+                {errors.qtyArticles && (
+              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
+              )}
+            </div>
+            )} 
+            </div>
+
           </div> {/* FIN GRID */}
 
           <div className=" flex justify-center space-x-4 mt-4">
@@ -464,7 +488,6 @@ function ProfilePage() {
                     Cambiar Contraseña
                 </button>
               </div>
-                
           </div>
         </form>
       </div>
