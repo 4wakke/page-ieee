@@ -30,10 +30,6 @@ function ProfilePage() {
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
   const participationType = watch("participationType"); 
-  const [setError] = useState(""); // Estado para el mensaje de error
-  const [serverErrors, setServerErrors] = useState([]);
-  const [membershipNumber, setMembershipNumber] = useState(""); // Controla el número de membresía IEEE
-  const [isTems, setIsTems] = useState(""); // Controla si el usuario es miembro de TEMS
   const [userDetails, setUserDetails] = useState(null);
   const [exchangeRate, setExchangeRate] = useState(null); // Almacena el tipo de cambio
   const exchange = ExchangeDollar(); 
@@ -423,14 +419,14 @@ function ProfilePage() {
                     <Input 
                       type="text" 
                       placeholder="Ingresa tu número de membresía"
-                      {...register("membershipNumber", { required: true })}
+                      {...register("membershipNumber", { required: true })} disabled={!isEditing}
                     />
                     {errors.membershipNumber && (
                       <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
                     )}
   
                     <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
-                    <SelectReg {...register("isTems", { required: true })}>
+                    <SelectReg {...register("isTems", { required: true })} disabled={!isEditing}>
                       <option value="">Selecciona</option>
                       <option value="yes">Sí</option>
                       <option value="no">No</option>
