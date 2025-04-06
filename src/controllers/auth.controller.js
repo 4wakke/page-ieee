@@ -287,11 +287,11 @@ export const updateUser = async (req, res) => {
     await pool.query(query, values);
 
     if (articles){
-      if (!Array.isArray(articles) || articles.some(a => !sequence || !a.pages)) {
+      if (!Array.isArray(articles) || articles.some(a => !a.sequence || !a.pages)) {
         return errorResponse(res,"El campo 'articles' debe ser un array de objetos con 'sequence' y 'pages'", 400)
       }
-  
-      if (articles.length !== qtyArticles) {
+
+      if (articles.length != qtyArticles) {
         return errorResponse(res,"La cantidad de artículos no coincide con 'qtyArticles'",400)
       }
   
@@ -314,19 +314,17 @@ export const updateUser = async (req, res) => {
       for (const [sequence, pages] of existingMap.entries()) {
         if (!newMap.has(sequence)) {
           deletes.push(sequence); // Si no está en el nuevo array, eliminarlo
-        } else if (newMap.get(sequence) !== pages) {
-          updates.push({ sequence, pages: newMap.get(sequence) }); // Si cambió, actualizarlo
+        } else if (newMap.get(pages) !== pages) {
+          updates.push({ sequence: sequence, pages: newMap.get(pages) }); // Si cambió, actualizarlo
         }
       }
   
-      // Revisar si hay que insertar nuevos artículos
       for (const [sequence, pages] of newMap.entries()) {
         if (!existingMap.has(sequence)) {
-          inserts.push({ id, sequence, pages });
+          inserts.push({sequence: sequence, pages: pages });
         }
       }
   
-      // Ejecutar consultas
       if (updates.length > 0) {
         for (const { sequence, pages } of updates) {
           await pool.query(
@@ -352,30 +350,29 @@ export const updateUser = async (req, res) => {
 
     }
 
-    const dataPayment = [
-      occupation || existingUser[0].occupation,
-      isIeeeMember ?? existingUser[0].is_ieee_member,
-      isTems ?? existingUser[0].is_tems,
-      participationType || existingUser[0].participation_type,
-      taxAmount || existingUser[0].tax_amount,
-      qtyArticles || existingUser[0].qty_articles,
-      articles || []
-    ]
-
-    const newPayment = payment(dataPayment)
-
-    if(!newPayment.success){
-        errorResponse(res,"Error al calcular el nuevo valor de pago",400,newPayment.error)
+    const dataPayment = {
+        update: true,
+        occupation: occupation || existingUser[0].occupation,
+        isIeeeMember: isIeeeMember ?? existingUser[0].is_ieee_member,
+        isTems: isTems ?? existingUser[0].is_tems,
+        participationType: participationType || existingUser[0].participation_type,
+        taxAmount: taxAmount || existingUser[0].tax_amount,
+        qtyArticles: qtyArticles || existingUser[0].qty_articles,
+        articles: articles || []
+    }
+/*
+    const newPayment = payment({body:dataPayment})
+    if(!newPayment || newPayment == 0){
+        errorResponse(res,"Error al calcular el nuevo valor de pago",400)
     }
     
     const paymentQuery = "SELECT * FROM payments WHERE user_id = ?"
     const infoPayment = await pool.query(paymentQuery, id);
-    const newPrice = newPayment.results.pric
     if (infoPayment.length > 0) {
-      if (infoPayment.usd != newPrice) {
+      if (infoPayment.usd != newPayment) {
         if (!["En proceso", "Creado"].includes(infoPayment.status)){
           const processData = [{
-            "amount": newPrice ,
+            "amount": newPayment ,
             "dollarRate":dollarRate,
             "description": `Pago auxiliar de ${name || existingUser[0].name} ${ lastName || existingUser[0].last_name}`,
             "userId":id
@@ -387,8 +384,8 @@ export const updateUser = async (req, res) => {
       }
       // Validar si se pago o no se pago. Si se pago se crea un nuevo pago con el valor seleccionado y si no se pago se hace un update al campo
     }
-
-    return successResponse(res, 'Usuario actualizado correctamente');
+    */
+    return successResponse(res, 'Usuario actualizado correctamente'),{userId: id};
     
   } catch (error) {
     console.error('Error al actualizar el usuario:', error);
@@ -410,7 +407,6 @@ export const signout = (req, res) => {
 export const payment = (req,res) =>{
   const data = req.body
   let price = 0
-
   const requiredFields = ["participationType","isIeeeMember","isTems","occupation","qtyArticles","articles"]
   const missingFields = requiredFields.filter(field => !(field in req.body));
   if (missingFields.length > 0) {
@@ -450,9 +446,12 @@ export const payment = (req,res) =>{
   });
 
   if (data.taxAmount && data.taxAmount > 0) {
-      price +=price*taxAmount/100
+      price +=price*data.taxAmount/100
   }
 
+  if (data.update){
+    return price
+  }
   return successResponse(res,"Precio calculado exitosamente",{"price":price})
 };
 
