@@ -33,8 +33,6 @@ function LoginPage() {
   return (
     <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center ">
       <Card>
-        
-        {/* Mostrar el mensaje de éxito o error */}
         {loginErrors && loginErrors.message && (
           <p
             className={`${

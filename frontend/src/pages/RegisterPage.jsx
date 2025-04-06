@@ -17,8 +17,6 @@ const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function RegisterPage() {
 
-  //! Empiezan cambios
-
   // useEffect(() => {
   //   document.body.classList.add("register-page");
   //   return () => {
@@ -36,8 +34,6 @@ function RegisterPage() {
 
   // eslint-disable-next-line no-unused-vars
   const { signup, errors: signupErrors } = useAuth(); //*
-  // const navigate = useNavigate();
-
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
@@ -47,10 +43,6 @@ function RegisterPage() {
   const [userId, setUserId] = useState(null); //?
   const priceRef = useRef(null);
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
-  
-
-    //! Empiezan cambios
-
 
   useEffect(() => {
     if (isTaxRequired === "no") {

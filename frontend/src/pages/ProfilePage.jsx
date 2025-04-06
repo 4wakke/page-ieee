@@ -6,6 +6,8 @@ import { Input, Button, CardReg, Label, Container, SelectReg } from "../componen
 import ExchangeDollar from "../hooks/ExchangeRate";
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
+import { toast } from "react-toastify";
+
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
@@ -34,11 +36,9 @@ function ProfilePage() {
   const [price, setPrice] = useState("");
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
 
-
-  
   const userEmail = localStorage.getItem("userEmail");
 
-  //! Empiezan cambios de nuevo
+  //! Empiezan cambios
 
   useEffect(() => {
     if (isTaxRequired === "no") {
