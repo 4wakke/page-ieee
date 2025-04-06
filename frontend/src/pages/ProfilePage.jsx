@@ -439,6 +439,21 @@ function ProfilePage() {
             </div>
 
             <div>
+            {participationType === "author" && ( 
+            <div>
+              <Label htmlFor="qtyArticles">Número de artículos</Label>
+              <Input type="number" placeholder="Ingresa el número de artículos"
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 0 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
+              {qtyArticles > 0 && (
+                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} isEditing={isEditing} />)}
+                {errors.qtyArticles && (
+              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
+              )}
+            </div>
+            )} 
+            </div>
+
+            <div>
             <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
               <SelectReg {...register("isTaxRequired", { required: true })} disabled={!isEditing}>
                 <option value="">Selecciona</option>
@@ -460,21 +475,6 @@ function ProfilePage() {
                 {errors.taxAmount && <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>}
               </div>
             )}
-            </div>
-
-            <div>
-            {participationType === "author" && ( 
-            <div>
-              <Label htmlFor="qtyArticles">Número de artículos</Label>
-              <Input type="number" placeholder="Ingresa el número de artículos"
-              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 0 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
-              {qtyArticles > 0 && (
-                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} isEditing={isEditing} />)}
-                {errors.qtyArticles && (
-              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
-              )}
-            </div>
-            )} 
             </div>
 
           </div> {/* FIN GRID */}
