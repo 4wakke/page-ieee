@@ -13,9 +13,10 @@ function AdminPage() {
     };
   }, []);
 
-  // eslint-disable-next-line no-unused-vars
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
+  const [nameFilter, setNameFilter] = useState("");
+  const [emailFilter, setEmailFilter] = useState("");
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -123,6 +124,20 @@ function AdminPage() {
   const [scrollWidth, setScrollWidth] = useState("2000px");
 
   useEffect(() => {
+    const filtered = users.filter((user) => {
+      const nameMatch = user.name
+        .toLowerCase()
+        .includes(nameFilter.toLowerCase());
+      const emailMatch = user.email
+        .toLowerCase()
+        .includes(emailFilter.toLowerCase());
+      return nameMatch && emailMatch;
+    });
+
+    setFilteredUsers(filtered);
+  }, [nameFilter, emailFilter, users]);
+
+  useEffect(() => {
     if (tableRef.current) {
       setScrollWidth(`${tableRef.current.scrollWidth}px`);
     }
@@ -133,6 +148,35 @@ function AdminPage() {
       <h1 className="text-2xl font-bold mb-4 text-black text-center">
         Tabla de usuarios
       </h1>
+      <div className="mb-4 flex flex-col md:flex-row items-center gap-4">
+        <div className="flex flex-col">
+          <label htmlFor="nameFilter" className="text-black font-semibold">
+            Filtro por nombre
+          </label>
+          <input
+            id="nameFilter"
+            type="text"
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+            className="border border-gray-400 p-2 rounded-md text-black"
+            placeholder="Buscar por nombre"
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="emailFilter" className="text-black font-semibold">
+            Filtro por correo
+          </label>
+          <input
+            id="emailFilter"
+            type="text"
+            value={emailFilter}
+            onChange={(e) => setEmailFilter(e.target.value)}
+            className="border border-gray-400 p-2 rounded-md text-black"
+            placeholder="Buscar por correo"
+          />
+        </div>
+      </div>
 
       <div ref={topScrollRef} className="overflow-x-auto mb-2 h-6">
         <div style={{ width: scrollWidth, height: "1px" }}></div>
