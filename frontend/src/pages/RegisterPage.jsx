@@ -2,6 +2,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
+// eslint-disable-next-line no-unused-vars
 import { Link, useNavigate } from "react-router-dom"; //?
 import { useAuth} from "../context/AuthContext";
 import { useEffect, useState, useRef  } from "react";
@@ -35,7 +36,7 @@ function RegisterPage() {
 
   // eslint-disable-next-line no-unused-vars
   const { signup, errors: signupErrors } = useAuth(); //*
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
@@ -45,8 +46,6 @@ function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [userId, setUserId] = useState(null); //?
   const priceRef = useRef(null);
-  //? const [serverErrors, setServerErrors] = useState([]);
-  //? const [serverMessage, setServerMessage] = useState(null);
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
   
 
@@ -66,16 +65,6 @@ function RegisterPage() {
       }
     }, [isIeeeMember, setValue]);
 
-  //? useEffect(() => {
-  //   if (serverMessage || serverErrors.length > 0) {
-  //     const timer = setTimeout(() => {
-  //       setServerMessage(null);
-  //       setServerErrors([]);
-  //     }, 6000);
-  //     return () => clearTimeout(timer);
-  //   }
-  //? }, [serverMessage, serverErrors]);
-
   useEffect(() => { 
     if (participationType === "attendee") {
       setValue("qtyArticles", "");
@@ -83,11 +72,37 @@ function RegisterPage() {
     }
   }, [participationType, setValue]); 
 
+  const handleBackendResponse = (response) => {
+    if (response.success) {
+      toast.success(response.message, {
+        className: "bg-green-600 text-white font-medium",
+        progressClassName: "bg-green-300",
+        autoClose: 5000,
+      });
+    } else {
+      toast.error(response.message, {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+  };
+
   const exchangeRate = ExchangeDollar(); //? PRUEBA DOLLARRATE DINÁMICO
 
   useEffect(() => { //? PRUEBA DOLLARRATE DINÁMICO
     setDollarRate(exchangeRate); // Cuando el valor de dollarRate cambia, se actualiza en el estado.
   }, [exchangeRate]); //? PRUEBA DOLLARRATE DINÁMICO  
+
+  useEffect(() => {
+    if (price && priceRef.current) {
+      priceRef.current.scrollIntoView({
+        behavior: "smooth", 
+        block: "center", 
+      });
+    }
+  }, [price]); 
+
 
   const handlePayment = async () => {
     try {
@@ -114,9 +129,19 @@ function RegisterPage() {
       const processPaymentData = await processPaymentResp.json();
       console.log("Respuesta de proceso de pago:", processPaymentData);
 
+
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
-        navigate("/");
-        window.location.href = processPaymentData.results.checkoutURL;
+        handleBackendResponse(processPaymentData);
+        toast.success("Redirigiendo a la página de pago, espere unos segundos...", {
+          className: "bg-green-600 text-white font-medium",
+          progressClassName: "bg-green-300",
+          autoClose: 5000,
+        });
+        setTimeout(() => {
+          window.location.href = processPaymentData.results.checkoutURL;  // Dirige al checkout
+        }, 5000);
+
+        
       } else {
         console.error("Error al obtener la URL de pago", processPaymentData);
       }
@@ -126,7 +151,7 @@ function RegisterPage() {
   };
 
     const onSubmit = handleSubmit(async (data) => {
-
+      try {
       data.isIeeeMember = data.isIeeeMember === "yes";
       data.isTems = data.isTems === "yes";
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
@@ -172,16 +197,10 @@ function RegisterPage() {
   
       const dataSignup = await resp.json();
       console.log("Respuesta de signup:", dataSignup);
+
   
       if (dataSignup.success) {
-      //? setServerMessage(dataSignup.message);
-
-      toast.success("Usuario registrado correctamente", {
-        className: "bg-green-600 text-white font-medium",
-        progressClassName: "bg-green-300",
-        autoClose: 6000,
-      });
-      
+      handleBackendResponse(dataSignup);
       const userId = dataSignup.results[0]?.userId;
       setUserId(userId);
       await signup(dataSignup);
@@ -193,33 +212,27 @@ function RegisterPage() {
   
         const responseData = await response.json();
         console.log("Respuesta de payment:", responseData);
-  
+
         if (responseData.success && responseData.results?.price !== undefined) {
           setPrice(responseData.results.price);
-          toast.success("Precio calculado exitosamente, puede proceder al pago", {
-            className: "bg-green-600 text-white font-medium",
-            progressClassName: "bg-green-300",
-            autoClose: 6000,
-          });
-
+          handleBackendResponse(responseData);
         }
+        
       } else {
-        toast.error("Hubo un error con el cálculo del precio", {
-          className: "bg-red-600 text-white font-medium",
-          progressClassName: "bg-red-300",
-          autoClose: 6000,
-        });
-}
+        handleBackendResponse(dataSignup); 
+    }
+    } catch (error) {
+      console.error("Error en el proceso de registro o pago:", error);
+      toast.error("Hubo un error en el proceso de registro o pago.", {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+      
     });
 
-    useEffect(() => {
-      if (price && priceRef.current) {
-        priceRef.current.scrollIntoView({
-          behavior: "smooth", 
-          block: "center", 
-        });
-      }
-    }, [price]); 
+    
 
   return (
     <Container className=" flex items-center justify-center min-h-screen">
