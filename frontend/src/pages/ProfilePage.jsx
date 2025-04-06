@@ -31,12 +31,14 @@ function ProfilePage() {
   const isIeeeMember = watch("isIeeeMember");
   const participationType = watch("participationType"); 
   const [userDetails, setUserDetails] = useState(null);
-  const [exchangeRate, setExchangeRate] = useState(null); // Almacena el tipo de cambio
-  const exchange = ExchangeDollar(); 
+  const [price, setPrice] = useState("");
+  const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
+
+
   
   const userEmail = localStorage.getItem("userEmail");
 
-  //! Empiezan cambios
+  //! Empiezan cambios de nuevo
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -58,11 +60,11 @@ function ProfilePage() {
     }
   }, [participationType, setValue]); 
 
-  useEffect(() => {
-    if (exchange) {
-      setExchangeRate(exchange);  // Almacena el tipo de cambio en el estado
-    }
-  }, [exchange]);
+  const exchangeRate = ExchangeDollar(); //? PRUEBA DOLLARRATE DINÁMICO
+
+  useEffect(() => { //? PRUEBA DOLLARRATE DINÁMICO
+    setDollarRate(exchangeRate); // Cuando el valor de dollarRate cambia, se actualiza en el estado.
+  }, [exchangeRate]); //? PRUEBA DOLLARRATE DINÁMICO 
   
   const handleChangePassword = () => {
     navigate("/profile/changepassword");
@@ -108,19 +110,9 @@ function ProfilePage() {
 
         setUserDetails(userData);
 
-        // const formattedData = {
-        //   occupation: data.occupation,
-        //   isIeeeMember: data.isIeeeMember,  
-        //   isTems: data.isTems,   
-        //   participationType: data.participationType,
-        //   attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
-        //   qtyArticles: data.qtyArticles,
-        //   articles: data.articles,
-        // };
-
-        // Verificar si el pago por impuesto es mayor a 0
+        
         if (userData.taxAmount > 0) {
-          userData.isTaxRequired = "yes";  // Establecer "sí" si el pago por impuesto es mayor a 0
+          userData.isTaxRequired = "yes";  
         } else {
             userData.isTaxRequired = "no";
         }
@@ -131,19 +123,11 @@ function ProfilePage() {
               setValue(key, userData[key]);
             }
           }
-          // Determina si `isIeeeMember` es "yes" o "no" y ajusta el estado
-          // if (userData.isIeeeMember === "yes") {
-          //   setIsIeeeMemberSelected(true);
-          // } else {
-          //   setIsIeeeMemberSelected(false);
-          // }
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
     };
-
-    
 
     fetchUserDetails();
   }, [setValue, userEmail, exchangeRate]);
@@ -156,10 +140,11 @@ function ProfilePage() {
   };
 
 
+  
+
   const handleSave = async (data) => {
     let updatedData = { ...data };
 
-      // Convertimos "yes" a true y "no" a false
     if (updatedData.isIeeeMember !== undefined) {
       updatedData.isIeeeMember = updatedData.isIeeeMember === "yes";
     }
@@ -168,26 +153,23 @@ function ProfilePage() {
     }
 
     if (updatedData.isTaxRequired === "no") {
-      updatedData.taxAmount = "0";  // Asignamos 0 si no se requiere impuesto
+      updatedData.taxAmount = "0";  
     }
 
-     // Filtrar los artículos según qtyArticles
     if (updatedData.qtyArticles && updatedData.qtyArticles > 0) {
-      // Filtramos artículos vacíos o nulos
+      
       updatedData.articles = updatedData.articles
-        .slice(0, updatedData.qtyArticles) // Limitamos a la cantidad de artículos que el usuario ingresó
-        .filter(article => article.sequence && article.pages); // Filtramos los artículos que tienen datos válidos
+        .slice(0, updatedData.qtyArticles) 
+        .filter(article => article.sequence && article.pages); 
 
-        // Aseguramos que `pages` sea un número
     updatedData.articles = updatedData.articles.map(article => ({
       ...article,
       pages: typeof article.pages === 'string' ? parseInt(article.pages, 10) : article.pages,
     }));
     } else {
-      updatedData.articles = []; // Si no hay artículos, vaciar el array
+      updatedData.articles = []; 
     }
 
-    // Si qtyArticles es 0, no enviar artículos vacíos (si no hay artículos)
   if (updatedData.qtyArticles === 0) {
     updatedData.articles = [];
   }
@@ -197,7 +179,7 @@ function ProfilePage() {
     if (!userDetails || !userDetails.id) { //! 
       console.error("ID de usuario no disponible");
       return;
-    } //?
+    } 
 
     try {
       const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
@@ -211,13 +193,72 @@ function ProfilePage() {
       if (result.success) {
         setIsEditing(false);
         alert("Datos guardados exitosamente");
-      } else {
-        alert("Error al guardar los datos");
-      }
+
+        const formattedData = {
+          occupation: data.occupation,
+          isIeeeMember: data.isIeeeMember,  
+          isTems: data.isTems,   
+          participationType: data.participationType,
+          attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
+          qtyArticles: data.qtyArticles,
+          articles: data.articles,
+        };
+
+        const response = await fetch(`${backRoute}/api/payment`, {
+          method: "POST",
+          body: JSON.stringify(formattedData), 
+          headers: { "Content-Type": "application/json" },
+        });
+        
+        const responseData = await response.json();
+        console.log("Respuesta de payment:", responseData);
+
+        if (responseData.success && responseData.results?.price !== undefined) {
+          setPrice(responseData.results.price); 
+        }
+      } 
+      
     } catch (error) {
       console.error("Error saving user details:", error);
     } //!
   };
+
+  const handlePayment = async () => {
+    try {
+
+      if (!dollarRate) { //? PRUEBA DOLLARRATE DINÁMICO
+        console.error("No se pudo obtener la tasa de cambio del dólar.");
+        return;
+      } //? PRUEBA DOLLARRATE DINÁMICO
+
+      console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
+      
+
+      const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: price,
+          dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINÁMICO
+          description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
+          userId: userDetails.id,
+        }),
+      });
+
+      const processPaymentData = await processPaymentResp.json();
+      console.log("Respuesta de proceso de pago:", processPaymentData);
+
+      if (processPaymentData.success && processPaymentData.results.checkoutURL) {
+        navigate("/");
+        window.location.href = processPaymentData.results.checkoutURL;
+      } else {
+        console.error("Error al obtener la URL de pago", processPaymentData);
+      }
+    } catch (error) {
+      console.error("Error en el proceso de pago:", error);
+    }
+  };
+  
 
   if (!userDetails) {
     return <p>Cargando...</p>;
@@ -493,6 +534,28 @@ function ProfilePage() {
                 </button>
               </div>
           </div>
+          <div>
+              {price && (
+              <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
+                <div className="text-center">
+                  <h4 className="text-xl font-bold">Cambio exitoso</h4>
+                  <p className="mt-2">
+                    {price > 0
+                      ? `${userDetails.name} ${userDetails.lastName}, usted debe esta ${price}$ por sus modificaciones`
+                      : `${userDetails.name} ${userDetails.lastName}, usted no debe nada`}
+                  </p>
+                </div>
+                    
+                {price > 0 && (
+                  <div className="mt-4 text-center">
+                    <button onClick={handlePayment} disabled={!price} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                      Pagar
+                    </button>
+                  </div>
+                )}
+              </div>
+              )}
+              </div>
         </form>
       </div>
     </div>
