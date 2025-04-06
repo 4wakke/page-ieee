@@ -70,6 +70,22 @@ function ProfilePage() {
     navigate("/profile/changepassword");
   };
 
+  const handleBackendResponse = (response) => {
+    if (response.success) {
+      toast.success(response.message, {
+        className: "bg-green-600 text-white font-medium",
+        progressClassName: "bg-green-300",
+        autoClose: 5000,
+      });
+    } else {
+      toast.error(response.message, {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+  };
+
   useEffect(() => {
     if (!userEmail || !exchangeRate) return; //? Evita varias peticiones 
     
@@ -85,6 +101,7 @@ function ProfilePage() {
 
         if (data.success) {
           let userData = {...data.results};
+          handleBackendResponse(userData)
 
           if (userData.admin) { //!
             navigate("/profile/admin");
