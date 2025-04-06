@@ -4,15 +4,20 @@ import { Input, Button, CardReg, Label, Container, SelectReg } from "../componen
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom"; //?
 import { useAuth} from "../context/AuthContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef  } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 import ExchangeDollar from "../hooks/ExchangeRate";
+import { toast } from "react-toastify";
+
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function RegisterPage() {
+
+  //! Empiezan cambios
+
   // useEffect(() => {
   //   document.body.classList.add("register-page");
   //   return () => {
@@ -39,8 +44,9 @@ function RegisterPage() {
   const [price, setPrice] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [userId, setUserId] = useState(null); //?
-  const [serverErrors, setServerErrors] = useState([]);
-  const [serverMessage, setServerMessage] = useState(null);
+  const priceRef = useRef(null);
+  //? const [serverErrors, setServerErrors] = useState([]);
+  //? const [serverMessage, setServerMessage] = useState(null);
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
   
 
@@ -60,15 +66,15 @@ function RegisterPage() {
       }
     }, [isIeeeMember, setValue]);
 
-  useEffect(() => {
-    if (serverMessage || serverErrors.length > 0) {
-      const timer = setTimeout(() => {
-        setServerMessage(null);
-        setServerErrors([]);
-      }, 6000);
-      return () => clearTimeout(timer);
-    }
-  }, [serverMessage, serverErrors]);
+  //? useEffect(() => {
+  //   if (serverMessage || serverErrors.length > 0) {
+  //     const timer = setTimeout(() => {
+  //       setServerMessage(null);
+  //       setServerErrors([]);
+  //     }, 6000);
+  //     return () => clearTimeout(timer);
+  //   }
+  //? }, [serverMessage, serverErrors]);
 
   useEffect(() => { 
     if (participationType === "attendee") {
@@ -168,7 +174,14 @@ function RegisterPage() {
       console.log("Respuesta de signup:", dataSignup);
   
       if (dataSignup.success) {
-      setServerMessage(dataSignup.message);
+      //? setServerMessage(dataSignup.message);
+
+      toast.success("Usuario registrado correctamente", {
+        className: "bg-green-600 text-white font-medium",
+        progressClassName: "bg-green-300",
+        autoClose: 6000,
+      });
+      
       const userId = dataSignup.results[0]?.userId;
       setUserId(userId);
       await signup(dataSignup);
@@ -182,12 +195,31 @@ function RegisterPage() {
         console.log("Respuesta de payment:", responseData);
   
         if (responseData.success && responseData.results?.price !== undefined) {
-          setPrice(responseData.results.price); 
+          setPrice(responseData.results.price);
+          toast.success("Precio calculado exitosamente, puede proceder al pago", {
+            className: "bg-green-600 text-white font-medium",
+            progressClassName: "bg-green-300",
+            autoClose: 6000,
+          });
+
         }
       } else {
-    setServerErrors([dataSignup.message]);
+        toast.error("Hubo un error con el cálculo del precio", {
+          className: "bg-red-600 text-white font-medium",
+          progressClassName: "bg-red-300",
+          autoClose: 6000,
+        });
 }
     });
+
+    useEffect(() => {
+      if (price && priceRef.current) {
+        priceRef.current.scrollIntoView({
+          behavior: "smooth", 
+          block: "center", 
+        });
+      }
+    }, [price]); 
 
   return (
     <Container className=" flex items-center justify-center min-h-screen">
@@ -471,6 +503,7 @@ function RegisterPage() {
             <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Registrarse</button>
           </div>
 
+{/*
           <div>
             {serverErrors.length > 0 && (
               <div className="text-red-500 font-medium bg-red-100 rounded-md shadow-md mb-4 mx-60 p-3">
@@ -486,6 +519,8 @@ function RegisterPage() {
             )}
           </div>
 
+          */}
+
           <div className="mt-4 text-center">
             <div className="flex justify-center tracking-wide"> 
             <p className="mr-4">Ya tienes una cuenta?</p>
@@ -497,7 +532,7 @@ function RegisterPage() {
           </div>
         </form>
 
-          <div>
+          <div ref={priceRef}>
             {price && (
               <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
                 <div className="text-center">

@@ -1,5 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { ToastContainer } from "react-toastify"; //! 🆕 Importación
+import "react-toastify/dist/ReactToastify.css"; //! 🆕 Estilos necesarios
+
+
 
 import Navbar from "./components/navbar/Navbar";
 import { Container } from "./components/ui";
@@ -21,9 +25,13 @@ function App() {
 
   if (loading) return <h1>Cargando...</h1>; //! LOADING
 
+  {/* Empiezan cambios*/}
+
   return (
     <>
       <Navbar />
+
+      <ToastContainer position="top-right" autoClose={5000} /> {/* //! */}
 
       <Container className="py-5">
         <Routes>
