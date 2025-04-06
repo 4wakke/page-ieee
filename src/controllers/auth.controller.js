@@ -184,7 +184,8 @@ export const getUser = async (req, res) => {
                   'sequence',a.sequence,
                   'pages',a.pages
               )
-            ) AS articles
+            ) AS articles,
+             admin
       FROM users u
       LEFT JOIN articles a ON a.user_id = u.id
       WHERE u.id = ? OR email = ?
