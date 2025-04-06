@@ -44,6 +44,8 @@ function RegisterPage() {
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
   
 
+    //! Empiezan cambios
+
 
   useEffect(() => {
     if (isTaxRequired === "no") {

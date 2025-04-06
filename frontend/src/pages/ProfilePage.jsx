@@ -40,6 +40,8 @@ function ProfilePage() {
   
   const userEmail = localStorage.getItem("userEmail");
 
+  //! Empiezan cambios
+
   useEffect(() => {
     if (isTaxRequired === "no") {
       setValue("taxAmount", "");
@@ -451,7 +453,7 @@ function ProfilePage() {
                   step="0.01"
                   placeholder="Ingresa el pago por impuesto"
                   {...register("taxAmount", { required: true })}
-                  onWheel={(e) => e.target.blur()}
+                  onWheel={(e) => e.target.blur()} disabled={!isEditing}
                 />
                 {errors.taxAmount && <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>}
               </div>
