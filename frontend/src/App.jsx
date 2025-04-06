@@ -13,6 +13,7 @@ import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPasswordPage";
 import ChangePassword from "./pages/ChangePasswordPage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   const { isAuth, loading } = useAuth(); //! LOADING
@@ -36,6 +37,8 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
+            <Route path="/profile/admin" element={<AdminPage />} /> 
+
           </Route>
 
           <Route
@@ -43,6 +46,9 @@ function App() {
           >
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/changepassword" element={<ChangePassword />} />
+            
+
+
           </Route>
 
           <Route path="*" element={<NotFound />} />

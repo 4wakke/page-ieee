@@ -247,8 +247,7 @@ function RegisterPage() {
                 <option value="passport">Pasaporte</option>
                 <option value="specialStayPermit">Permiso especial de permanencia</option>
                 <option value="nationalIdentityDocument">Documento Nacional de identidad</option>
-                <option value="safeConduct
-                Pass">Salvoconducto</option>
+                <option value="safeConductPass">Salvoconducto</option>
               </SelectReg>
               {errors.docType && (
               <p className="text-red-500 font-medium">El tipo de documento es requerido</p>

@@ -10,6 +10,14 @@ body {
   color: white;
 }
 
+
+.admin-page { 
+  background: aliceblue;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}
+
 /*
 .home-page { 
   background-image: url('/assets/fondo-barranquilla2.jpeg');

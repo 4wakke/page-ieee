@@ -85,6 +85,11 @@ function ProfilePage() {
 
         if (data.success) {
           let userData = {...data.results};
+
+          if (userData.admin) { //!
+            navigate("/profile/admin");
+          }
+          
           localStorage.setItem("userId", userData.id);
 
         userData.isIeeeMember = userData.isIeeeMember === 1 ? "yes" : "no";
@@ -130,7 +135,7 @@ function ProfilePage() {
     };
 
     fetchUserDetails();
-  }, [setValue, userEmail, exchangeRate]);
+  }, [setValue, userEmail, exchangeRate, navigate]);
 
   const handleEdit = () => {
     setIsEditing(true);
