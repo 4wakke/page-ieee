@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Input, Label, Container } from "../components/ui"; // Asumimos que estos componentes están definidos
 import { useForm } from "react-hook-form";
@@ -7,13 +7,13 @@ import { useForm } from "react-hook-form";
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ChangePassword() {
-  useEffect(() => {
-    document.body.classList.add("change-page");
+  // useEffect(() => {
+  //   document.body.classList.add("change-page");
 
-    return () => {
-      document.body.classList.remove("change-page");
-    };
-  }, []);
+  //   return () => {
+  //     document.body.classList.remove("change-page");
+  //   };
+  // }, []);
 
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();

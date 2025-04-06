@@ -2,16 +2,16 @@ import { Card, Input, Label, Container } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function LoginPage() {
-  useEffect(() => {
-    document.body.classList.add("login-page");
-    return () => {
-      document.body.classList.remove("login-page");
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.body.classList.add("login-page");
+  //   return () => {
+  //     document.body.classList.remove("login-page");
+  //   };
+  // }, []);
 
   const {
     register,

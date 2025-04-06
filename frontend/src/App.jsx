@@ -1,5 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { ToastContainer } from "react-toastify"; //! 🆕 Importación
+import "react-toastify/dist/ReactToastify.css"; //! 🆕 Estilos necesarios
+
+
 
 import Navbar from "./components/navbar/Navbar";
 import { Container } from "./components/ui";
@@ -13,6 +17,7 @@ import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPasswordPage";
 import ChangePassword from "./pages/ChangePasswordPage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   const { isAuth, loading } = useAuth(); //! LOADING
@@ -20,9 +25,13 @@ function App() {
 
   if (loading) return <h1>Cargando...</h1>; //! LOADING
 
+  {/* Empiezan cambios*/}
+
   return (
     <>
       <Navbar />
+
+      <ToastContainer position="top-right" autoClose={5000} /> {/* //! */}
 
       <Container className="py-5">
         <Routes>
@@ -36,6 +45,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
+
           </Route>
 
           <Route
@@ -43,6 +53,11 @@ function App() {
           >
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/changepassword" element={<ChangePassword />} />
+            <Route path="/profile/admin" element={<AdminPage />} /> 
+
+            
+
+
           </Route>
 
           <Route path="*" element={<NotFound />} />

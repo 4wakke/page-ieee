@@ -2,45 +2,55 @@
 // eslint-disable-next-line no-unused-vars
 import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
 import { useForm } from "react-hook-form";
+// eslint-disable-next-line no-unused-vars
 import { Link, useNavigate } from "react-router-dom"; //?
 import { useAuth} from "../context/AuthContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef  } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
+import ExchangeDollar from "../hooks/ExchangeRate";
+import { toast } from "react-toastify";
+
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function RegisterPage() {
-  useEffect(() => {
-    document.body.classList.add("register-page");
-    return () => {
-      document.body.classList.remove("register-page");
-    };
-  }, []);
+
+  //! Empiezan cambios
+
+  // useEffect(() => {
+  //   document.body.classList.add("register-page");
+  //   return () => {
+  //     document.body.classList.remove("register-page");
+  //   };
+  // }, []);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
-    setValue, //* Correción isIeeeMember
+    setValue,
   } = useForm();
 
   // eslint-disable-next-line no-unused-vars
   const { signup, errors: signupErrors } = useAuth(); //*
-  const navigate = useNavigate();
-
+  // const navigate = useNavigate();
 
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
-  const participationType = watch("participationType"); //!
+  const participationType = watch("participationType"); 
   const [price, setPrice] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [userId, setUserId] = useState(null); //?
-  const [serverErrors, setServerErrors] = useState([]);
-  const [serverMessage, setServerMessage] = useState(null);
+  const priceRef = useRef(null);
+  const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
+  
+
+    //! Empiezan cambios
+
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -55,16 +65,6 @@ function RegisterPage() {
       }
     }, [isIeeeMember, setValue]);
 
-  useEffect(() => {
-    if (serverMessage || serverErrors.length > 0) {
-      const timer = setTimeout(() => {
-        setServerMessage(null);
-        setServerErrors([]);
-      }, 6000);
-      return () => clearTimeout(timer);
-    }
-  }, [serverMessage, serverErrors]);
-
   useEffect(() => { 
     if (participationType === "attendee") {
       setValue("qtyArticles", "");
@@ -72,14 +72,67 @@ function RegisterPage() {
     }
   }, [participationType, setValue]); 
 
+  const handleBackendResponse = (response) => {
+    if (response.success) {
+      toast.success(response.message, {
+        className: "bg-green-600 text-white font-medium",
+        progressClassName: "bg-green-300",
+        autoClose: 5000,
+      });
+    } else {
+      toast.error(response.message, {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+  };
+
+  const exchangeRate = ExchangeDollar(); //? PRUEBA DOLLARRATE DINÁMICO
+
+  useEffect(() => { //? PRUEBA DOLLARRATE DINÁMICO
+    setDollarRate(exchangeRate); // Cuando el valor de dollarRate cambia, se actualiza en el estado.
+  }, [exchangeRate]); //? PRUEBA DOLLARRATE DINÁMICO  
+
+  useEffect(() => {
+    if (price && priceRef.current) {
+      priceRef.current.scrollIntoView({
+        behavior: "smooth", 
+        block: "center", 
+      });
+    }
+  }, [price]); 
+
+  useEffect(() => {
+    // Verificar si hay errores en el formulario
+    if (Object.keys(errors).length > 0) {
+      // Mostrar un toast indicando que todos los campos son requeridos
+      toast.error("Debes completar todos los campos requeridos para registrar tu cuenta.", {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+  }, [errors]); 
+
+
   const handlePayment = async () => {
     try {
+
+      if (!dollarRate) { //? PRUEBA DOLLARRATE DINÁMICO
+        console.error("No se pudo obtener la tasa de cambio del dólar.");
+        return;
+      } //? PRUEBA DOLLARRATE DINÁMICO
+
+      console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
+      
+
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: price,
-          dollarRate: 4300,
+          dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINÁMICO
           description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
           userId,
         }),
@@ -88,18 +141,35 @@ function RegisterPage() {
       const processPaymentData = await processPaymentResp.json();
       console.log("Respuesta de proceso de pago:", processPaymentData);
 
+
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
-        navigate("/");
-        window.location.href = processPaymentData.results.checkoutURL;
+        handleBackendResponse(processPaymentData);
+        toast.success("Redirigiendo a la página de pago, espere unos segundos...", {
+          className: "bg-green-600 text-white font-medium",
+          progressClassName: "bg-green-300",
+          autoClose: 5000,
+        });
+        setTimeout(() => {
+          window.location.href = processPaymentData.results.checkoutURL;  // Dirige al checkout
+        }, 5000);
+
+        
       } else {
         console.error("Error al obtener la URL de pago", processPaymentData);
+        handleBackendResponse(processPaymentData);
       }
     } catch (error) {
-      console.error("Error en el proceso de pago:", error);
-    }
+    console.error("Error en el proceso de pago:", error);
+    toast.error("Hubo un error en el proceso de pago.", {
+      className: "bg-red-600 text-white font-medium",
+      progressClassName: "bg-red-300",
+      autoClose: 5000,
+    });
+  }
   };
 
     const onSubmit = handleSubmit(async (data) => {
+      try {
 
       data.isIeeeMember = data.isIeeeMember === "yes";
       data.isTems = data.isTems === "yes";
@@ -146,9 +216,10 @@ function RegisterPage() {
   
       const dataSignup = await resp.json();
       console.log("Respuesta de signup:", dataSignup);
+
   
       if (dataSignup.success) {
-      setServerMessage(dataSignup.message);
+      handleBackendResponse(dataSignup);
       const userId = dataSignup.results[0]?.userId;
       setUserId(userId);
       await signup(dataSignup);
@@ -160,20 +231,29 @@ function RegisterPage() {
   
         const responseData = await response.json();
         console.log("Respuesta de payment:", responseData);
-  
+
         if (responseData.success && responseData.results?.price !== undefined) {
-          setPrice(responseData.results.price); 
+          setPrice(responseData.results.price);
+          handleBackendResponse(responseData);
         }
+        
       } else {
-    setServerErrors([dataSignup.message]);
-}
+        handleBackendResponse(dataSignup); 
+    }
+    } catch (error) {
+      console.error("Error en el proceso de registro o pago:", error);
+      toast.error("Hubo un error en el proceso de registro o pago.", {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+      
     });
 
   return (
     <Container className=" flex items-center justify-center min-h-screen">
       <CardReg>  
-
-
             
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
@@ -229,8 +309,7 @@ function RegisterPage() {
                 <option value="passport">Pasaporte</option>
                 <option value="specialStayPermit">Permiso especial de permanencia</option>
                 <option value="nationalIdentityDocument">Documento Nacional de identidad</option>
-                <option value="safeConduct
-                Pass">Salvoconducto</option>
+                <option value="safeConductPass">Salvoconducto</option>
               </SelectReg>
               {errors.docType && (
               <p className="text-red-500 font-medium">El tipo de documento es requerido</p>
@@ -238,14 +317,11 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="participationType">Tipo de participación</Label>
-              <SelectReg {...register("participationType", { required: true })}>
-                <option value="">Selecciona el tipo de participación</option>
-                <option value="author">Autor</option>
-                <option value="attendee">Asistente</option>
-              </SelectReg>
-              {errors.participationType && (
-              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+            <Label htmlFor="affiliation">Afiliación</Label>
+              <Input type="text" placeholder="Ingresa tu afiliación"
+              {...register("affiliation", { required: true })}/>
+              {errors.affiliation && (
+              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
               )}
             </div>
 
@@ -296,7 +372,7 @@ function RegisterPage() {
 
             <div>
               <Label htmlFor="country">País</Label>
-              <CountriesSelect register={register} errors={errors} />
+              <CountriesSelect register={register} errors={errors} disabled={false} />
             </div>
 
             <div>
@@ -339,18 +415,6 @@ function RegisterPage() {
               <p className="text-red-500 font-medium">La número de teléfono es requerido</p>
               )}
             </div>
-
-            <div>
-            <Label htmlFor="affiliation">Afiliación</Label>
-              <Input type="text" placeholder="Ingresa tu afiliación"
-              {...register("affiliation", { required: true })}/>
-              {errors.affiliation && (
-              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
-              )}
-            </div>
-
-            <div></div> 
-            {/* //! */}
 
             <div>
             <Label htmlFor="gender">Género</Label>
@@ -408,6 +472,31 @@ function RegisterPage() {
                 )}
               </div>
 
+              <div>
+              <Label htmlFor="participationType">Tipo de participación</Label>
+              <SelectReg {...register("participationType", { required: true })}>
+                <option value="">Selecciona el tipo de participación</option>
+                <option value="author">Autor</option>
+                <option value="attendee">Asistente</option>
+              </SelectReg>
+              {errors.participationType && (
+              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+              )}
+
+            {participationType === "author" && ( 
+            <div>
+              <Label htmlFor="qtyArticles">Número de artículos</Label>
+              <Input type="number" placeholder="Ingresa el número de artículos"
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
+              {qtyArticles > 0 && (
+                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} isRegister={true}/>)}
+                {errors.qtyArticles && (
+              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
+              )}
+            </div>
+            )}
+            </div>
+
             <div>
                 <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
                 <SelectReg {...register("isTaxRequired", { required: true })}>
@@ -436,25 +525,15 @@ function RegisterPage() {
                 )}
             </div>
 
-            {participationType === "author" && ( 
-            <div>
-              <Label htmlFor="qtyArticles">Número de artículos</Label>
-              <Input type="number" placeholder="Ingresa el número de artículos"
-              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
-              {qtyArticles > 0 && (
-                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
-                {errors.qtyArticles && (
-              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
-              )}
-            </div>
-            )} 
             
+
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center mb-6">
             <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Registrarse</button>
           </div>
 
+{/*
           <div>
             {serverErrors.length > 0 && (
               <div className="text-red-500 font-medium bg-red-100 rounded-md shadow-md mb-4 mx-60 p-3">
@@ -470,6 +549,8 @@ function RegisterPage() {
             )}
           </div>
 
+          */}
+
           <div className="mt-4 text-center">
             <div className="flex justify-center tracking-wide"> 
             <p className="mr-4">Ya tienes una cuenta?</p>
@@ -481,7 +562,7 @@ function RegisterPage() {
           </div>
         </form>
 
-          <div>
+          <div ref={priceRef}>
             {price && (
               <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
                 <div className="text-center">
