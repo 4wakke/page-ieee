@@ -322,7 +322,7 @@ export const updateUser = async (req, res) => {
       // Revisar si hay que insertar nuevos artículos
       for (const [sequence, pages] of newMap.entries()) {
         if (!existingMap.has(sequence)) {
-          inserts.push({ userId, sequence, pages });
+          inserts.push({ id, sequence, pages });
         }
       }
   
@@ -330,23 +330,23 @@ export const updateUser = async (req, res) => {
       if (updates.length > 0) {
         for (const { sequence, pages } of updates) {
           await pool.query(
-            "UPDATE user_articles SET pages = ? WHERE userId = ? AND sequence = ?",
-            [pages, userId, sequence]
+            "UPDATE articles SET pages = ? WHERE user_id = ? AND sequence = ?",
+            [pages, id, sequence]
           );
         }
       }
   
       if (deletes.length > 0) {
         await pool.query(
-          "DELETE FROM user_articles WHERE userId = ? AND sequence IN (?)",
-          [userId, deletes]
+          "DELETE FROM articles WHERE user_id = ? AND sequence IN (?)",
+          [id, deletes]
         );
       }
   
       if (inserts.length > 0) {
         await pool.query(
-          "INSERT INTO user_articles (userId, sequence, pages) VALUES ?",
-          [inserts.map(({ userId, sequence, pages }) => [userId, sequence, pages])]
+          "INSERT INTO articles (user_id, sequence, pages) VALUES ?",
+          [inserts.map(({ id, sequence, pages }) => [id, sequence, pages])]
         );
       }
 
@@ -368,8 +368,8 @@ export const updateUser = async (req, res) => {
         errorResponse(res,"Error al calcular el nuevo valor de pago",400,newPayment.error)
     }
     
-    const paymentQury = "SELECT * FROM payments WHERE user_id = ?"
-    const infoPayment = await pool.query(paymentQury, id);
+    const paymentQuery = "SELECT * FROM payments WHERE user_id = ?"
+    const infoPayment = await pool.query(paymentQuery, id);
     const newPrice = newPayment.results.pric
     if (infoPayment.length > 0) {
       if (infoPayment.usd != newPrice) {
