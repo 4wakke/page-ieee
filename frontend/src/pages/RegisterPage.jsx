@@ -192,8 +192,6 @@ function RegisterPage() {
   return (
     <Container className=" flex items-center justify-center min-h-screen">
       <CardReg>  
-
-
             
         <h3 className="text-3xl font-bold text-center mb-2 tracking-wide">Registro</h3>
         <form onSubmit={onSubmit} autoComplete="off">
@@ -413,6 +411,31 @@ function RegisterPage() {
                 )}
               </div>
 
+              <div>
+              <Label htmlFor="participationType">Tipo de participación</Label>
+              <SelectReg {...register("participationType", { required: true })}>
+                <option value="">Selecciona el tipo de participación</option>
+                <option value="author">Autor</option>
+                <option value="attendee">Asistente</option>
+              </SelectReg>
+              {errors.participationType && (
+              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+              )}
+
+            {participationType === "author" && ( 
+            <div>
+              <Label htmlFor="qtyArticles">Número de artículos</Label>
+              <Input type="number" placeholder="Ingresa el número de artículos"
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
+              {qtyArticles > 0 && (
+                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} isRegister={true}/>)}
+                {errors.qtyArticles && (
+              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
+              )}
+            </div>
+            )}
+            </div>
+
             <div>
                 <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
                 <SelectReg {...register("isTaxRequired", { required: true })}>
@@ -441,34 +464,8 @@ function RegisterPage() {
                 )}
             </div>
 
-            <div>
-              <Label htmlFor="participationType">Tipo de participación</Label>
-              <SelectReg {...register("participationType", { required: true })}>
-                <option value="">Selecciona el tipo de participación</option>
-                <option value="author">Autor</option>
-                <option value="attendee">Asistente</option>
-              </SelectReg>
-              {errors.participationType && (
-              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
-              )}
-            </div>
-
-            <div></div>
-            <div></div>
-
-            {participationType === "author" && ( 
-            <div>
-              <Label htmlFor="qtyArticles">Número de artículos</Label>
-              <Input type="number" placeholder="Ingresa el número de artículos"
-              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
-              {qtyArticles > 0 && (
-                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} />)}
-                {errors.qtyArticles && (
-              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
-              )}
-            </div>
-            )} 
             
+
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center mb-6">

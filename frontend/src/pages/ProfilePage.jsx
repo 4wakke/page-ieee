@@ -181,6 +181,12 @@ function ProfilePage() {
       updatedData.articles = updatedData.articles
         .slice(0, updatedData.qtyArticles) // Limitamos a la cantidad de artículos que el usuario ingresó
         .filter(article => article.sequence && article.pages); // Filtramos los artículos que tienen datos válidos
+
+        // Aseguramos que `pages` sea un número
+    updatedData.articles = updatedData.articles.map(article => ({
+      ...article,
+      pages: typeof article.pages === 'string' ? parseInt(article.pages, 10) : article.pages,
+    }));
     } else {
       updatedData.articles = []; // Si no hay artículos, vaciar el array
     }

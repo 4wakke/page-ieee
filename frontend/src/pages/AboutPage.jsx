@@ -11,7 +11,7 @@ function AboutPage() {
   // }, []);
 
   return (
-    <div className="flex justify-center items-center bg-cover bg-center">
+    <div className="flex justify-center items-center">
     <div className="bg-[#2e5ca6] bg-opacity-85 shadow-lg rounded-lg w-full max-w-[900px] min-h-[83vh] h-auto py-12 px-6 flex flex-col items-center justify-center mt-4"> 
       <div className="max-w-7xl text-center tracking-wide">
         <h1 className="text-4xl font-bold text-[#ffffff] mb-6">Sobre Nosotros</h1>

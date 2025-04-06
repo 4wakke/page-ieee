@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Input, Label } from "../components/ui";
 
-const ArticlesSpaces = ({ register, errors, qtyArticles, isEditing }) => {
+const ArticlesSpaces = ({ register, errors, qtyArticles, isEditing, isRegister}) => {
   const renderArticleFields = () => {
     let fields = [];
     for (let i = 0; i < qtyArticles; i++) {
@@ -13,7 +13,7 @@ const ArticlesSpaces = ({ register, errors, qtyArticles, isEditing }) => {
               type="text"
               placeholder="Nombre del artículo" 
               {...register(`articles[${i}].sequence`, { required: "El nombre del articulo es obligatorio"  })}
-              disabled={!isEditing}/>
+              disabled={isRegister ? false : !isEditing}/>
             {errors?.articles?.[i]?.sequence && (
               <p className="text-red-500 font-medium">{errors.articles[i]?.sequence?.message}</p>
             )}
@@ -25,7 +25,7 @@ const ArticlesSpaces = ({ register, errors, qtyArticles, isEditing }) => {
               placeholder="Número de páginas"
               {...register(`articles[${i}].pages`, { required: "El número de páginas es obligatorio" })}
               onWheel={(e) => e.target.blur()}
-              disabled={!isEditing}/>
+              disabled={isRegister ? false : !isEditing}/>
             
             {errors?.articles?.[i]?.pages && (
               <p className="text-red-500 font-medium">{errors.articles[i]?.pages?.message}</p>
