@@ -103,6 +103,18 @@ function RegisterPage() {
     }
   }, [price]); 
 
+  useEffect(() => {
+    // Verificar si hay errores en el formulario
+    if (Object.keys(errors).length > 0) {
+      // Mostrar un toast indicando que todos los campos son requeridos
+      toast.error("Debes completar todos los campos requeridos para registrar tu cuenta.", {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+  }, [errors]); 
+
 
   const handlePayment = async () => {
     try {
@@ -144,23 +156,20 @@ function RegisterPage() {
         
       } else {
         console.error("Error al obtener la URL de pago", processPaymentData);
+        handleBackendResponse(processPaymentData);
       }
     } catch (error) {
-      console.error("Error en el proceso de pago:", error);
-    }
+    console.error("Error en el proceso de pago:", error);
+    toast.error("Hubo un error en el proceso de pago.", {
+      className: "bg-red-600 text-white font-medium",
+      progressClassName: "bg-red-300",
+      autoClose: 5000,
+    });
+  }
   };
 
     const onSubmit = handleSubmit(async (data) => {
       try {
-
-        if (Object.keys(errors).length > 0) {
-          toast.error("Por favor, completa todos los campos requeridos.", {
-            className: "bg-red-600 text-white font-medium",
-            progressClassName: "bg-red-300",
-            autoClose: 5000,
-          });
-          return; // Si hay errores, detenemos el flujo de ejecución
-        }
 
       data.isIeeeMember = data.isIeeeMember === "yes";
       data.isTems = data.isTems === "yes";
@@ -241,8 +250,6 @@ function RegisterPage() {
     }
       
     });
-
-    
 
   return (
     <Container className=" flex items-center justify-center min-h-screen">
