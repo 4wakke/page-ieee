@@ -223,7 +223,7 @@ function ProfilePage() {
 
   return (
     <div className="flex items-center justify-center ">
-      <div className="bg-[#2e5ca6] bg-opacity-90 shadow-lg p-6 min-h-screen rounded-lg w-[1050px] mx-auto ">
+      <div className="bg-[#2e5ca6] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto ">
         <h3 className="text-3xl font-bold text-center mb-4 tracking-wide">Perfil de usuario</h3>
         <form onSubmit={handleSubmit(handleSave)} autoComplete="off">
 
