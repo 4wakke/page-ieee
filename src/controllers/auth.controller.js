@@ -169,7 +169,7 @@ const sendRegisterEmail = async (data,res) =>{
 
   const participationMap = {
     author: "Autor",
-    atendee: "Asistente",
+    attendee: "Asistente",
     speaker: "Conferencista",
   };
 
@@ -454,14 +454,23 @@ export const signout = (req, res) => {
   return successResponse(res,"Sesión cerrada correctamente",{})
 };
 
-export const payment = (req,res) =>{
+export const payment = async (req,res) =>{
   const data = req.body
   let price = 0
-  const requiredFields = ["participationType","isIeeeMember","isTems","occupation","qtyArticles","articles"]
+  const requiredFields = ["participationType","isIeeeMember","isTems","occupation","qtyArticles","articles","userId"]
   const missingFields = requiredFields.filter(field => !(field in req.body));
   if (missingFields.length > 0) {
     return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
   }
+  const query = `
+      SELECT *
+      FROM payments
+      WHERE status = 'Pagado' and user_id = ?
+      ORDER BY id DESC
+      LIMIT 1;
+    `;
+
+  const [payments] = await pool.query(query, [data.userId]);
 
   if (data.participationType == "author"){
     if (data.isIeeeMember){
@@ -499,9 +508,18 @@ export const payment = (req,res) =>{
       price +=price*data.taxAmount/100
   }
 
-  if (data.update){
-    return price
+  
+  if (payments.length > 0) {
+    const payment = payments[0];
+    if (payment.usd !== price) {
+      price -= payment.usd;
+    }
   }
+  
+  if (price < 0) {
+    price = 0;
+  }
+
   return successResponse(res,"Precio calculado exitosamente",{"price":price})
 };
 
@@ -534,29 +552,52 @@ export const processPayment = async (req, res) => {
     if (missingFields.length > 0) {
       return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
     } 
+
+    const query = `
+      SELECT dollar_rate 
+      FROM dollar_rate
+      ORDER BY fecha_registro DESC
+      LIMIT 1
+    `;
+
+    const [dollarRateDb] = await pool.query(query);
+    const PaymentQuery = `
+      SELECT *
+      FROM payments
+      WHERE status = 'Creado' and user_id = ?
+      ORDER BY id DESC
+      LIMIT 1
+    `;
+
+    const [payments] = await pool.query(PaymentQuery, [data.userId]);
+    if (payments.length > 0){
+      
+        const payment = payments[0];
+        if (parseFloat(payment.usd) !== parseFloat(data.amount,10)) {
+          const updatePayment = " UPDATE payments SET status = 'Cancel' WHERE id = ?"
+          await pool.query(updatePayment, [payment.id]);
+        } else {
+          return successResponse(res,"El cobro ya existe",
+            {cobro: {},checkoutURL: `https://${process.env.cobru_url}/${payment.url}`},200)
+        }
+        
+    }
+
       if (cobruToken || isTokenExpired(cobruToken) ){
         await getRefreshToken(res)
       }
-
-      const query = `
-        SELECT dollar_rate 
-        FROM dollar_rate
-        ORDER BY fecha_registro DESC
-        LIMIT 1
-      `;
-
-      const [dollarRateDb] = await pool.query(query);
-      console.log(dollarRateDb[0].dollar_rate)
-      const copAmount = Math.ceil(data.amount * dollarRateDb[0].dollar_rate)
-      const newCobru = {
-        amount: copAmount ,
-        description: data.description || "Pago por servicio",
-        expiration_days: 7,
-        payment_method_enabled: JSON.stringify({
-          credit_card: true,  
-          pse: true,
-        }),
-        platform: "API",
+      
+      
+    const copAmount = Math.ceil(data.amount * dollarRateDb[0].dollar_rate)
+    const newCobru = {
+      amount: copAmount ,
+      description: data.description || "Pago por servicio",
+      expiration_days: 7,
+      payment_method_enabled: JSON.stringify({
+        credit_card: true,  
+        pse: true,
+      }),
+      platform: "API",
     };
 
     const responseCobro = await fetch(`https://${process.env.cobru_url}/cobru/`, {
@@ -591,6 +632,7 @@ export const processPayment = async (req, res) => {
     const [result] = await pool.query(sql, values);
     return successResponse(res,"Cobro creado exitosamente",
       {cobro: cobroResponse,checkoutURL: `https://${process.env.cobru_url}/${cobroResponse.url}`},200)
+    
     
   } catch (error) {
     console.error("Error en el proceso de pago:", error);
