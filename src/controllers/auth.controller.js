@@ -573,11 +573,10 @@ export const processPayment = async (req, res) => {
     if (payments.length > 0){
       
         const payment = payments[0];
-        if (payment.usd !== data.amount) {
+        if (parseFloat(payment.usd) !== parseFloat(data.amount,10)) {
           const updatePayment = " UPDATE payments SET status = 'Cancel' WHERE id = ?"
           await pool.query(updatePayment, [payment.id]);
         } else {
-          
           return successResponse(res,"El cobro ya existe",
             {cobro: {},checkoutURL: `https://${process.env.cobru_url}/${payment.url}`},200)
         }
