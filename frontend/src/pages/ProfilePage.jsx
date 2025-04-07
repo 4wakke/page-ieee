@@ -38,8 +38,8 @@ function ProfilePage() {
   const priceRef = useRef(null);
   const pendingPriceRef = useRef(null);
   const paymentTriggeredByEdit = useRef(false);
-  const [showNewCharge, setShowNewCharge] = useState(false);
-  const [paymentInProgress, setPaymentInProgress] = useState(false);
+  const [IsSave, setIsSave] = useState(false);
+
 
   const [pendingPrice, setPendingPrice] = useState(null);
   // eslint-disable-next-line no-unused-vars
@@ -118,8 +118,8 @@ function ProfilePage() {
     
     const fetchUserDetails = async () => {
       
-      console.log("Correo que se está usando:", userEmail);
-      console.log("Valor del tipo de cambio (exchangeRate):", exchangeRate);
+      //? console.log("Correo que se está usando:", userEmail);
+      //? console.log("Valor del tipo de cambio (exchangeRate):", exchangeRate);
 
       toast.success(
         <div>
@@ -243,7 +243,7 @@ function ProfilePage() {
         handleBackendResponse(paymentData);
       }
     } catch (error) {
-      console.error("Error en el pago pendiente:", error);
+      //? console.error("Error en el pago pendiente:", error);
       handleBackendResponse(error);
     }
   };
@@ -266,15 +266,13 @@ function ProfilePage() {
         });
   
         const processPendingPaymentData = await processResponse.json();
-        console.log("Respuesta de proceso de pago:", processPendingPaymentData);
+        //? console.log("Respuesta de proceso de pago:", processPendingPaymentData);
   
         if (
           processPendingPaymentData.success &&
           processPendingPaymentData.results.checkoutURL
           
         ) {
-          setShowNewCharge(false); //!
-          setPaymentInProgress(false); //!
           setPendingUrl(processPendingPaymentData.results.checkoutURL);
           handleBackendResponse(processPendingPaymentData);
           toast.success("Redirigiendo a la página de pago, espere unos segundos...", {
@@ -287,7 +285,7 @@ function ProfilePage() {
             window.open(processPendingPaymentData.results.checkoutURL, "_blank");
           }, 4000);
         } else {
-          console.error("Error al obtener la URL de pago", processPendingPaymentData);
+          //? console.error("Error al obtener la URL de pago", processPendingPaymentData);
           handleBackendResponse(processPendingPaymentData);
         }
       } else {
@@ -298,7 +296,7 @@ function ProfilePage() {
         });
       }
     } catch (error) {
-      console.error("Error al procesar el pago pendiente:", error);
+      //? console.error("Error al procesar el pago pendiente:", error);
       handleBackendResponse(error);
     }
   };
@@ -312,6 +310,8 @@ function ProfilePage() {
   };
 
   const handleSave = async (data) => {
+    setIsSave(true);
+
     let updatedData = { ...data };
 
     if (updatedData.isIeeeMember !== undefined) {
@@ -343,10 +343,10 @@ function ProfilePage() {
     updatedData.articles = [];
   }
 
-    console.log("Datos que se van a enviar:", updatedData);
+    //? console.log("Datos que se van a enviar:", updatedData);
 
     if (!userDetails || !userDetails.id) { //! 
-      console.error("ID de usuario no disponible");
+      //? console.error("ID de usuario no disponible");
       return;
     } 
 
@@ -359,7 +359,7 @@ function ProfilePage() {
       
       const result = await response.json();
       
-      console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
+      //? console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
       if (result.success) {
         handleBackendResponse(result)
         setIsEditing(false);
@@ -377,7 +377,7 @@ function ProfilePage() {
 
         paymentTriggeredByEdit.current = true;
 
-        console.log("Respuesta de payment:", formattedData);
+        //? console.log("Respuesta de payment:", formattedData);
 
 
         const response = await fetch(`${backRoute}/api/payment`, {
@@ -387,13 +387,12 @@ function ProfilePage() {
         });
         
         const responseData = await response.json();
-        console.log("Respuesta de payment:", responseData);
-//cambios nuevos
+        //? console.log("Respuesta de payment:", responseData);
+
         if (responseData.success && responseData.results?.price !== undefined) {
           setPendingPrice(null);
           if (paymentTriggeredByEdit.current) {
             setPrice(responseData.results.price);
-            setShowNewCharge(true); //! ✅ SOLO SI NO ESTÁ EN FLUJO DE PAGO
           }
           handleBackendResponse(responseData);
         }
@@ -413,9 +412,7 @@ function ProfilePage() {
         return;
       } //? PRUEBA DOLLARRATE DINÁMICO
 
-      console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
-
-      setPaymentInProgress(true);
+      //? console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
 
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
@@ -429,7 +426,7 @@ function ProfilePage() {
       });
 
       const processPaymentData = await processPaymentResp.json();
-      console.log("Respuesta de proceso de pago:", processPaymentData);
+      //? console.log("Respuesta de proceso de pago:", processPaymentData);
 
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
         handleBackendResponse(processPaymentData);
@@ -726,7 +723,7 @@ function ProfilePage() {
                 </button>
               </div>
               <div>
-              {!isEditing && (
+              {!isEditing && !IsSave && (
               <div>
                 <button type="button" onClick={handlePendingPayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#c01d0f] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                   Pago pendiente
@@ -758,14 +755,14 @@ function ProfilePage() {
             )}
           </div>
           <div ref={priceRef}>
-              {price > 0 && showNewCharge && !paymentInProgress &&(
+              {IsSave && price > 0 &&(
               <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
                 <div className="text-center">
                   <h4 className="text-xl font-bold">Nuevo Cobro</h4>
                   <p className="mt-2">
                     {price > 0
-                      ? `${userDetails.name} ${userDetails.lastName}, usted debe ${price}$ por sus modificaciones`
-                      : `${userDetails.name} ${userDetails.lastName}, usted no debe nada`}
+                      ? `${userDetails.name} ${userDetails.lastName}, usted debe ${price}$.`
+                      : `${userDetails.name} ${userDetails.lastName}, usted no debe nada.`}
                   </p>
                 </div>
                     
