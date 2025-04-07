@@ -3,6 +3,8 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from "react";
 import { SelectReg } from "../components/ui";
+const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
+
 
 const CountriesSelect = ({ register, errors, disabled, selectedCountry, onChange }) => {
   const [countries, setCountries] = useState([]);
@@ -12,11 +14,11 @@ const CountriesSelect = ({ register, errors, disabled, selectedCountry, onChange
     // Llamada al endpoint REST Countries para obtener la lista de países
     const fetchCountries = async () => {
       try {
-        const response = await fetch("https://restcountries.com/v3.1/all");
+        const response = await fetch(`${backRoute}/api/country`);
         const data = await response.json();
 
         // Filtramos solo los nombres de los países
-        const countryNames = data.map((country) => country.name.common);
+        const countryNames = data.map((country) => country.name);
         countryNames.sort((a, b) => a.localeCompare(b)); // Ordena alfabéticamente
         setCountries(countryNames);
         setLoading(false);

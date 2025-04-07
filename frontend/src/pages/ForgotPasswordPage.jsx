@@ -50,6 +50,7 @@ function ForgotPassword() {
 
   return (
     <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center ">
+      <div className="w-[420px] md:w-[500px] lg:w-[350px] h-auto bg-opacity-90">
       <Card>
         <h1 className="text-4xl font-bold my-2 text-center mb-4 tracking-wide">
           Recuperar<br />contraseña
@@ -77,6 +78,7 @@ function ForgotPassword() {
           </div>
         </form>
       </Card>
+      </div>
     </Container>
   );
 }

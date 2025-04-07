@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Input, Label, Container } from "../components/ui"; // Asumimos que estos componentes están definidos
 import { useForm } from "react-hook-form";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
@@ -18,8 +19,11 @@ function ChangePassword() {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
   const userId = localStorage.getItem("userId");
-  console.log(userId); // Recuperamos el ID del usuario desde localStorage
+  console.log(userId); 
 
 
   const onSubmit = async (data) => {
@@ -57,33 +61,56 @@ function ChangePassword() {
 
   return (
     <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center">
+      <div className="w-[420px] md:w-[500px] lg:w-[400px] h-auto bg-opacity-90">
       <Card>
-        <h1 className="text-3xl font-bold my-2 text-center mb-4 tracking-wide">
-          Cambio<br /> contraseña
+        <h1 className="text-3xl font-bold text-center mb-6 tracking-wide">
+          Cambiar<br />  Contraseña
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Label htmlFor="oldPassword">Contraseña actual</Label>
-          <Input
-            type="password"
-            placeholder="Ingrese su contraseña actual"
-            {...register("oldPassword", {
-              required: "La contraseña actual es requerida",
-            })}
-          />
-          {errors.oldPassword && <p className="text-red-500 font-medium">{errors.oldPassword.message}</p>}
+        <Label htmlFor="oldPassword">Contraseña actual</Label>
+      <div className="relative">
+        <Input
+          type={showOldPassword ? "text" : "password"}
+          placeholder="Ingrese su contraseña actual"
+          {...register("oldPassword", {
+            required: "La contraseña actual es requerida",
+          })}
+        />
+        {errors.oldPassword && (
+          <p className="text-red-500 font-medium">{errors.oldPassword.message}</p>
+        )}
+        <button
+          type="button"
+          onClick={() => setShowOldPassword(!showOldPassword)}
+          className="absolute inset-y-0 right-3 flex items-center text-gray-600"
+        >
+          {showOldPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+        </button>
+      </div>
 
-          <Label htmlFor="newPassword">Nueva contraseña</Label>
-          <Input
-            type="password"
-            placeholder="Ingrese su nueva contraseña"
-            {...register("newPassword", {
-              required: "La nueva contraseña es requerida",
-            })}
-          />
-          {errors.newPassword && <p className="text-red-500 font-medium">{errors.newPassword.message}</p>}
+      <Label htmlFor="newPassword">Nueva contraseña</Label>
+      <div className="relative">
+        <Input
+          type={showNewPassword ? "text" : "password"}
+          placeholder="Ingrese su nueva contraseña"
+          {...register("newPassword", {
+            required: "La nueva contraseña es requerida",
+          })}
+        />
+        {errors.newPassword && (
+          <p className="text-red-500 font-medium">{errors.newPassword.message}</p>
+        )}
+        <button
+          type="button"
+          onClick={() => setShowNewPassword(!showNewPassword)}
+          className="absolute inset-y-0 right-3 flex items-center text-gray-600"
+        >
+          {showNewPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+        </button>
+      </div>
 
-          <div className="mt-4 flex items-center justify-center">
+          <div className="mt-6 flex items-center justify-center">
             <button
               type="submit"
               className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
@@ -94,6 +121,7 @@ function ChangePassword() {
           </div>
         </form>
       </Card>
+      </div>
     </Container>
   );
 }

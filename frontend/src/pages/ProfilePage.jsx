@@ -6,6 +6,8 @@ import { Input, Button, CardReg, Label, Container, SelectReg } from "../componen
 import ExchangeDollar from "../hooks/ExchangeRate";
 import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
+import { toast } from "react-toastify";
+
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
@@ -34,11 +36,9 @@ function ProfilePage() {
   const [price, setPrice] = useState("");
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
 
-
-  
   const userEmail = localStorage.getItem("userEmail");
 
-  //! Empiezan cambios de nuevo
+  //! Empiezan cambios
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -70,6 +70,22 @@ function ProfilePage() {
     navigate("/profile/changepassword");
   };
 
+  const handleBackendResponse = (response) => {
+    if (response.success) {
+      toast.success(response.message, {
+        className: "bg-green-600 text-white font-medium",
+        progressClassName: "bg-green-300",
+        autoClose: 5000,
+      });
+    } else {
+      toast.error(response.message, {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+  };
+
   useEffect(() => {
     if (!userEmail || !exchangeRate) return; //? Evita varias peticiones 
     
@@ -85,6 +101,7 @@ function ProfilePage() {
 
         if (data.success) {
           let userData = {...data.results};
+          handleBackendResponse(userData)
 
           if (userData.admin) { //!
             navigate("/profile/admin");
@@ -285,27 +302,60 @@ function ProfilePage() {
             </div>
 
             <div>
-              <Label htmlFor="birthDate">Fecha de nacimiento</Label>
-              <Input type="date" placeholder="Editar fecha de nacimiento" {...register("birthDate", { required: true })} disabled={!isEditing} />
-              {/* {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>} */}
-            </div>
-
-            <div>
-              <Label htmlFor="address">Dirección</Label>
-                  <Input type="text" placeholder="Editar dirección"
-                  {...register("address", { required: true })} disabled={!isEditing}/>
-                  {/* {errors.address && (
-                  <p className="text-red-500 font-medium">La dirección es requerida</p>
-                  )} */}
-            </div>
-
-            <div>
               <Label htmlFor="lastName">Apellidos</Label>
               <Input type="text" placeholder="Editar apellido"
               {...register("lastName", { required: true })} disabled={!isEditing}/>
               {/* {errors.lastName && (
               <p className="text-red-500 font-medium">El apellido es requerido</p>
               )} */}
+            </div>
+
+            <div>
+              <Label htmlFor="country">País</Label>
+              {isEditing ? (
+                <CountriesSelect
+                  register={register}
+                  errors={errors}
+                  disabled={!isEditing}
+                  selectedCountry={watch("country")}
+                  onChange={(e) => setValue("country", e.target.value)} // <-- Añadido
+                />
+              ) : (
+                <Input
+                  type="text"
+                  value={watch("country") || ""}
+                  disabled
+                />
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="city">Ciudad</Label>
+              <Input type="text" placeholder="Ingresa tu ciudad"
+                {...register("city", { required: true })} disabled={!isEditing}/>
+              {/* {errors.city && (
+              <p className="text-red-500 font-medium">La ciudad es requerida</p>
+              )} */}
+            </div>
+
+            <div>
+              <Label htmlFor="birthDate">Fecha de nacimiento</Label>
+              <Input type="date" placeholder="Editar fecha de nacimiento" {...register("birthDate", { required: true })} disabled={!isEditing} />
+              {/* {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>} */}
+            </div>
+
+            <div>
+              <Label htmlFor="gender">Género</Label>
+                <SelectReg 
+                  {...register("gender", { required: true })} disabled={!isEditing}>
+                  <option value="">Selecciona tu género</option>
+                  <option value="Male">Masculino</option>
+                  <option value="Female">Femenino</option>
+                  <option value="Other">Otro</option>
+                </SelectReg>
+                {/* {errors.gender && (
+                <p className="text-red-500 font-medium">El género es requerido</p>
+                )} */}
             </div>
 
             <div>
@@ -329,29 +379,6 @@ function ProfilePage() {
             </div>
 
             <div>
-              <Label htmlFor="affiliation">Afiliación</Label>
-                <Input type="text" placeholder="Ingresa tu afiliación"
-                {...register("affiliation", { required: true })}disabled={!isEditing}/>
-                {/* {errors.affiliation && (
-                <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
-                )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="gender">Género</Label>
-                <SelectReg 
-                  {...register("gender", { required: true })} disabled={!isEditing}>
-                  <option value="">Selecciona tu género</option>
-                  <option value="Male">Masculino</option>
-                  <option value="Female">Femenino</option>
-                  <option value="Other">Otro</option>
-                </SelectReg>
-                {/* {errors.gender && (
-                <p className="text-red-500 font-medium">El género es requerido</p>
-                )} */}
-            </div>
-
-            <div>
               <Label htmlFor="docNumber">
                 Número de documento
               </Label>
@@ -360,37 +387,6 @@ function ProfilePage() {
               {/* {errors.docNumber && (
               <p className="text-red-500 font-medium">El número de documento es requerido</p>
               )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="attendanceType">Tipo de asistencia</Label>
-              <SelectReg {...register("attendanceType", { required: true })}disabled={!isEditing} >
-                <option value="">Selecciona el tipo de asistencia</option>
-                <option value="inPerson">Presencial</option>
-                <option value="online">En línea</option>
-              </SelectReg>
-              {/* {errors.attendanceType && (
-              <p className="text-red-500 font-medium">El tipo de asistencia es requerido</p>
-              )} */}
-            </div>
-                
-              <div>
-              <Label htmlFor="country">País</Label>
-              {isEditing ? (
-                <CountriesSelect
-                  register={register}
-                  errors={errors}
-                  disabled={!isEditing}
-                  selectedCountry={watch("country")}
-                  onChange={(e) => setValue("country", e.target.value)} // <-- Añadido
-                />
-              ) : (
-                <Input
-                  type="text"
-                  value={watch("country") || ""}
-                  disabled
-                />
-              )}
             </div>
 
             <div>
@@ -404,28 +400,6 @@ function ProfilePage() {
             </div>
 
             <div>
-            <Label htmlFor="occupation">Ocupación</Label>
-              <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
-              {...register("occupation", { required: true })}disabled={!isEditing}>
-                <option value="">Selecciona el tipo de ocupación</option>
-                <option value="student">Estudiante</option>
-                <option value="professional">Profesional</option>
-              </SelectReg>
-              {/* {errors.birthDate && (
-              <p className="text-red-500 font-medium">La ocupación es requerida</p>
-              )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="city">Ciudad</Label>
-              <Input type="text" placeholder="Ingresa tu ciudad"
-                {...register("city", { required: true })} disabled={!isEditing}/>
-              {/* {errors.city && (
-              <p className="text-red-500 font-medium">La ciudad es requerida</p>
-              )} */}
-            </div>
-
-            <div>
               <Label htmlFor="phoneNumber">Número de teléfono</Label>
               <Input type="tel" placeholder="Ingresa tu número de teléfono"
               {...register("phoneNumber", { required: true })} disabled={!isEditing}/>
@@ -435,6 +409,36 @@ function ProfilePage() {
             </div>
 
             <div>
+              <Label htmlFor="address">Dirección</Label>
+                  <Input type="text" placeholder="Editar dirección"
+                  {...register("address", { required: true })} disabled={!isEditing}/>
+                  {/* {errors.address && (
+                  <p className="text-red-500 font-medium">La dirección es requerida</p>
+                  )} */}
+            </div>
+
+            <div>
+              <Label htmlFor="affiliation">Afiliación</Label>
+                <Input type="text" placeholder="Ingresa tu afiliación"
+                {...register("affiliation", { required: true })}disabled={!isEditing}/>
+                {/* {errors.affiliation && (
+                <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
+                )} */}
+            </div>
+
+            <div>
+              <Label htmlFor="attendanceType">Tipo de asistencia</Label>
+              <SelectReg {...register("attendanceType", { required: true })}disabled={!isEditing} >
+                <option value="">Selecciona el tipo de asistencia</option>
+                <option value="inPerson">Presencial</option>
+                <option value="online">En línea</option>
+              </SelectReg>
+              {/* {errors.attendanceType && (
+              <p className="text-red-500 font-medium">El tipo de asistencia es requerido</p>
+              )} */}
+            </div>
+            
+            <div>
               <Label htmlFor="participationType">Tipo de participación</Label>
               <SelectReg {...register("participationType", { required: true })} disabled={!isEditing}>
                 <option value="">Selecciona el tipo de participación</option>
@@ -443,6 +447,19 @@ function ProfilePage() {
               </SelectReg>
               {/* {errors.participationType && (
               <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+              )} */}
+            </div>
+
+            <div>
+            <Label htmlFor="occupation">Ocupación</Label>
+              <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
+              {...register("occupation", { required: true })}disabled={!isEditing}>
+                <option value="">Selecciona el tipo de ocupación</option>
+                <option value="student">Estudiante</option>
+                <option value="professional">Profesional</option>
+              </SelectReg>
+              {/* {errors.birthDate && (
+              <p className="text-red-500 font-medium">La ocupación es requerida</p>
               )} */}
             </div>
 

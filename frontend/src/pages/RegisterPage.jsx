@@ -17,8 +17,6 @@ const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function RegisterPage() {
 
-  //! Empiezan cambios
-
   // useEffect(() => {
   //   document.body.classList.add("register-page");
   //   return () => {
@@ -36,8 +34,6 @@ function RegisterPage() {
 
   // eslint-disable-next-line no-unused-vars
   const { signup, errors: signupErrors } = useAuth(); //*
-  // const navigate = useNavigate();
-
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
@@ -47,10 +43,6 @@ function RegisterPage() {
   const [userId, setUserId] = useState(null); //?
   const priceRef = useRef(null);
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
-  
-
-    //! Empiezan cambios
-
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -105,15 +97,19 @@ function RegisterPage() {
 
   useEffect(() => {
     // Verificar si hay errores en el formulario
-    if (Object.keys(errors).length > 0) {
-      // Mostrar un toast indicando que todos los campos son requeridos
+    // Filtrar el campo "membershipNumber" de los errores
+    const filteredErrors = { ...errors };
+    delete filteredErrors.membershipNumber;
+  
+    // Si hay errores y no es "membershipNumber", muestra el toast
+    if (Object.keys(filteredErrors).length > 0) {
       toast.error("Debes completar todos los campos requeridos para registrar tu cuenta.", {
         className: "bg-red-600 text-white font-medium",
         progressClassName: "bg-red-300",
         autoClose: 5000,
       });
     }
-  }, [errors]); 
+  }, [errors]);
 
 
   const handlePayment = async () => {
@@ -150,7 +146,7 @@ function RegisterPage() {
           autoClose: 5000,
         });
         setTimeout(() => {
-          window.location.href = processPaymentData.results.checkoutURL;  // Dirige al checkout
+          window.open(processPaymentData.results.checkoutURL, "_blank");
         }, 5000);
 
         
@@ -271,57 +267,11 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="birthDate">Fecha de nacimiento</Label>
-              <Input type="date"
-              {...register("birthDate", { required: true })}/>
-              {errors.birthDate && (
-              <p className="text-red-500 font-medium">La fecha es requerida</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="address">Dirección</Label>
-                  <Input type="text" placeholder="Ingresa tu dirección"
-                  {...register("address", { required: true })}/>
-                  {errors.address && (
-                  <p className="text-red-500 font-medium">La dirección es requerida</p>
-                  )}
-            </div>
-
-            <div>
               <Label htmlFor="lastName">Apellidos</Label>
               <Input type="text" placeholder="Ingresa tus apellidos"
               {...register("lastName", { required: true })}/>
               {errors.lastName && (
               <p className="text-red-500 font-medium">El apellido es requerido</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="docType">Tipo de documento</Label>
-              <SelectReg
-              {...register("docType", { required: true })}>
-                <option value="">Selecciona el tipo de documento</option>
-                <option value="civilRegistry">Registro civil</option>
-                <option value="identityCard">Tarjeta de identidad</option>
-                <option value="citizenshipIdCard">Cédula de ciudadanía</option>
-                <option value="foreignResidentCard">Tarjeta de extranjería</option>
-                <option value="passport">Pasaporte</option>
-                <option value="specialStayPermit">Permiso especial de permanencia</option>
-                <option value="nationalIdentityDocument">Documento Nacional de identidad</option>
-                <option value="safeConductPass">Salvoconducto</option>
-              </SelectReg>
-              {errors.docType && (
-              <p className="text-red-500 font-medium">El tipo de documento es requerido</p>
-              )}
-            </div>
-
-            <div>
-            <Label htmlFor="affiliation">Afiliación</Label>
-              <Input type="text" placeholder="Ingresa tu afiliación"
-              {...register("affiliation", { required: true })}/>
-              {errors.affiliation && (
-              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
               )}
             </div>
 
@@ -348,6 +298,62 @@ function RegisterPage() {
             </div>
 
             <div>
+              <Label htmlFor="country">País</Label>
+              <CountriesSelect register={register} errors={errors} disabled={false} />
+            </div>
+
+            <div>
+              <Label htmlFor="city">Ciudad</Label>
+              <Input type="text" placeholder="Ingresa tu ciudad"
+                {...register("city", { required: true })}/>
+              {errors.city && (
+              <p className="text-red-500 font-medium">La ciudad es requerida</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="birthDate">Fecha de nacimiento</Label>
+              <Input type="date"
+              {...register("birthDate", { required: true })}/>
+              {errors.birthDate && (
+              <p className="text-red-500 font-medium">La fecha es requerida</p>
+              )}
+            </div>
+
+            <div>
+            <Label htmlFor="gender">Género</Label>
+              <SelectReg 
+                {...register("gender", { required: true })}>
+                <option value="">Selecciona tu género</option>
+                <option value="Male">Masculino</option>
+                <option value="Female">Femenino</option>
+                <option value="Other">Otro</option>
+              </SelectReg>
+              {errors.gender && (
+              <p className="text-red-500 font-medium">El género es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="docType">Tipo de documento</Label>
+              <SelectReg
+              {...register("docType", { required: true })}>
+                <option value="">Selecciona el tipo de documento</option>
+                <option value="civilRegistry">Registro civil</option>
+                <option value="identityCard">Tarjeta de identidad</option>
+                <option value="citizenshipIdCard">Cédula de ciudadanía</option>
+                <option value="foreignResidentCard">Tarjeta de extranjería</option>
+                <option value="passport">Pasaporte</option>
+                <option value="specialStayPermit">Permiso especial de permanencia</option>
+                <option value="nationalIdentityDocument">Documento Nacional de identidad</option>
+                <option value="safeConductPass">Salvoconducto</option>
+              </SelectReg>
+              {errors.docType && (
+              <p className="text-red-500 font-medium">El tipo de documento es requerido</p>
+              )}
+            </div>
+
+            <div>
               <Label htmlFor="docNumber">
                 Número de documento
               </Label>
@@ -355,6 +361,43 @@ function RegisterPage() {
               {...register("docNumber", { required: true })}/>
               {errors.docNumber && (
               <p className="text-red-500 font-medium">El número de documento es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="email">Correo</Label>
+              <Input type="email" placeholder="Ingresa tu correo electrónico"
+              {...register("email", { required: true })}
+              />
+              {errors.email && (
+              <p className="text-red-500 font-medium">El correo es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="phoneNumber">Número de teléfono</Label>
+              <Input type="tel" placeholder="Ingresa tu número de teléfono"
+              {...register("phoneNumber", { required: true })}/>
+              {errors.phoneNumber && (
+              <p className="text-red-500 font-medium">La número de teléfono es requerido</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="address">Dirección</Label>
+                  <Input type="text" placeholder="Ingresa tu dirección"
+                  {...register("address", { required: true })}/>
+                  {errors.address && (
+                  <p className="text-red-500 font-medium">La dirección es requerida</p>
+                  )}
+            </div>
+
+            <div>
+            <Label htmlFor="affiliation">Afiliación</Label>
+              <Input type="text" placeholder="Ingresa tu afiliación"
+              {...register("affiliation", { required: true })}/>
+              {errors.affiliation && (
+              <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
               )}
             </div>
 
@@ -371,21 +414,6 @@ function RegisterPage() {
             </div>
 
             <div>
-              <Label htmlFor="country">País</Label>
-              <CountriesSelect register={register} errors={errors} disabled={false} />
-            </div>
-
-            <div>
-              <Label htmlFor="email">Correo</Label>
-              <Input type="email" placeholder="Ingresa tu correo electrónico"
-              {...register("email", { required: true })}
-              />
-              {errors.email && (
-              <p className="text-red-500 font-medium">El correo es requerido</p>
-              )}
-            </div>
-
-            <div>
             <Label htmlFor="occupation">Ocupación</Label>
               <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
               {...register("occupation", { required: true })}>
@@ -393,40 +421,8 @@ function RegisterPage() {
                 <option value="student">Estudiante</option>
                 <option value="professional">Profesional</option>
               </SelectReg>
-              {errors.birthDate && (
+              {errors.occupation && (
               <p className="text-red-500 font-medium">La ocupación es requerida</p>
-              )}
-            </div>
-              
-            <div>
-              <Label htmlFor="city">Ciudad</Label>
-              <Input type="text" placeholder="Ingresa tu ciudad"
-                {...register("city", { required: true })}/>
-              {errors.city && (
-              <p className="text-red-500 font-medium">La ciudad es requerida</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="phoneNumber">Número de teléfono</Label>
-              <Input type="tel" placeholder="Ingresa tu número de teléfono"
-              {...register("phoneNumber", { required: true })}/>
-              {errors.phoneNumber && (
-              <p className="text-red-500 font-medium">La número de teléfono es requerido</p>
-              )}
-            </div>
-
-            <div>
-            <Label htmlFor="gender">Género</Label>
-              <SelectReg 
-                {...register("gender", { required: true })}>
-                <option value="">Selecciona tu género</option>
-                <option value="Male">Masculino</option>
-                <option value="Female">Femenino</option>
-                <option value="Other">Otro</option>
-              </SelectReg>
-              {errors.gender && (
-              <p className="text-red-500 font-medium">El género es requerido</p>
               )}
             </div>
 
