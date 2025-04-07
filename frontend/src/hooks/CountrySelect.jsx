@@ -18,7 +18,7 @@ const CountriesSelect = ({ register, errors, disabled, selectedCountry, onChange
         const data = await response.json();
 
         // Filtramos solo los nombres de los países
-        const countryNames = data.map((country) => country.name.common);
+        const countryNames = data.map((country) => country.name);
         countryNames.sort((a, b) => a.localeCompare(b)); // Ordena alfabéticamente
         setCountries(countryNames);
         setLoading(false);
