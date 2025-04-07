@@ -17,6 +17,8 @@ function AdminPage() {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -36,6 +38,19 @@ function AdminPage() {
 
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    const filtered = users.filter((user) => {
+      const nameMatch = user.name.toLowerCase().includes(nameFilter.toLowerCase());
+      const emailMatch = user.email.toLowerCase().includes(emailFilter.toLowerCase());
+  
+      const isInDateRange = (user.created_at >= startDateFilter && user.created_at <= endDateFilter) || (!startDateFilter && !endDateFilter);
+      
+      return nameMatch && emailMatch && isInDateRange;
+    });
+  
+    setFilteredUsers(filtered);
+  }, [nameFilter, emailFilter, users, startDateFilter, endDateFilter]);
 
   // Función para formatear las fechas
   const formatDate = (dateString) => {
@@ -148,8 +163,9 @@ function AdminPage() {
       <h1 className="text-2xl font-bold mb-4 text-black text-center">
         Tabla de usuarios
       </h1>
-      <div className="mb-4 flex flex-col md:flex-row items-center justify-center gap-4">
-        <div className="flex flex-col">
+      <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Filtro por nombre */}
+        <div className="flex flex-col md:w-1/3">
           <label htmlFor="nameFilter" className="text-black font-semibold">
             Filtro por nombre
           </label>
@@ -163,7 +179,8 @@ function AdminPage() {
           />
         </div>
 
-        <div className="flex flex-col">
+        {/* Filtro por correo */}
+        <div className="flex flex-col md:w-1/3">
           <label htmlFor="emailFilter" className="text-black font-semibold">
             Filtro por correo
           </label>
@@ -175,6 +192,35 @@ function AdminPage() {
             className="border border-gray-400 p-2 rounded-md text-black"
             placeholder="Buscar por correo"
           />
+        </div>
+
+        {/* Filtros de fechas */}
+        <div className="flex flex-col md:w-1/3 items-center mt-4 md:mt-0">
+          <div className="flex flex-col mb-2 w-full">
+            <label htmlFor="startDateFilter" className="text-black font-semibold">
+              Fecha de registro inicial
+            </label>
+            <input
+              id="startDateFilter"
+              type="date"
+              value={startDateFilter}
+              onChange={(e) => setStartDateFilter(e.target.value)}
+              className="border border-gray-400 p-2 rounded-md text-black"
+            />
+          </div>
+
+          <div className="flex flex-col mb-2 w-full">
+            <label htmlFor="endDateFilter" className="text-black font-semibold">
+              Fecha de registro final
+            </label>
+            <input
+              id="endDateFilter"
+              type="date"
+              value={endDateFilter}
+              onChange={(e) => setEndDateFilter(e.target.value)}
+              className="border border-gray-400 p-2 rounded-md text-black"
+            />
+          </div>
         </div>
       </div>
 
