@@ -48,15 +48,19 @@ function AdminPage() {
         .toLowerCase()
         .includes(emailFilter.toLowerCase());
   
+      // Formatear las fechas
+      const formattedStartDate = startDateFilter ? formatDate(startDateFilter) : null;
+      const formattedEndDate = endDateFilter ? formatDate(endDateFilter) : null;
+      const formattedUserDate = formatDate(user.created_at);
+  
       // Comprobación de rango de fechas ajustada
       const isInDateRange =
-        (startDateFilter && endDateFilter)
-          ? user.created_at >= startDateFilter && user.created_at <= endDateFilter
-          : (!startDateFilter && !endDateFilter) || 
-            (startDateFilter && user.created_at >= startDateFilter) ||
-            (endDateFilter && user.created_at <= endDateFilter);
+        (formattedStartDate && formattedEndDate)
+          ? formattedUserDate >= formattedStartDate && formattedUserDate <= formattedEndDate
+          : (!formattedStartDate && !formattedEndDate) ||
+            (formattedStartDate && formattedUserDate >= formattedStartDate) ||
+            (formattedEndDate && formattedUserDate <= formattedEndDate);
   
-            
       return nameMatch && emailMatch && isInDateRange;
     });
   
