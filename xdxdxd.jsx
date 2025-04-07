@@ -1,562 +1,344 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-// eslint-disable-next-line no-unused-vars
-import { Input, Button, CardReg, Label, Container, SelectReg } from "../components/ui";
-import ExchangeDollar from "../hooks/ExchangeRate";
-import CountriesSelect from "../hooks/CountrySelect";
-import ArticlesSpaces from "../hooks/ArticlesSpaces";
+import { useEffect, useState, useRef } from "react";
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
-function ProfilePage() {
+//! EMPIEZAN CAMBIOS DE ESTILO
 
-  const [isEditing, setIsEditing] = useState(false);
+function AdminPage() {
+  useEffect(() => {
+    document.body.classList.add("admin-page");
 
-  const { 
-    register, 
-    handleSubmit, 
-    setValue, 
-    watch, 
-    formState: { errors } 
-  } = useForm();
-  if (isEditing && errors.country ) {
-    delete errors.country;
-  }
+    return () => {
+      document.body.classList.remove("admin-page");
+    };
+  }, []);
 
-  const navigate = useNavigate();
-
-  const isTaxRequired = watch("isTaxRequired");
-  const qtyArticles = watch("qtyArticles", 0);
-  const isIeeeMember = watch("isIeeeMember");
-  const participationType = watch("participationType"); 
-  const [userDetails, setUserDetails] = useState(null);
-  const [exchangeRate, setExchangeRate] = useState(null); // Almacena el tipo de cambio
-  const [price, setPrice] = useState(null);
-  const exchange = ExchangeDollar(); 
-  
-  const userEmail = localStorage.getItem("userEmail");
-
-  //! Empiezan cambios de nuevo
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [nameFilter, setNameFilter] = useState("");
+  const [emailFilter, setEmailFilter] = useState("");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
+  const tableRef = useRef(null);
 
   useEffect(() => {
-    if (isTaxRequired === "no") {
-      setValue("taxAmount", "");
-    }
-  }, [isTaxRequired, setValue]);
-  
-  useEffect(() => { 
-    if (isIeeeMember === "no") {
-      setValue("isTems", "no"); 
-      setValue("membershipNumber", ""); 
-    }
-  }, [isIeeeMember, setValue]);
-
-  useEffect(() => { 
-    if (participationType === "attendee") {
-      setValue("qtyArticles", 0);
-      setValue("articles", []);
-    }
-  }, [participationType, setValue]); 
-
-  useEffect(() => {
-    if (exchange) {
-      setExchangeRate(exchange);  // Almacena el tipo de cambio en el estado
-    }
-  }, [exchange]);
-  
-  const handleChangePassword = () => {
-    navigate("/profile/changepassword");
-  };
-
-  useEffect(() => {
-    if (!userEmail || !exchangeRate) return; //? Evita varias peticiones 
-    
-    const fetchUserDetails = async () => {
-      
-      console.log("Correo que se está usando:", userEmail);
-      console.log("Valor del tipo de cambio (exchangeRate):", exchangeRate);
-
+    const fetchUsers = async () => {
       try {
-        const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
+        const response = await fetch(`${backRoute}/api/users`);
         const data = await response.json();
-        console.log("Datos recibidos del backend:", data.results)
 
         if (data.success) {
-          let userData = {...data.results};
-          localStorage.setItem("userId", userData.id);
-
-        userData.isIeeeMember = userData.isIeeeMember === 1 ? "yes" : "no";
-        userData.isTems = userData.isTems === 1 ? "yes" : "no";
-
-        userData.taxAmount = userData.isTaxRequired === "no" ? "0" : userData.taxAmount;
-
-        if (userData.participationType === "attendee") {
-          userData.qtyArticles = 0;  
-          userData.articles = [];  
-        } else {
-          let formattedArticles = [];
-          if (userData.qtyArticles > 0 && userData.participationType === "author") {
-            formattedArticles = userData.articles?.slice(0, userData.qtyArticles).map(article => ({
-              sequence: article?.sequence || "",
-              pages: article?.pages ? parseInt(article.pages, 10) : ""
-            })) || [];
-          } else {
-            formattedArticles = [{ sequence: "", pages: "" }];
-          }
-          userData.articles = formattedArticles;
-        }
-
-        setUserDetails(userData);
-
-        // const formattedData = {
-        //   occupation: data.occupation,
-        //   isIeeeMember: data.isIeeeMember,  
-        //   isTems: data.isTems,   
-        //   participationType: data.participationType,
-        //   attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
-        //   qtyArticles: data.qtyArticles,
-        //   articles: data.articles,
-        // };
-
-        // Verificar si el pago por impuesto es mayor a 0
-        if (userData.taxAmount > 0) {
-          userData.isTaxRequired = "yes";  // Establecer "sí" si el pago por impuesto es mayor a 0
-        } else {
-            userData.isTaxRequired = "no";
-        }
-        setUserDetails(userData);
-
-          for (const key in userData) {
-            if (userData[key]) {
-              setValue(key, userData[key]);
-            }
-          }
-          // Determina si `isIeeeMember` es "yes" o "no" y ajusta el estado
-          // if (userData.isIeeeMember === "yes") {
-          //   setIsIeeeMemberSelected(true);
-          // } else {
-          //   setIsIeeeMemberSelected(false);
-          // }
+          setUsers(data.results);
+          setFilteredUsers(data.results);
         }
       } catch (error) {
-        console.error("Error fetching user details:", error);
+        console.error("Error fetching users:", error);
       }
     };
 
-    
+    fetchUsers();
+  }, []);
 
-    fetchUserDetails();
-  }, [setValue, userEmail, exchangeRate]);
+  useEffect(() => {
+    const filtered = users.filter((user) => {
+      const nameMatch = user.name
+        .toLowerCase()
+        .includes(nameFilter.toLowerCase());
+      const emailMatch = user.email
+        .toLowerCase()
+        .includes(emailFilter.toLowerCase());
 
-  const handleEdit = () => {
-    setIsEditing(true);
-    if (userDetails?.country) {
-      setValue("country", userDetails.country, { shouldValidate: false, shouldTouch: false });
-    }
+      const isInDateRange =
+        (user.created_at >= startDateFilter &&
+          user.created_at <= endDateFilter) ||
+        (!startDateFilter && !endDateFilter);
+
+      return nameMatch && emailMatch && isInDateRange;
+    });
+
+    setFilteredUsers(filtered);
+  }, [nameFilter, emailFilter, users, startDateFilter, endDateFilter]);
+
+  // Función para formatear las fechas
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // Devuelve la fecha en formato "YYYY-MM-DD"
   };
 
-
-  const handleSave = async (data) => {
-    let updatedData = { ...data };
-
-      // Convertimos "yes" a true y "no" a false
-    if (updatedData.isIeeeMember !== undefined) {
-      updatedData.isIeeeMember = updatedData.isIeeeMember === "yes";
-    }
-    if (updatedData.isTems !== undefined) {
-      updatedData.isTems = updatedData.isTems === "yes";
-    }
-
-    if (updatedData.isTaxRequired === "no") {
-      updatedData.taxAmount = "0";  // Asignamos 0 si no se requiere impuesto
-    }
-
-     // Filtrar los artículos según qtyArticles
-    if (updatedData.qtyArticles && updatedData.qtyArticles > 0) {
-      // Filtramos artículos vacíos o nulos
-      updatedData.articles = updatedData.articles
-        .slice(0, updatedData.qtyArticles) // Limitamos a la cantidad de artículos que el usuario ingresó
-        .filter(article => article.sequence && article.pages); // Filtramos los artículos que tienen datos válidos
-
-        // Aseguramos que `pages` sea un número
-    updatedData.articles = updatedData.articles.map(article => ({
-      ...article,
-      pages: typeof article.pages === 'string' ? parseInt(article.pages, 10) : article.pages,
-    }));
-    } else {
-      updatedData.articles = []; 
-    }
-
-  if (updatedData.qtyArticles === 0) {
-    updatedData.articles = [];
-  }
-  
-
-    console.log("Datos que se van a enviar:", updatedData);
-
-    if (!userDetails || !userDetails.id) { //! 
-      console.error("ID de usuario no disponible");
-      return;
-    } //?
-
-    try {
-      const response = await fetch(`${backRoute}/api/users/${userDetails.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
-      const result = await response.json();
-      
-      console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
-      if (result.success) {
-        setIsEditing(false);
-        alert("Datos guardados exitosamente");
-
-        const formattedData = {
-          occupation: data.occupation,
-          isIeeeMember: data.isIeeeMember,  
-          isTems: data.isTems,   
-          participationType: data.participationType,
-          attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
-          qtyArticles: data.qtyArticles,
-          articles: data.articles,
-        };
-
-        const paymentResponse = await fetch(`${backRoute}/api/payment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formattedData),
-        });
-        const paymentData = await paymentResponse.json();
-        console.log("Respuesta de payment:", responseData);
-
-        if (paymentData.success && paymentData.results?.price !== undefined) {
-          setPrice(paymentData.results.price); 
-        }
-        } else {
-        alert("Error al guardar los datos");
-        
-        if (paymentData.success) {
-          setPrice(paymentData.message.price);
-          setPaymentUrl(paymentData.message.paymentUrl);
-
-          alert(`Revise el valor a pagar en el campo: ${paymentData.message.price}`);
-        } else {
-          alert("Error al obtener el precio de pago");
-        }
-      } else {
-        alert("Error al guardar los datos");
-      }
-    } catch (error) {
-      console.error("Error saving user details:", error);
-    }
+  // Función para mostrar el tipo de documento
+  const formatDocType = (docType) => {
+    const docTypes = {
+      identityCard: "Tarjeta de identidad",
+      citizenshipIdCard: "Cédula de ciudadanía",
+      foreignResidentCard: "Tarjeta de extranjería",
+      passport: "Pasaporte",
+      specialStayPermit: "Permiso especial de permanencia",
+      nationalIdentityDocument: "Documento Nacional de identidad",
+      safeConductPass: "Salvoconducto",
+    };
+    return docTypes[docType] || docType; // Retorna el tipo si está definido, si no, muestra el tipo original
   };
 
-  const handlePayment = () => {
-    window.location.href = paymentUrl;
+  // Función para mostrar el género
+  const formatGender = (gender) => {
+    if (gender === "Male") return "Masculino";
+    if (gender === "Female") return "Feminino";
+    if (gender === "Other") return "Otro";
+    return gender;
   };
 
-  if (!userDetails) {
-    return <p>Cargando...</p>;
-  }
+  // Función para mostrar la ocupación
+  const formatOccupation = (occupation) => {
+    if (occupation === "professional") return "Profesional";
+    if (occupation === "student") return "Estudiante";
+    return occupation;
+  };
+
+  // Función para mostrar "Sí" o "No" en los campos de membresía
+  const formatMembership = (isMember) => {
+    return isMember === 1 ? "Sí" : "No";
+  };
+
+  // Función para mostrar tipo de participación
+  const formatParticipation = (participationType) => {
+    if (participationType === "attendee") return "Asistente";
+    if (participationType === "author") return "Autor";
+    return participationType;
+  };
+
+  // Función para mostrar tipo de asistencia
+  const formatAttendance = (attendanceType) => {
+    if (attendanceType === "online") return "Virtual";
+    if (attendanceType === "inPerson") return "En persona";
+    return attendanceType;
+  };
+
+  // Función para mostrar número de membresía
+  const formatMembershipNumber = (membershipNumber) => {
+    return membershipNumber ? membershipNumber : "No";
+  };
+
+  const topScrollRef = useRef(null);
+  const bottomScrollRef = useRef(null);
+
+  useEffect(() => {
+    const top = topScrollRef.current;
+    const bottom = bottomScrollRef.current;
+
+    if (top && bottom) {
+      const syncScroll = (e) => {
+        bottom.scrollLeft = e.target.scrollLeft;
+      };
+      const syncScrollBottom = (e) => {
+        top.scrollLeft = e.target.scrollLeft;
+      };
+
+      top.addEventListener("scroll", syncScroll);
+      bottom.addEventListener("scroll", syncScrollBottom);
+
+      return () => {
+        top.removeEventListener("scroll", syncScroll);
+        bottom.removeEventListener("scroll", syncScrollBottom);
+      };
+    }
+  }, []);
+
+  const [scrollWidth, setScrollWidth] = useState("2000px");
+
+  useEffect(() => {
+    const filtered = users.filter((user) => {
+      const nameMatch = user.name
+        .toLowerCase()
+        .includes(nameFilter.toLowerCase());
+      const emailMatch = user.email
+        .toLowerCase()
+        .includes(emailFilter.toLowerCase());
+      return nameMatch && emailMatch;
+    });
+
+    setFilteredUsers(filtered);
+  }, [nameFilter, emailFilter, users]);
+
+  useEffect(() => {
+    if (tableRef.current) {
+      setScrollWidth(`${tableRef.current.scrollWidth}px`);
+    }
+  }, [filteredUsers]);
 
   return (
-    <div className="flex items-center justify-center ">
-      <div className="bg-[#2e5ca6] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto ">
-        <h3 className="text-3xl font-bold text-center mb-4 tracking-wide">Perfil de usuario</h3>
-        <form onSubmit={handleSubmit(handleSave)} autoComplete="off">
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide"> {/* GRID */}
-
-            <div>
-            <Label htmlFor="name">Nombre</Label>
-              <Input type="text" placeholder="Ingresa tu nombre"
-              {...register("name", { required: true })} disabled={!isEditing} />
-              {/* {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>} */}
-            </div>
-
-            <div>
-              <Label htmlFor="birthDate">Fecha de nacimiento</Label>
-              <Input type="date" placeholder="Editar fecha de nacimiento" {...register("birthDate", { required: true })} disabled={!isEditing} />
-              {/* {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>} */}
-            </div>
-
-            <div>
-              <Label htmlFor="address">Dirección</Label>
-                  <Input type="text" placeholder="Editar dirección"
-                  {...register("address", { required: true })} disabled={!isEditing}/>
-                  {/* {errors.address && (
-                  <p className="text-red-500 font-medium">La dirección es requerida</p>
-                  )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="lastName">Apellidos</Label>
-              <Input type="text" placeholder="Editar apellido"
-              {...register("lastName", { required: true })} disabled={!isEditing}/>
-              {/* {errors.lastName && (
-              <p className="text-red-500 font-medium">El apellido es requerido</p>
-              )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="docType">Tipo de documento</Label>
-              <SelectReg
-              {...register("docType", { required: true })}disabled={!isEditing}>
-                <option value="">Selecciona el tipo de documento</option>
-                <option value="civilRegistry">Registro civil</option>
-                <option value="identityCard">Tarjeta de identidad</option>
-                <option value="citizenshipIdCard">Cédula de ciudadanía</option>
-                <option value="foreignResidentCard">Tarjeta de extranjería</option>
-                <option value="passport">Pasaporte</option>
-                <option value="specialStayPermit">Permiso especial de permanencia</option>
-                <option value="nationalIdentityDocument">Documento Nacional de identidad</option>
-                <option value="safeConduct
-                Pass">Salvoconducto</option>
-              </SelectReg>
-              {/* {errors.docType && (
-              <p className="text-red-500 font-medium">El tipo de documento es requerido</p>
-              )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="affiliation">Afiliación</Label>
-                <Input type="text" placeholder="Ingresa tu afiliación"
-                {...register("affiliation", { required: true })}disabled={!isEditing}/>
-                {/* {errors.affiliation && (
-                <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
-                )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="gender">Género</Label>
-                <SelectReg 
-                  {...register("gender", { required: true })} disabled={!isEditing}>
-                  <option value="">Selecciona tu género</option>
-                  <option value="Male">Masculino</option>
-                  <option value="Female">Femenino</option>
-                  <option value="Other">Otro</option>
-                </SelectReg>
-                {/* {errors.gender && (
-                <p className="text-red-500 font-medium">El género es requerido</p>
-                )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="docNumber">
-                Número de documento
-              </Label>
-              <Input type="text" placeholder="Editar número de documento"
-              {...register("docNumber", { required: true })} disabled={!isEditing} />
-              {/* {errors.docNumber && (
-              <p className="text-red-500 font-medium">El número de documento es requerido</p>
-              )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="attendanceType">Tipo de asistencia</Label>
-              <SelectReg {...register("attendanceType", { required: true })}disabled={!isEditing} >
-                <option value="">Selecciona el tipo de asistencia</option>
-                <option value="inPerson">Presencial</option>
-                <option value="online">En línea</option>
-              </SelectReg>
-              {/* {errors.attendanceType && (
-              <p className="text-red-500 font-medium">El tipo de asistencia es requerido</p>
-              )} */}
-            </div>
-                
-              <div>
-              <Label htmlFor="country">País</Label>
-              {isEditing ? (
-                <CountriesSelect
-                  register={register}
-                  errors={errors}
-                  disabled={!isEditing}
-                  selectedCountry={watch("country")}
-                  onChange={(e) => setValue("country", e.target.value)} // <-- Añadido
-                />
-              ) : (
-                <Input
-                  type="text"
-                  value={watch("country") || ""}
-                  disabled
-                />
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="email">Correo</Label>
-              <Input type="email" placeholder="Editar correo electrónico"
-              {...register("email", { required: true })}
-              disabled={!isEditing} />
-              {/* {errors.email && (
-              <p className="text-red-500 font-medium">El correo es requerido</p>
-              )} */}
-            </div>
-
-            <div>
-            <Label htmlFor="occupation">Ocupación</Label>
-              <SelectReg className="text-[#000000] w-full px-3 py-2 mt-2 border bg-white"
-              {...register("occupation", { required: true })}disabled={!isEditing}>
-                <option value="">Selecciona el tipo de ocupación</option>
-                <option value="student">Estudiante</option>
-                <option value="professional">Profesional</option>
-              </SelectReg>
-              {/* {errors.birthDate && (
-              <p className="text-red-500 font-medium">La ocupación es requerida</p>
-              )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="city">Ciudad</Label>
-              <Input type="text" placeholder="Ingresa tu ciudad"
-                {...register("city", { required: true })} disabled={!isEditing}/>
-              {/* {errors.city && (
-              <p className="text-red-500 font-medium">La ciudad es requerida</p>
-              )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="phoneNumber">Número de teléfono</Label>
-              <Input type="tel" placeholder="Ingresa tu número de teléfono"
-              {...register("phoneNumber", { required: true })} disabled={!isEditing}/>
-              {/* {errors.phoneNumber && (
-              <p className="text-red-500 font-medium">La número de teléfono es requerido</p>
-              )} */}
-            </div>
-
-            <div>
-              <Label htmlFor="participationType">Tipo de participación</Label>
-              <SelectReg {...register("participationType", { required: true })} disabled={!isEditing}>
-                <option value="">Selecciona el tipo de participación</option>
-                <option value="author">Autor</option>
-                <option value="attendee">Asistente</option>
-              </SelectReg>
-              {/* {errors.participationType && (
-              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
-              )} */}
-            </div>
-
-            <div>
-            <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
-                <SelectReg
-                  {...register("isIeeeMember", { required: true })} disabled={!isEditing}
-                >
-                  <option value="">Selecciona</option>
-                  <option value="yes">Sí</option>
-                  <option value="no">No</option>
-                </SelectReg>
-                {errors.isIeeeMember && (
-                  <p className="text-red-500 font-medium">Este campo es requerido</p>
-                )}
-  
-                {isIeeeMember === "yes" && (
-                  <>
-                    <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="Ingresa tu número de membresía"
-                      {...register("membershipNumber", { required: true })} disabled={!isEditing}
-                    />
-                    {errors.membershipNumber && (
-                      <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
-                    )}
-  
-                    <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
-                    <SelectReg {...register("isTems", { required: true })} disabled={!isEditing}>
-                      <option value="">Selecciona</option>
-                      <option value="yes">Sí</option>
-                      <option value="no">No</option>
-                    </SelectReg>
-                    {errors.isTems && (
-                      <p className="text-red-500 font-medium">Este campo es requerido</p>
-                    )}
-                  </>
-                )}
-            </div>
-
-            <div>
-            {participationType === "author" && ( 
-            <div>
-              <Label htmlFor="qtyArticles">Número de artículos</Label>
-              <Input type="number" placeholder="Ingresa el número de artículos"
-              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 0 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
-              {qtyArticles > 0 && (
-                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} isEditing={isEditing} />)}
-                {errors.qtyArticles && (
-              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
-              )}
-            </div>
-            )} 
-            </div>
-
-            <div>
-            <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
-              <SelectReg {...register("isTaxRequired", { required: true })} disabled={!isEditing}>
-                <option value="">Selecciona</option>
-                <option value="yes">Sí</option>
-                <option value="no">No</option>
-              </SelectReg>
-              {errors.isTaxRequired && <p className="text-red-500 font-medium">Este campo es requerido</p>}
-
-              {isTaxRequired === "yes" && (
-              <div>
-                <Label htmlFor="taxAmount">Pago por impuesto</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="Ingresa el pago por impuesto"
-                  {...register("taxAmount", { required: true })}
-                  onWheel={(e) => e.target.blur()} disabled={!isEditing}
-                />
-                {errors.taxAmount && <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>}
-              </div>
-            )}
-            </div>
-
-          </div> {/* FIN GRID */}
-
-          <div className=" flex justify-center space-x-4 mt-4">
-            <div>
-              {isEditing ? (
-                <button type="submit" className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
-              ) : (
-                <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
-              )}
-              </div>
-              <div>
-                <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
-                    Cambiar Contraseña
-                </button>
-              </div>
-          </div>
-        </form>
-        <div>
-        {price && (
-          <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
-            <div className="text-center">
-              <h4 className="text-xl font-bold">Registro exitoso</h4>
-              <p className="mt-2">
-                {price > 0
-                  ? `El precio a pagar es: $${price}`
-                  : `${userDetails.firstName} ${userDetails.lastName}, usted no debe nada`}
-              </p>
-            </div>
-
-            {price > 0 && (
-              <div className="mt-4 text-center">
-                <button onClick={handlePayment} disabled={!price} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
-                  Pagar
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4 text-black text-center">
+        Tabla de usuarios
+      </h1>
+      <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Filtro por nombre */}
+        <div className="flex flex-col md:w-1/3">
+          <label htmlFor="nameFilter" className="text-black font-semibold">
+            Filtro por nombre
+          </label>
+          <input
+            id="nameFilter"
+            type="text"
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+            className="border border-gray-400 p-2 rounded-md text-black"
+            placeholder="Buscar por nombre"
+          />
         </div>
+
+        {/* Filtro por correo */}
+        <div className="flex flex-col md:w-1/3">
+          <label htmlFor="emailFilter" className="text-black font-semibold">
+            Filtro por correo
+          </label>
+          <input
+            id="emailFilter"
+            type="text"
+            value={emailFilter}
+            onChange={(e) => setEmailFilter(e.target.value)}
+            className="border border-gray-400 p-2 rounded-md text-black"
+            placeholder="Buscar por correo"
+          />
+        </div>
+
+        {/* Filtros de fechas */}
+        <div className="flex flex-col md:w-1/3 items-center mt-4 md:mt-0">
+          <div className="flex flex-col mb-2 w-full">
+            <label
+              htmlFor="startDateFilter"
+              className="text-black font-semibold"
+            >
+              Fecha de registro inicial
+            </label>
+            <input
+              id="startDateFilter"
+              type="date"
+              value={startDateFilter}
+              onChange={(e) => setStartDateFilter(e.target.value)}
+              className="border border-gray-400 p-2 rounded-md text-black"
+            />
+          </div>
+
+          <div className="flex flex-col mb-2 w-full">
+            <label htmlFor="endDateFilter" className="text-black font-semibold">
+              Fecha de registro final
+            </label>
+            <input
+              id="endDateFilter"
+              type="date"
+              value={endDateFilter}
+              onChange={(e) => setEndDateFilter(e.target.value)}
+              className="border border-gray-400 p-2 rounded-md text-black"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div ref={topScrollRef} className="overflow-x-auto mb-2 h-6">
+        <div style={{ width: scrollWidth, height: "1px" }}></div>
+      </div>
+      {/* cambios drasticos */}
+      <div
+        ref={bottomScrollRef}
+        className="overflow-x-auto bg-white rounded-lg shadow-md"
+      >
+        <table
+          ref={tableRef}
+          className="min-w-full text-sm text-left text-gray-700"
+        >
+          <thead className="bg-[#e5eff5] text-[#0073ae] text-sm font-semibold text-center">
+            <tr>
+              <th className="px-4 py-3 font-semibold">Nombre</th>
+              <th className="px-4 py-3 font-semibold">Apellido</th>
+              <th className="px-4 py-3 font-semibold">País</th>
+              <th className="px-4 py-3 font-semibold">Ciudad</th>
+              <th className="px-4 py-3 font-semibold">Dirección</th>
+              <th className="px-4 py-3 font-semibold">Género</th>
+              <th className="px-4 py-3 font-semibold">Fecha de nacimiento</th>
+              <th className="px-4 py-3 font-semibold">Tipo de documento</th>
+              <th className="px-4 py-3 font-semibold">Número de documento</th>
+              <th className="px-4 py-3 font-semibold">Afiliación</th>
+              <th className="px-4 py-3 font-semibold">Correo</th>
+              <th className="px-4 py-3 font-semibold">Número telefónico</th>
+              <th className="px-4 py-3 font-semibold">Ocupación</th>
+              <th className="px-4 py-3 font-semibold">Miembro IEEE</th>
+              <th className="px-4 py-3 font-semibold">Miembro TEMS</th>
+              <th className="px-4 py-3 font-semibold">Número membresía</th>
+              <th className="px-4 py-3 font-semibold">Tipo de participación</th>
+              <th className="px-4 py-3 font-semibold">Tipo de asistencia</th>
+              <th className="px-4 py-3 font-semibold">Cantidad de impuesto</th>
+              <th className="px-4 py-3 font-semibold">Número de artículos</th>
+              <th className="px-4 py-3 font-semibold">Fecha de registro</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
+                <tr
+                  key={user.id}
+                  className="hover:bg-gray-50"
+                >
+                  <td className="px-4 py-3">{user.name}</td>
+                  <td className="px-4 py-3">{user.last_name}</td>
+                  <td className="px-4 py-3">{user.country}</td>
+                  <td className="px-4 py-3">{user.city}</td>
+                  <td className="px-4 py-3">{user.address}</td>
+                  <td className="px-4 py-3">
+                    {formatGender(user.gender)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatDate(user.birth_date)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatDocType(user.doc_type)}
+                  </td>
+                  <td className="px-4 py-3">{user.doc_number}</td>
+                  <td className="px-4 py-3">
+                    {user.affiliation}
+                  </td>
+                  <td className="px-4 py-3">{user.email}</td>
+                  <td className="px-4 py-3">
+                    {user.phone_number}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatOccupation(user.occupation)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatMembership(user.is_ieee_member)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatMembership(user.is_tems)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatMembershipNumber(user.membership_number)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatParticipation(user.participation_type)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatAttendance(user.attendance_type)}
+                  </td>
+                  <td className="px-4 py-3">{user.tax_amount}</td>
+                  <td className="px-4 py-3">
+                    {user.qty_articles}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatDate(user.created_at)}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="border border-black p-2 text-center">
+                  No users found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
 
-export default ProfilePage;
+export default AdminPage;

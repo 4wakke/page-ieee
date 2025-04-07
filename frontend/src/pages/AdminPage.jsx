@@ -41,14 +41,21 @@ function AdminPage() {
 
   useEffect(() => {
     const filtered = users.filter((user) => {
-      const nameMatch = user.name.toLowerCase().includes(nameFilter.toLowerCase());
-      const emailMatch = user.email.toLowerCase().includes(emailFilter.toLowerCase());
-  
-      const isInDateRange = (user.created_at >= startDateFilter && user.created_at <= endDateFilter) || (!startDateFilter && !endDateFilter);
-      
+      const nameMatch = user.name
+        .toLowerCase()
+        .includes(nameFilter.toLowerCase());
+      const emailMatch = user.email
+        .toLowerCase()
+        .includes(emailFilter.toLowerCase());
+
+      const isInDateRange =
+        (user.created_at >= startDateFilter &&
+          user.created_at <= endDateFilter) ||
+        (!startDateFilter && !endDateFilter);
+
       return nameMatch && emailMatch && isInDateRange;
     });
-  
+
     setFilteredUsers(filtered);
   }, [nameFilter, emailFilter, users, startDateFilter, endDateFilter]);
 
@@ -197,7 +204,10 @@ function AdminPage() {
         {/* Filtros de fechas */}
         <div className="flex flex-col md:w-1/3 items-center mt-4 md:mt-0">
           <div className="flex flex-col mb-2 w-full">
-            <label htmlFor="startDateFilter" className="text-black font-semibold">
+            <label
+              htmlFor="startDateFilter"
+              className="text-black font-semibold"
+            >
               Fecha de registro inicial
             </label>
             <input
@@ -227,89 +237,92 @@ function AdminPage() {
       <div ref={topScrollRef} className="overflow-x-auto mb-2 h-6">
         <div style={{ width: scrollWidth, height: "1px" }}></div>
       </div>
-
+      {/* cambios drasticos */}
       <div
         ref={bottomScrollRef}
-        className="overflow-x-auto white-space: nowrap"
+        className="overflow-x-auto bg-white rounded-lg shadow-md"
       >
         <table
           ref={tableRef}
-          className="min-w-full table-auto border-collapse border border-black text-black"
+          className="min-w-full text-sm text-left text-gray-700"
         >
-          <thead>
+          <thead className="bg-[#e5eff5] text-[#0073ae] text-sm font-semibold text-center">
             <tr>
-              <th className="border border-black p-2">Nombre</th>
-              <th className="border border-black p-2">Apellido</th>
-              <th className="border border-black p-2">País</th>
-              <th className="border border-black p-2">Ciudad</th>
-              <th className="border border-black p-2">Dirección</th>
-              <th className="border border-black p-2">Género</th>
-              <th className="border border-black p-2">Fecha de nacimiento</th>
-              <th className="border border-black p-2">Tipo de documento</th>
-              <th className="border border-black p-2">Número de documento</th>
-              <th className="border border-black p-2">Afiliación</th>
-              <th className="border border-black p-2">Correo</th>
-              <th className="border border-black p-2">Número telefónico</th>
-              <th className="border border-black p-2">Ocupación</th>
-              <th className="border border-black p-2">Miembro IEEE</th>
-              <th className="border border-black p-2">Miembro TEMS</th>
-              <th className="border border-black p-2">Número membresía</th>
-              <th className="border border-black p-2">Tipo de participación</th>
-              <th className="border border-black p-2">Tipo de asistencia</th>
-              <th className="border border-black p-2">Cantidad de impuesto</th>
-              <th className="border border-black p-2">Número de artículos</th>
-              <th className="border border-black p-2">Fecha de registro</th>
+              <th className="px-4 py-3 font-semibold">Nombre</th>
+              <th className="px-4 py-3 font-semibold">Apellido</th>
+              <th className="px-4 py-3 font-semibold">País</th>
+              <th className="px-4 py-3 font-semibold">Ciudad</th>
+              <th className="px-4 py-3 font-semibold">Dirección</th>
+              <th className="px-4 py-3 font-semibold">Género</th>
+              <th className="px-4 py-3 font-semibold">Fecha de nacimiento</th>
+              <th className="px-4 py-3 font-semibold">Tipo de documento</th>
+              <th className="px-4 py-3 font-semibold">Número de documento</th>
+              <th className="px-4 py-3 font-semibold">Afiliación</th>
+              <th className="px-4 py-3 font-semibold">Correo</th>
+              <th className="px-4 py-3 font-semibold">Número telefónico</th>
+              <th className="px-4 py-3 font-semibold">Ocupación</th>
+              <th className="px-4 py-3 font-semibold">Miembro IEEE</th>
+              <th className="px-4 py-3 font-semibold">Miembro TEMS</th>
+              <th className="px-4 py-3 font-semibold">Número membresía</th>
+              <th className="px-4 py-3 font-semibold">Tipo de participación</th>
+              <th className="px-4 py-3 font-semibold">Tipo de asistencia</th>
+              <th className="px-4 py-3 font-semibold">Cantidad de impuesto</th>
+              <th className="px-4 py-3 font-semibold">Número de artículos</th>
+              <th className="px-4 py-3 font-semibold">Fecha de registro</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200 text-center">
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
-                <tr key={user.id}>
-                  <td className="border border-black p-2">{user.name}</td>
-                  <td className="border border-black p-2">{user.last_name}</td>
-                  <td className="border border-black p-2">{user.country}</td>
-                  <td className="border border-black p-2">{user.city}</td>
-                  <td className="border border-black p-2">{user.address}</td>
-                  <td className="border border-black p-2">
+                <tr
+                  key={user.id}
+                  className="hover:bg-gray-100"
+                >
+                  <td className="px-4 py-3">{user.name}</td>
+                  <td className="px-4 py-3">{user.last_name}</td>
+                  <td className="px-4 py-3">{user.country}</td>
+                  <td className="px-4 py-3">{user.city}</td>
+                  <td className="px-4 py-3">{user.address}</td>
+                  <td className="px-4 py-3">
                     {formatGender(user.gender)}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatDate(user.birth_date)}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatDocType(user.doc_type)}
                   </td>
-                  <td className="border border-black p-2">{user.doc_number}</td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">{user.doc_number}</td>
+                  <td className="px-4 py-3">
                     {user.affiliation}
                   </td>
-                  <td className="border border-black p-2">{user.email}</td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">{user.email}</td>
+                  <td className="px-4 py-3">
                     {user.phone_number}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatOccupation(user.occupation)}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatMembership(user.is_ieee_member)}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatMembership(user.is_tems)}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatMembershipNumber(user.membership_number)}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatParticipation(user.participation_type)}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatAttendance(user.attendance_type)}
                   </td>
-                  <td className="border border-black p-2">{user.tax_amount}</td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">{user.tax_amount}</td>
+                  <td className="px-4 py-3">
                     {user.qty_articles}
                   </td>
-                  <td className="border border-black p-2">
+                  <td className="px-4 py-3">
                     {formatDate(user.created_at)}
                   </td>
                 </tr>

@@ -53,7 +53,7 @@ function ForgotPassword() {
       <div className="w-[420px] md:w-[500px] lg:w-[350px] h-auto bg-opacity-90">
       <Card>
         <h1 className="text-4xl font-bold my-2 text-center mb-4 tracking-wide">
-          Recuperar<br />contraseña
+          Recuperación<br />contraseña
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>

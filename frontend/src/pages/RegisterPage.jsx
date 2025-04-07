@@ -562,9 +562,9 @@ function RegisterPage() {
             {price && (
               <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
                 <div className="text-center">
-                  <h4 className="text-xl font-bold">Registro exitoso</h4>
+                  <h4 className="text-xl font-bold">Cobro pendiente</h4>
                   <p className="mt-2">
-                    El precio a pagar es: <span className="font-bold">${price}</span>
+                  El precio que debes pagar por el registro es: <span className="font-bold">${price}</span>
                   </p>
                 </div>
             

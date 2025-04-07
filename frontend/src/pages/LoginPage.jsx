@@ -97,7 +97,6 @@ function LoginPage() {
             <Link to="/forgotpassword" className="font-bold tracking-wide">
               <div className="flex flex-col justify-center items-center">
                 <span>Recuperar</span>
-                <span>contraseña</span>
               </div>
             </Link>
           </div>
