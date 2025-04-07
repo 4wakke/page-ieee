@@ -547,7 +547,7 @@ export const processPayment = async (req, res) => {
 
       const [dollarRateDb] = await pool.query(query);
       
-      const copAmount = Math.ceil(data.amount * dollarRateDb)
+      const copAmount = Math.ceil(data.amount * float(dollarRateDb))
       const newCobru = {
         amount: copAmount ,
         description: data.description || "Pago por servicio",
