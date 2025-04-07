@@ -47,15 +47,19 @@ function AdminPage() {
       const emailMatch = user.email
         .toLowerCase()
         .includes(emailFilter.toLowerCase());
-
+  
+      // Comprobación de rango de fechas ajustada
       const isInDateRange =
-        (user.created_at >= startDateFilter &&
-          user.created_at <= endDateFilter) ||
-        (!startDateFilter && !endDateFilter);
-
+        (startDateFilter && endDateFilter)
+          ? user.created_at >= startDateFilter && user.created_at <= endDateFilter
+          : (!startDateFilter && !endDateFilter) || 
+            (startDateFilter && user.created_at >= startDateFilter) ||
+            (endDateFilter && user.created_at <= endDateFilter);
+  
+            
       return nameMatch && emailMatch && isInDateRange;
     });
-
+  
     setFilteredUsers(filtered);
   }, [nameFilter, emailFilter, users, startDateFilter, endDateFilter]);
 
