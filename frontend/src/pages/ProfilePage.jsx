@@ -8,7 +8,8 @@ import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 import { toast } from "react-toastify";
 
-// Nuevo camio
+
+//! Nuevo camio
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ProfilePage() {
@@ -283,7 +284,8 @@ function ProfilePage() {
   
           setTimeout(() => {
             window.open(processPendingPaymentData.results.checkoutURL, "_blank");
-          }, 4000);
+          }, 0);
+          navigate("/");
         } else {
           //? console.error("Error al obtener la URL de pago", processPendingPaymentData);
           handleBackendResponse(processPendingPaymentData);
@@ -755,7 +757,7 @@ function ProfilePage() {
             )}
           </div>
           <div ref={priceRef}>
-              {IsSave && price > 0 &&(
+              {IsSave && price > 0 && pendingPrice === null && (
               <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
                 <div className="text-center">
                   <h4 className="text-xl font-bold">Nuevo Cobro</h4>
@@ -766,9 +768,9 @@ function ProfilePage() {
                   </p>
                 </div>
                     
-                {price > 0 && (
+                {price > 0 && IsSave && (
                   <div className="mt-4 text-center">
-                    <button onClick={handlePayment} disabled={!price} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                    <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                       Pagar
                     </button>
                   </div>
