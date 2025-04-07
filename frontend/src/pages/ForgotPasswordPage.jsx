@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Card, Input, Label, Container } from "../components/ui"; // Asumimos que estos componentes están definidos
 import { useForm } from "react-hook-form";
 // import { useEffect } from "react";
+import { toast } from "react-toastify";
+
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
@@ -21,9 +23,25 @@ function ForgotPassword() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
 
+  const handleBackendResponse = (response) => {
+    if (response.success) {
+      toast.success(response.message, {
+        className: "bg-green-600 text-white font-medium",
+        progressClassName: "bg-green-300",
+        autoClose: 5000,
+      });
+    } else {
+      toast.error(response.message, {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
-    console.log("Datos enviados:", data);
+    //? console.log("Datos enviados:", data);
     try {
       const response = await fetch(`${backRoute}/api/forgotPassword`, {
         method: "POST",
@@ -33,20 +51,22 @@ function ForgotPassword() {
         body: JSON.stringify({ email: data.email }),
       });
 
+      const result = await response.json();
+
       if (response.ok) {
-        alert("Se ha enviado a su correo una contraseña de recuperación");
+        handleBackendResponse(result)
         navigate("/");
       } else {
-        const result = await response.json();
-        alert(result.message || "Hubo un error al enviar el correo de recuperación");
+        handleBackendResponse(result)
       }
-    // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      alert("Error al intentar recuperar la contraseña");
+      handleBackendResponse(error)
     } finally {
       setLoading(false);
     }
   };
+
+
 
   return (
     <Container className="min-h-[85vh] min-w-[70vw] flex items-center justify-center ">

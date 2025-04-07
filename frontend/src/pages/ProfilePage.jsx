@@ -48,7 +48,6 @@ function ProfilePage() {
 
   const userEmail = localStorage.getItem("userEmail");
 
-  //! Empiezan cambios
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -140,7 +139,7 @@ function ProfilePage() {
         {
           className: "bg-green-600 text-white font-medium border-2 border-green-800 p-4 rounded-lg shadow-lg",
           progressClassName: "bg-green-300",
-          autoClose: 15000,
+          autoClose: 7000,
         }
       );
       
@@ -149,7 +148,7 @@ function ProfilePage() {
       try {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
-        console.log("Datos recibidos del backend:", data.results)
+        //? console.log("Datos recibidos del backend:", data.results)
 
         if (data.success) {
           let userData = {...data.results};
@@ -222,7 +221,7 @@ function ProfilePage() {
       };
   
 
-      console.log("Datos que envio a payment pendiente:", formattedPendingData)
+      //? console.log("Datos que envio a payment pendiente:", formattedPendingData)
 
       const paymentResponse = await fetch(`${backRoute}/api/payment`, {
         method: "POST",
@@ -233,7 +232,7 @@ function ProfilePage() {
       const paymentData = await paymentResponse.json();
   
       if (paymentData.success && paymentData.results?.price !== undefined) {
-        console.log("Datos que recibo del payment:", paymentData)
+        //? console.log("Datos que recibo del payment:", paymentData)
         
         const priceValue = paymentData.results.price;
         setPendingPrice(priceValue);
@@ -279,7 +278,7 @@ function ProfilePage() {
           toast.success("Redirigiendo a la página de pago, espere unos segundos...", {
             className: "bg-green-600 text-white font-medium",
             progressClassName: "bg-green-300",
-            autoClose: 5000,
+            autoClose: 4000,
           });
   
           setTimeout(() => {
@@ -410,7 +409,7 @@ function ProfilePage() {
     try {
 
       if (!dollarRate) { //? PRUEBA DOLLARRATE DINÁMICO
-        console.error("No se pudo obtener la tasa de cambio del dólar.");
+        //? console.error("No se pudo obtener la tasa de cambio del dólar.");
         return;
       } //? PRUEBA DOLLARRATE DINÁMICO
 
@@ -441,7 +440,7 @@ function ProfilePage() {
           window.open(processPaymentData.results.checkoutURL, "_blank");
         }, 4000);
       } else {
-        console.error("Error al obtener la URL de pago", processPaymentData);
+        //? console.error("Error al obtener la URL de pago", processPaymentData);
         handleBackendResponse(processPaymentData);
       }
     } catch (error) {

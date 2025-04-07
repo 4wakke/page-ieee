@@ -116,11 +116,11 @@ function RegisterPage() {
     try {
 
       if (!dollarRate) { //? PRUEBA DOLLARRATE DINÁMICO
-        console.error("No se pudo obtener la tasa de cambio del dólar.");
+        //? console.error("No se pudo obtener la tasa de cambio del dólar.");
         return;
       } //? PRUEBA DOLLARRATE DINÁMICO
 
-      console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
+      //? console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
       
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
@@ -134,7 +134,7 @@ function RegisterPage() {
       });
 
       const processPaymentData = await processPaymentResp.json();
-      console.log("Respuesta de proceso de pago:", processPaymentData);
+      //? console.log("Respuesta de proceso de pago:", processPaymentData);
 
 
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
@@ -150,7 +150,7 @@ function RegisterPage() {
 
         
       } else {
-        console.error("Error al obtener la URL de pago", processPaymentData);
+        //? console.error("Error al obtener la URL de pago", processPaymentData);
         handleBackendResponse(processPaymentData);
       }
     } catch (error) {
@@ -181,7 +181,7 @@ function RegisterPage() {
         data.articles = formattedArticles;
       }
       
-      console.log("Datos enviados a signup:", data);
+      //? console.log("Datos enviados a signup:", data);
   
       const resp = await fetch(`${backRoute}/api/signup`, {
         method: "POST",
@@ -193,7 +193,7 @@ function RegisterPage() {
       });
   
       const dataSignup = await resp.json();
-      console.log("Respuesta de signup:", dataSignup);
+      //? console.log("Respuesta de signup:", dataSignup);
 
       if (dataSignup.success) {
 
@@ -213,7 +213,7 @@ function RegisterPage() {
         userId 
       };
   
-      console.log("Datos enviados a payment:", formattedData);
+      //? console.log("Datos enviados a payment:", formattedData);
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
           body: JSON.stringify(formattedData), 
@@ -221,7 +221,7 @@ function RegisterPage() {
         });
   
         const responseData = await response.json();
-        console.log("Respuesta de payment:", responseData);
+        //? console.log("Respuesta de payment:", responseData);
 
         if (responseData.success && responseData.results?.price !== undefined) {
           setPrice(responseData.results.price);

@@ -1,6 +1,24 @@
 import { useEffect, useState, useRef } from "react";
+import { toast } from "react-toastify";
+
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
+
+const handleBackendResponse = (response) => {
+  if (response.success) {
+    toast.success(response.message, {
+      className: "bg-green-600 text-white font-medium",
+      progressClassName: "bg-green-300",
+      autoClose: 5000,
+    });
+  } else {
+    toast.error(response.message, {
+      className: "bg-red-600 text-white font-medium",
+      progressClassName: "bg-red-300",
+      autoClose: 5000,
+    });
+  }
+};
 
 //! EMPIEZAN CAMBIOS DE ESTILO
 
@@ -28,11 +46,13 @@ function AdminPage() {
         const data = await response.json();
 
         if (data.success) {
+          handleBackendResponse(data)
           setUsers(data.results);
           setFilteredUsers(data.results);
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        handleBackendResponse(error)
+        // console.error("Error fetching users:", error);
       }
     };
 
