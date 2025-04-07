@@ -76,7 +76,7 @@ export const signupSchema = z.object({
       invalid_type_error: 'El tipo de documento debe ser un texto'
     })
     .min(1)
-    .max(20),
+    .max(30),
   docNumber: z
     .string({
       required_error: 'El número de documento es requerido',

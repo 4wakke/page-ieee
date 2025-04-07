@@ -11,7 +11,8 @@ import {
   getUser,
   updateUser,
   forgotPassword,
-  changePassword
+  changePassword,
+  getCountries
 } from "../controllers/auth.controller.js";
 import { isAuth } from "../middlewares/auth.middleware.js";
 import { validateSchema } from "../middlewares/validate.middleware.js";
@@ -42,5 +43,7 @@ router.put('/users/:id', updateUser);
 router.post('/forgotPassword', forgotPassword);
 
 router.post('/changePassword', changePassword);
+
+router.get('/country', getCountries);
 
 export default router;
