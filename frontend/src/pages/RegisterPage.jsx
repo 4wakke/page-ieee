@@ -122,7 +122,6 @@ function RegisterPage() {
 
       console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
       
-
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -147,7 +146,7 @@ function RegisterPage() {
         });
         setTimeout(() => {
           window.open(processPaymentData.results.checkoutURL, "_blank");
-        }, 5000);
+        }, 4000);
 
         
       } else {
@@ -155,12 +154,7 @@ function RegisterPage() {
         handleBackendResponse(processPaymentData);
       }
     } catch (error) {
-    console.error("Error en el proceso de pago:", error);
-    toast.error("Hubo un error en el proceso de pago.", {
-      className: "bg-red-600 text-white font-medium",
-      progressClassName: "bg-red-300",
-      autoClose: 5000,
-    });
+      handleBackendResponse(error); 
   }
   };
 
@@ -188,18 +182,6 @@ function RegisterPage() {
       }
       
       console.log("Datos enviados a signup:", data);
-      
-      const formattedData = {
-        occupation: data.occupation,
-        isIeeeMember: data.isIeeeMember,  
-        isTems: data.isTems,   
-        participationType: data.participationType,
-        attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
-        qtyArticles: data.qtyArticles,
-        articles: data.articles,
-      };
-  
-      console.log("Datos enviados a payment:", formattedData);
   
       const resp = await fetch(`${backRoute}/api/signup`, {
         method: "POST",
@@ -213,12 +195,25 @@ function RegisterPage() {
       const dataSignup = await resp.json();
       console.log("Respuesta de signup:", dataSignup);
 
-  
       if (dataSignup.success) {
+
       handleBackendResponse(dataSignup);
       const userId = dataSignup.results[0]?.userId;
       setUserId(userId);
       await signup(dataSignup);
+
+      const formattedData = {
+        occupation: data.occupation,
+        isIeeeMember: data.isIeeeMember,  
+        isTems: data.isTems,   
+        participationType: data.participationType,
+        attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
+        qtyArticles: data.qtyArticles,
+        articles: data.articles,
+        userId 
+      };
+  
+      console.log("Datos enviados a payment:", formattedData);
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
           body: JSON.stringify(formattedData), 
@@ -237,12 +232,8 @@ function RegisterPage() {
         handleBackendResponse(dataSignup); 
     }
     } catch (error) {
-      console.error("Error en el proceso de registro o pago:", error);
-      toast.error("Hubo un error en el proceso de registro o pago.", {
-        className: "bg-red-600 text-white font-medium",
-        progressClassName: "bg-red-300",
-        autoClose: 5000,
-      });
+      handleBackendResponse(error); 
+
     }
       
     });

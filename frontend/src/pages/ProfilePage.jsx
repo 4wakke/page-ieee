@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
@@ -8,7 +8,7 @@ import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 import { toast } from "react-toastify";
 
-
+// Nuevo camio
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ProfilePage() {
@@ -35,6 +35,15 @@ function ProfilePage() {
   const [userDetails, setUserDetails] = useState(null);
   const [price, setPrice] = useState("");
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
+  const priceRef = useRef(null);
+  const pendingPriceRef = useRef(null);
+  const paymentTriggeredByEdit = useRef(false);
+  const [showNewCharge, setShowNewCharge] = useState(false);
+  const [paymentInProgress, setPaymentInProgress] = useState(false);
+
+  const [pendingPrice, setPendingPrice] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [pendingUrl, setPendingUrl] = useState(null);
 
   const userEmail = localStorage.getItem("userEmail");
 
@@ -59,6 +68,24 @@ function ProfilePage() {
       setValue("articles", []);
     }
   }, [participationType, setValue]); 
+
+  useEffect(() => {
+    if (price && priceRef.current) {
+      priceRef.current.scrollIntoView({
+        behavior: "smooth", 
+        block: "center", 
+      });
+    }
+  }, [price]); 
+
+  useEffect(() => {
+    if (pendingPrice && pendingPriceRef.current) {
+      pendingPriceRef.current.scrollIntoView({
+        behavior: "smooth", 
+        block: "center", 
+      });
+    }
+  }, [pendingPrice]); 
 
   const exchangeRate = ExchangeDollar(); //? PRUEBA DOLLARRATE DINÁMICO
 
@@ -93,6 +120,30 @@ function ProfilePage() {
       
       console.log("Correo que se está usando:", userEmail);
       console.log("Valor del tipo de cambio (exchangeRate):", exchangeRate);
+
+      toast.success(
+        <div>
+          <span style={{ color: '#0073ae', fontWeight: 'bold', fontSize: '18px' }}>
+            Recuerda:{' '} 
+          </span>
+          <span style={{ color: '#000000', fontWeight: 'bold', fontSize: '16px' }}>
+            Si tienes un pago pendiente del registro, haz click en  
+          </span>
+          <span style={{ color: '#c01d0f', fontWeight: 'bold', fontSize: '18px' }}>
+            {' '}Pago pendiente{' '}
+          </span>
+          <span style={{ color: '#000000', fontWeight: 'bold', fontSize: '16px' }}>
+            para completar el registro.
+          </span>
+        </div>,
+        {
+          className: "bg-green-600 text-white font-medium border-2 border-green-800 p-4 rounded-lg shadow-lg",
+          progressClassName: "bg-green-300",
+          autoClose: 15000,
+        }
+      );
+      
+      
 
       try {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
@@ -131,7 +182,6 @@ function ProfilePage() {
         }
 
         setUserDetails(userData);
-
         
         if (userData.taxAmount > 0) {
           userData.isTaxRequired = "yes";  
@@ -147,12 +197,112 @@ function ProfilePage() {
           }
         }
       } catch (error) {
-        console.error("Error fetching user details:", error);
+        handleBackendResponse(error)
       }
     };
 
     fetchUserDetails();
   }, [setValue, userEmail, exchangeRate, navigate]);
+
+  const handlePendingPayment = async () => {
+    try {
+      const userData = userDetails;
+      
+  
+      const formattedPendingData = {
+        occupation: userData.occupation,
+        isIeeeMember: userData.isIeeeMember === 'yes',  // Cambiar 'yes' a true y 'no' a false
+        isTems: userData.isTems === 'yes',
+        participationType: userData.participationType,
+        attendanceType: userData.attendanceType === "inPerson" ? "In-person" : "Online",
+        qtyArticles: userData.qtyArticles,
+        articles: userData.articles,
+        userId: userData.id
+      };
+  
+
+      console.log("Datos que envio a payment pendiente:", formattedPendingData)
+
+      const paymentResponse = await fetch(`${backRoute}/api/payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedPendingData),
+      });
+  
+      const paymentData = await paymentResponse.json();
+  
+      if (paymentData.success && paymentData.results?.price !== undefined) {
+        console.log("Datos que recibo del payment:", paymentData)
+        
+        const priceValue = paymentData.results.price;
+        setPendingPrice(priceValue);
+        handleBackendResponse(paymentData);
+      } else {
+        setPendingPrice(0);
+        setPendingUrl(null);
+        handleBackendResponse(paymentData);
+      }
+    } catch (error) {
+      console.error("Error en el pago pendiente:", error);
+      handleBackendResponse(error);
+    }
+  };
+  
+
+  const handlePendingProcessPayment = async () => {
+    try {
+      if (pendingPrice > 0) {
+        const userData = userDetails;
+  
+        const processResponse = await fetch(`${backRoute}/api/processPayment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: pendingPrice,
+            dollarRate: dollarRate,
+            description: `Pago conferencia ${userData.name} ${userData.lastName}`,
+            userId: userData.id,
+          }),
+        });
+  
+        const processPendingPaymentData = await processResponse.json();
+        console.log("Respuesta de proceso de pago:", processPendingPaymentData);
+  
+        if (
+          processPendingPaymentData.success &&
+          processPendingPaymentData.results.checkoutURL
+          
+        ) {
+          setShowNewCharge(false); //!
+          setPaymentInProgress(false); //!
+          setPendingUrl(processPendingPaymentData.results.checkoutURL);
+          handleBackendResponse(processPendingPaymentData);
+          toast.success("Redirigiendo a la página de pago, espere unos segundos...", {
+            className: "bg-green-600 text-white font-medium",
+            progressClassName: "bg-green-300",
+            autoClose: 5000,
+          });
+  
+          setTimeout(() => {
+            window.open(processPendingPaymentData.results.checkoutURL, "_blank");
+          }, 4000);
+        } else {
+          console.error("Error al obtener la URL de pago", processPendingPaymentData);
+          handleBackendResponse(processPendingPaymentData);
+        }
+      } else {
+        toast.info("No tienes pagos pendientes para procesar.", {
+          className: "bg-yellow-500 text-white font-medium",
+          progressClassName: "bg-yellow-300",
+          autoClose: 4000,
+        });
+      }
+    } catch (error) {
+      console.error("Error al procesar el pago pendiente:", error);
+      handleBackendResponse(error);
+    }
+  };
+  
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -160,9 +310,6 @@ function ProfilePage() {
       setValue("country", userDetails.country, { shouldValidate: false, shouldTouch: false });
     }
   };
-
-
-  
 
   const handleSave = async (data) => {
     let updatedData = { ...data };
@@ -209,22 +356,29 @@ function ProfilePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
+      
       const result = await response.json();
       
       console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
       if (result.success) {
+        handleBackendResponse(result)
         setIsEditing(false);
-        alert("Datos guardados exitosamente");
 
         const formattedData = {
           occupation: data.occupation,
-          isIeeeMember: data.isIeeeMember,  
-          isTems: data.isTems,   
+          isIeeeMember: data.isIeeeMember === 'yes',  // Cambiar 'yes' a true y 'no' a false
+          isTems: data.isTems === 'yes',
           participationType: data.participationType,
           attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
           qtyArticles: data.qtyArticles,
           articles: data.articles,
+          userId: userDetails.id
         };
+
+        paymentTriggeredByEdit.current = true;
+
+        console.log("Respuesta de payment:", formattedData);
+
 
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
@@ -234,15 +388,21 @@ function ProfilePage() {
         
         const responseData = await response.json();
         console.log("Respuesta de payment:", responseData);
-
+//cambios nuevos
         if (responseData.success && responseData.results?.price !== undefined) {
-          setPrice(responseData.results.price); 
+          setPendingPrice(null);
+          if (paymentTriggeredByEdit.current) {
+            setPrice(responseData.results.price);
+            setShowNewCharge(true); //! ✅ SOLO SI NO ESTÁ EN FLUJO DE PAGO
+          }
+          handleBackendResponse(responseData);
         }
+        paymentTriggeredByEdit.current = false;
       } 
       
     } catch (error) {
-      console.error("Error saving user details:", error);
-    } //!
+      handleBackendResponse(error)
+    } 
   };
 
   const handlePayment = async () => {
@@ -254,7 +414,8 @@ function ProfilePage() {
       } //? PRUEBA DOLLARRATE DINÁMICO
 
       console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
-      
+
+      setPaymentInProgress(true);
 
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
@@ -271,14 +432,23 @@ function ProfilePage() {
       console.log("Respuesta de proceso de pago:", processPaymentData);
 
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
-        navigate("/");
-        window.location.href = processPaymentData.results.checkoutURL;
+        handleBackendResponse(processPaymentData);
+        toast.success("Redirigiendo a la página de pago, espere unos segundos...", {
+          className: "bg-green-600 text-white font-medium",
+          progressClassName: "bg-green-300",
+          autoClose: 5000,
+        });
+        setTimeout(() => {
+          window.open(processPaymentData.results.checkoutURL, "_blank");
+        }, 4000);
       } else {
         console.error("Error al obtener la URL de pago", processPaymentData);
+        handleBackendResponse(processPaymentData);
       }
     } catch (error) {
-      console.error("Error en el proceso de pago:", error);
-    }
+      handleBackendResponse(error); 
+
+  }
   };
   
 
@@ -526,7 +696,7 @@ function ProfilePage() {
               {errors.isTaxRequired && <p className="text-red-500 font-medium">Este campo es requerido</p>}
 
               {isTaxRequired === "yes" && (
-              <div>
+              <div className="mt-2">
                 <Label htmlFor="taxAmount">Pago por impuesto</Label>
                 <Input
                   type="number"
@@ -555,15 +725,46 @@ function ProfilePage() {
                     Cambiar Contraseña
                 </button>
               </div>
+              <div>
+              {!isEditing && (
+              <div>
+                <button type="button" onClick={handlePendingPayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#c01d0f] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                  Pago pendiente
+                </button>
+              </div>
+            )}
+              </div>
           </div>
-          <div>
-              {price && (
+          <div ref={pendingPriceRef}>
+          {!isEditing && pendingPrice !== null && (
+          <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
+            <div className="text-center">
+              <h4 className="text-xl font-bold">Cobro Pendiente</h4>
+              <p className="mt-2">
+                {pendingPrice > 0
+                  ? `${userDetails.name} ${userDetails.lastName}, debes pagar ${pendingPrice}$`
+                  : `${userDetails.name} ${userDetails.lastName}, no tienes pagos pendientes`}
+              </p>
+                
+              {pendingPrice > 0 && (
+                <div className="mt-4 text-center">
+                <button onClick={handlePendingProcessPayment} disabled={!pendingPrice} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                  Pagar
+                </button>
+              </div>
+              )}
+            </div>
+          </div>
+            )}
+          </div>
+          <div ref={priceRef}>
+              {price > 0 && showNewCharge && !paymentInProgress &&(
               <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
                 <div className="text-center">
-                  <h4 className="text-xl font-bold">Cambio exitoso</h4>
+                  <h4 className="text-xl font-bold">Nuevo Cobro</h4>
                   <p className="mt-2">
                     {price > 0
-                      ? `${userDetails.name} ${userDetails.lastName}, usted debe esta ${price}$ por sus modificaciones`
+                      ? `${userDetails.name} ${userDetails.lastName}, usted debe ${price}$ por sus modificaciones`
                       : `${userDetails.name} ${userDetails.lastName}, usted no debe nada`}
                   </p>
                 </div>
@@ -575,6 +776,7 @@ function ProfilePage() {
                     </button>
                   </div>
                 )}
+                
               </div>
               )}
               </div>
