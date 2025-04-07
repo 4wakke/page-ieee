@@ -18,9 +18,15 @@ const CountriesSelect = ({ register, errors, disabled, selectedCountry, onChange
         const data = await response.json();
 
         // Filtramos solo los nombres de los países
-        const countryNames = data.map((country) => country.name);
-        countryNames.sort((a, b) => a.localeCompare(b)); // Ordena alfabéticamente
-        setCountries(countryNames);
+        // Verifica si la respuesta es exitosa y existe la propiedad "results"
+        if (data.success && data.results) {
+          // Extrae los nombres de los países de "results"
+          const countryNames = data.results.map((country) => country.name);
+          countryNames.sort((a, b) => a.localeCompare(b)); // Ordena alfabéticamente
+          setCountries(countryNames);
+        } else {
+          console.error("Error: No se recibieron datos de países.");
+        }
         setLoading(false);
       } catch (error) {
         console.error("Error al obtener los países:", error);
