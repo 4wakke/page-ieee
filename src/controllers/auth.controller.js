@@ -282,8 +282,7 @@ export const updateUser = async (req, res) => {
     attendanceType,
     taxAmount,
     qtyArticles,
-    articles,
-    dollarRate
+    articles
   } = req.body;
 
   try {
@@ -362,10 +361,11 @@ export const updateUser = async (req, res) => {
   
       // Revisar si hay que actualizar o eliminar
       for (const [sequence, pages] of existingMap.entries()) {
+
         if (!newMap.has(sequence)) {
           deletes.push(sequence); // Si no está en el nuevo array, eliminarlo
-        } else if (newMap.get(pages) !== pages) {
-          updates.push({ sequence: sequence, pages: newMap.get(pages) }); // Si cambió, actualizarlo
+        } else if (newMap.get((sequence)) != pages) {
+          updates.push({ sequence: sequence, pages: newMap.get(sequence) }); // Si cambió, actualizarlo
         }
       }
   
@@ -390,7 +390,7 @@ export const updateUser = async (req, res) => {
           [id, deletes]
         );
       }
-  
+      
       if (inserts.length > 0) {
         await pool.query(
           "INSERT INTO articles (user_id, sequence, pages) VALUES ?",
