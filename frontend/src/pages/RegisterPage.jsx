@@ -116,13 +116,12 @@ function RegisterPage() {
     try {
 
       if (!dollarRate) { //? PRUEBA DOLLARRATE DINÁMICO
-        console.error("No se pudo obtener la tasa de cambio del dólar.");
+        //? console.error("No se pudo obtener la tasa de cambio del dólar.");
         return;
       } //? PRUEBA DOLLARRATE DINÁMICO
 
-      console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
+      //? console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
       
-
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -135,7 +134,7 @@ function RegisterPage() {
       });
 
       const processPaymentData = await processPaymentResp.json();
-      console.log("Respuesta de proceso de pago:", processPaymentData);
+      //? console.log("Respuesta de proceso de pago:", processPaymentData);
 
 
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
@@ -147,20 +146,15 @@ function RegisterPage() {
         });
         setTimeout(() => {
           window.open(processPaymentData.results.checkoutURL, "_blank");
-        }, 5000);
+        }, 4000);
 
         
       } else {
-        console.error("Error al obtener la URL de pago", processPaymentData);
+        //? console.error("Error al obtener la URL de pago", processPaymentData);
         handleBackendResponse(processPaymentData);
       }
     } catch (error) {
-    console.error("Error en el proceso de pago:", error);
-    toast.error("Hubo un error en el proceso de pago.", {
-      className: "bg-red-600 text-white font-medium",
-      progressClassName: "bg-red-300",
-      autoClose: 5000,
-    });
+      handleBackendResponse(error); 
   }
   };
 
@@ -187,19 +181,7 @@ function RegisterPage() {
         data.articles = formattedArticles;
       }
       
-      console.log("Datos enviados a signup:", data);
-      
-      const formattedData = {
-        occupation: data.occupation,
-        isIeeeMember: data.isIeeeMember,  
-        isTems: data.isTems,   
-        participationType: data.participationType,
-        attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
-        qtyArticles: data.qtyArticles,
-        articles: data.articles,
-      };
-  
-      console.log("Datos enviados a payment:", formattedData);
+      //? console.log("Datos enviados a signup:", data);
   
       const resp = await fetch(`${backRoute}/api/signup`, {
         method: "POST",
@@ -211,14 +193,27 @@ function RegisterPage() {
       });
   
       const dataSignup = await resp.json();
-      console.log("Respuesta de signup:", dataSignup);
+      //? console.log("Respuesta de signup:", dataSignup);
 
-  
       if (dataSignup.success) {
+
       handleBackendResponse(dataSignup);
       const userId = dataSignup.results[0]?.userId;
       setUserId(userId);
       await signup(dataSignup);
+
+      const formattedData = {
+        occupation: data.occupation,
+        isIeeeMember: data.isIeeeMember,  
+        isTems: data.isTems,   
+        participationType: data.participationType,
+        attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
+        qtyArticles: data.qtyArticles,
+        articles: data.articles,
+        userId 
+      };
+  
+      //? console.log("Datos enviados a payment:", formattedData);
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
           body: JSON.stringify(formattedData), 
@@ -226,7 +221,7 @@ function RegisterPage() {
         });
   
         const responseData = await response.json();
-        console.log("Respuesta de payment:", responseData);
+        //? console.log("Respuesta de payment:", responseData);
 
         if (responseData.success && responseData.results?.price !== undefined) {
           setPrice(responseData.results.price);
@@ -237,12 +232,8 @@ function RegisterPage() {
         handleBackendResponse(dataSignup); 
     }
     } catch (error) {
-      console.error("Error en el proceso de registro o pago:", error);
-      toast.error("Hubo un error en el proceso de registro o pago.", {
-        className: "bg-red-600 text-white font-medium",
-        progressClassName: "bg-red-300",
-        autoClose: 5000,
-      });
+      handleBackendResponse(error); 
+
     }
       
     });
@@ -562,9 +553,9 @@ function RegisterPage() {
             {price && (
               <div className="mt-2 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
                 <div className="text-center">
-                  <h4 className="text-xl font-bold">Registro exitoso</h4>
+                  <h4 className="text-xl font-bold">Cobro pendiente</h4>
                   <p className="mt-2">
-                    El precio a pagar es: <span className="font-bold">${price}</span>
+                  El precio que debes pagar por el registro es: <span className="font-bold">${price}</span>
                   </p>
                 </div>
             

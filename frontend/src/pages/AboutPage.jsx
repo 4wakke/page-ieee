@@ -1,18 +1,7 @@
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 
 function AboutPage() {
-
-  const navigate = useNavigate(); // Aquí estamos usando el hook useNavigate
-
-
-  useEffect(() => {
-    
-    // Esto redirige a la ruta "/profile/admin" cuando el componente se monta
-    navigate("/profile/admin");
-  }, [navigate]); 
 
   // useEffect(() => {
   //   document.body.classList.add("about-page");

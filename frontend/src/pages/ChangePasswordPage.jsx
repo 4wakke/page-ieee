@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Card, Input, Label, Container } from "../components/ui"; // Asumimos que estos componentes están definidos
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "react-toastify";
+
 
 
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
@@ -22,14 +24,30 @@ function ChangePassword() {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
+  const handleBackendResponse = (response) => {
+    if (response.success) {
+      toast.success(response.message, {
+        className: "bg-green-600 text-white font-medium",
+        progressClassName: "bg-green-300",
+        autoClose: 5000,
+      });
+    } else {
+      toast.error(response.message, {
+        className: "bg-red-600 text-white font-medium",
+        progressClassName: "bg-red-300",
+        autoClose: 5000,
+      });
+    }
+  };
+
   const userId = localStorage.getItem("userId");
-  console.log(userId); 
+  //? console.log(userId); 
 
 
   const onSubmit = async (data) => {
     setLoading(true);
-    console.log("Datos enviados:", data);
-    console.log("id está:", userId);
+    //? console.log("Datos enviados:", data);
+    //? console.log("id está:", userId);
 
     try {
       const response = await fetch(`${backRoute}/api/changePassword`, {
@@ -43,17 +61,16 @@ function ChangePassword() {
           newPassword: data.newPassword,
         }),
       });
-
+      const result = await response.json();
       if (response.ok) {
-        alert("La contraseña se ha cambiado con éxito");
+        
+        handleBackendResponse(result)
         navigate("/profile");
       } else {
-        const result = await response.json();
-        alert(result.message || "Hubo un error al cambiar la contraseña");
+        handleBackendResponse(result)
       }
-    // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      alert("Error al intentar cambiar la contraseña");
+      handleBackendResponse(error)
     } finally {
       setLoading(false);
     }
