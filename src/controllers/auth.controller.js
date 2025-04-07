@@ -9,7 +9,7 @@ import {isValidEmail,isValidPassword,isValidDocType,
   isValidPhoneNumber,isValidBirthDate,isValidName,
   isValidMembershipNumber,isValidGender,isValidTaxAmount,
   successResponse,errorResponse} from "./helpers.js"
-import {forgotPasswordTemplate} from "./templates.js"
+import {forgotPasswordTemplate,successRegisterTemplate} from "./templates.js"
 import { access } from "fs";
 
 const transporter = nodemailer.createTransport({
@@ -79,7 +79,7 @@ export const signup = async (req, res, next) => {
   try {
   
     if (!isValidEmail(email))  return errorResponse(res,"Correo electrónico inválido.",400);
-    if (!isValidPassword(password)) return errorResponse(res,"La contraseña debe contener un mínimo de 8 caracteres, una mayúscula, una minúscula y un número.",400);
+    if (!isValidPassword(password)) return errorResponse(res,"La contraseña debe contener un mínimo de 6 caracteres, una mayúscula y una minúscula.",400);
     if (!isValidPhoneNumber(phoneNumber)) return errorResponse(res,"Número de teléfono inválido",400);
     if (!isValidBirthDate(birthDate)) return errorResponse(res,"Fecha de nacimiento inválida",400)
     if (!isValidName(name) || !isValidName(lastName)) return errorResponse(res,"Nombre o Apellido inválido",400)
@@ -131,6 +131,15 @@ export const signup = async (req, res, next) => {
       await pool.query(articlesQuery);
     }
     
+    sendRegisterEmail({
+      name: name,
+      lastName: lastName,
+      country: country,
+      occupation: occupation,
+      participationType: participationType,
+      email: email
+    })
+    
     const token = await createAccessToken({ id: userId });
 
     res.cookie("token", token, {
@@ -147,6 +156,46 @@ export const signup = async (req, res, next) => {
     return errorResponse(res,"Error al registrar el usuario",400,error.message)
   
   }
+};
+
+const sendRegisterEmail = async (data,res) =>{
+  //const email = data.email
+  const email = "Kevinguegra@gmail.com"
+  
+  const occupationMap = {
+    student: "Estudiante",
+    professional: "Profesional",
+  };
+
+  const participationMap = {
+    author: "Autor",
+    atendee: "Asistente",
+    speaker: "Conferencista",
+  };
+
+  const emailData = {
+    name: data.name,
+    lastName: data.lastName,
+    country: data.country,
+    occupation: occupationMap[data.occupation?.toLowerCase()] || data.occupation,
+    participationType: participationMap[data.participationType?.toLowerCase()] || data.participationType
+  }
+
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Registro exitoso",
+      html: successRegisterTemplate(emailData),
+    };
+
+    await transporter.sendMail(mailOptions);
+
+  return { success: true, message: "Correo de registro enviado" };
+} catch (error) {
+  return { success: false, message: "Error al enviar el correo", error: error.message };
+}
+
 };
 
 export const getAllUsers = async (req, res) => {
@@ -322,7 +371,7 @@ export const updateUser = async (req, res) => {
   
       for (const [sequence, pages] of newMap.entries()) {
         if (!existingMap.has(sequence)) {
-          inserts.push({sequence: sequence, pages: pages });
+          inserts.push({id:id, sequence: sequence, pages: pages });
         }
       }
   
@@ -488,7 +537,17 @@ export const processPayment = async (req, res) => {
       if (cobruToken || isTokenExpired(cobruToken) ){
         await getRefreshToken(res)
       }
-      const copAmount = Math.ceil(data.amount * data.dollarRate)
+
+      const query = `
+        SELECT dollar_rate 
+        FROM dollar_rate
+        ORDER BY fecha_registro DESC
+        LIMIT 1
+      `;
+
+      const [dollarRateDb] = await pool.query(query);
+      
+      const copAmount = Math.ceil(data.amount * dollarRateDb)
       const newCobru = {
         amount: copAmount ,
         description: data.description || "Pago por servicio",
@@ -682,5 +741,24 @@ export const changePassword = async(req,res) => {
   await pool.query(query, [hashedPassword ,data.userId]);
 
   return successResponse(res,"Contraseña actualizada correctamente",{"userId":data.userId},200)
+
+}
+
+export const getCountries = async (req, res) => {
+
+  try {
+
+    const query = `
+      SELECT *
+      FROM countries
+    `;
+
+    const [countries] = await pool.query(query);
+
+    return successResponse(res, 'Paises listados correctamente', countries);
+  } catch (error) {
+    console.error('Error al listar los paises:', error);
+    return errorResponse(res, 'Error al listar los paises', 500, error.message);
+  }
 
 }
