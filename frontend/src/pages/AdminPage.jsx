@@ -212,7 +212,7 @@ function AdminPage() {
               <th className="border border-black p-2">Tipo de asistencia</th>
               <th className="border border-black p-2">Cantidad de impuesto</th>
               <th className="border border-black p-2">Número de artículos</th>
-              <th className="border border-black p-2">Fecha creación</th>
+              <th className="border border-black p-2">Fecha de registro</th>
             </tr>
           </thead>
           <tbody>

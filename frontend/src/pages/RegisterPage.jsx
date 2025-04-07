@@ -97,15 +97,19 @@ function RegisterPage() {
 
   useEffect(() => {
     // Verificar si hay errores en el formulario
-    if (Object.keys(errors).length > 0) {
-      // Mostrar un toast indicando que todos los campos son requeridos
+    // Filtrar el campo "membershipNumber" de los errores
+    const filteredErrors = { ...errors };
+    delete filteredErrors.membershipNumber;
+  
+    // Si hay errores y no es "membershipNumber", muestra el toast
+    if (Object.keys(filteredErrors).length > 0) {
       toast.error("Debes completar todos los campos requeridos para registrar tu cuenta.", {
         className: "bg-red-600 text-white font-medium",
         progressClassName: "bg-red-300",
         autoClose: 5000,
       });
     }
-  }, [errors]); 
+  }, [errors]);
 
 
   const handlePayment = async () => {
@@ -142,7 +146,7 @@ function RegisterPage() {
           autoClose: 5000,
         });
         setTimeout(() => {
-          window.location.href = processPaymentData.results.checkoutURL;  // Dirige al checkout
+          window.open(processPaymentData.results.checkoutURL, "_blank");
         }, 5000);
 
         
