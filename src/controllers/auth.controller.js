@@ -451,8 +451,6 @@ export const profile = async (req, res) => {
 export const signout = (req, res) => {
   res.clearCookie('token');
   res.sendStatus(200);
-
-  return successResponse(res,"Sesión cerrada correctamente",{})
 };
 
 export const payment = async (req,res) =>{
