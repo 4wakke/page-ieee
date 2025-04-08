@@ -13,18 +13,18 @@ function Navbar() {
   return ( 
     <nav className="bg-[#e5eff5] shadow-md border-b-2 border-[#006699] rounded-b-lg "> 
       <Container className="flex justify-between py-3">
-        <div className="mx-10">
-          <div className="flex items-center space-x-3">
-            <Link to="./" className="flex">
-              <img src="/assets/logo-temscon.png" alt="TEMSCon Logo" className="h-12" />
+        <div className="flex-1 min-w-0 ml-4 sm:ml-10">
+          <div className="flex items-center">
+            <Link to="./" className="flex items-center ">
+              <img src="/assets/logo-temscon.png" alt="TEMSCon Logo" className="h-10 sm:h-12 w-auto max-w-[120px] sm:max-w-none object-contain" />
             </Link>
-            <Link to="https://www.ieee.org/" className="flex items-left  ">
-              <img src="/assets/logo-ieee.svg" alt="IEEE Logo" className="h-8" />
+            <Link to="https://www.ieee.org/" className="hidden lg:block shrink-0 ">
+              <img src="/assets/logo-ieee.svg" alt="IEEE Logo" className="h-8 w-auto object-contain" />
             </Link>
           </div>
         </div>
         <div className="flex items-center justify-center md:gap-x-1 mx-10">
-          <ul className="flex items-center justify-center md:gap-x-1">
+          <ul className="flex items-center justify-center gap-x-1 sm:gap-x-3 text-xs sm:text-sm">
             {isAuth ? (
               <>
                 {privateRoutes.map(({ path, name, icon }) => (
@@ -32,8 +32,8 @@ function Navbar() {
                     <Link
                       to={path}
                       className={twMerge(
-                        "text-slate-300 flex items-center px-3 py-1 gap-x-1",
-                        location.pathname === path && "bg-[#0073ae]"
+                        "text-slate-300 flex items-center px-3 py-1 gap-x-1 border rounded-md transition-all duration-150 hover:brightness-125",
+                        location.pathname === path && "bg-[#4369a6]"
                       )}
                     >
                       {icon}
@@ -43,8 +43,7 @@ function Navbar() {
                 ))}
 
                 <li
-                  className="text-[#2e5ca6] flex items-center px-3 py-1 
-                  hover:cursor-pointer font-bold"
+                  className="bg-[#c01d0f] text-white flex items-center px-3 py-1 gap-x-1 rounded-md hover:cursor-pointer mx-2 transition-all duration-150 hover:brightness-125"
                   onClick={() => {
                     signout();
                   }}
@@ -53,21 +52,31 @@ function Navbar() {
                   <span className="hidden sm:block">Salir</span>
                 </li>
 
-                <li className="flex gap-x-1 items-center justify-center">
-                  <LuUserPen className="w-5 h-5" />
-                  <span className="font-medium">{user.name}</span>
+                <li className="flex gap-x-1 items-center justify-center text-[#0073ae]">
+                  <LuUserPen className="w-5 h-5 sm:inline" />
+                  <span className="font-bold">{user.name}</span>
                 </li>
               </>
             ) : (
               publicRoutes.map(({ path, name }) => (
                 <li
-                  className={twMerge(
-                    "text-white-500 flex items-center px-3 py-1 font-medium text text-[#006699]",
-                    location.pathname === path && "bg-[#f9f8f8] border-2"
-                  )}
+                className={twMerge(
+                  "text-[#4067a5] flex items-center px-3 py-2 font-semibold  rounded-md transition-colors duration-150  hover:bg-[#cbe5f0] bg-[#ffff] shadow-sm hover:shadow-md",
+                  location.pathname === path && "bg-[#4067a5] text-[#fff] border-2"
+                )}
+
+                //                 "text-white   px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold rounded-md transition-all duration-150",
+  // "bg-[#0073ae] hover:bg-[#0091ce] shadow-sm hover:shadow-md"
                   key={path}
                 >
-                  <Link to={path}>{name}</Link>
+                  <Link to={path}>
+            <span className="hidden sm:inline">
+              {name} {/* Texto largo */}
+            </span>
+            {name === "Sobre nosotros" && <span className="sm:hidden">Tems</span>}
+            {name === "Iniciar sesión" && <span className="sm:hidden">Ingresa</span>}
+            {name === "Registrarse" && <span className="sm:hidden">Registro</span>}
+          </Link>
                 </li>
               ))
             )}

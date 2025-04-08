@@ -43,6 +43,7 @@ export function AuthProvider({ children }) {
   const signin = async (data) => {
     try {
       const response = await axios.post(`${backRoute}/api/signin`, data);
+      console.log(response)
       if(response.data.success){
         setErrors({ message: response.data.message, success: true }); //?
       }else {
@@ -50,7 +51,7 @@ export function AuthProvider({ children }) {
         setErrors({ message: response.data.message, success: false }); //?
       }
 
-      setUser(response.data);
+      setUser(response.data.results);
       setIsAuth(true);
       localStorage.setItem("userEmail", data.email);
       // clearErrors(); //! LIMPIAR ERRORES
@@ -81,7 +82,7 @@ export function AuthProvider({ children }) {
       axios
         .get(`${backRoute}/profile`)
         .then((res) => {
-          setUser(res.data);
+          setUser(res.data.results);
           setIsAuth(true);
         })
         .catch((err) => {
