@@ -7,8 +7,8 @@ const ArticlesSpaces = ({ register, errors, qtyArticles, isEditing, isRegister})
     for (let i = 0; i < qtyArticles; i++) {
       fields.push(
         <div key={i} className="grid grid-cols-2 gap-2">
-          <div>
-            <Label htmlFor={`articles[${i}].sequence`}>Nombre del Artículo {i + 1}</Label>
+          <div className="m">
+            <Label htmlFor={`articles[${i}].sequence`}>Número del artículo {i + 1}</Label>
             <Input
               type="text"
               placeholder="Nombre del artículo" 
@@ -19,7 +19,7 @@ const ArticlesSpaces = ({ register, errors, qtyArticles, isEditing, isRegister})
             )}
           </div>
           <div>
-            <Label htmlFor={`articles[${i}].pages`}>Número de Páginas</Label>
+            <Label htmlFor={`articles[${i}].pages`}>Número de páginas</Label>
             <Input
               type="number"
               placeholder="Número de páginas"

@@ -436,7 +436,9 @@ function RegisterPage() {
   
                 {isIeeeMember === "yes" && (
                   <>
+                  <div className="mt-4">
                     <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+                  </div>
                     <Input 
                       type="text" 
                       placeholder="Ingresa tu número de membresía"
@@ -472,7 +474,9 @@ function RegisterPage() {
 
             {participationType === "author" && ( 
             <div>
+              <div className="mt-4">
               <Label htmlFor="qtyArticles">Número de artículos</Label>
+              </div>
               <Input type="number" placeholder="Ingresa el número de artículos"
               {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
               {qtyArticles > 0 && (
@@ -496,7 +500,7 @@ function RegisterPage() {
                 )}
 
               {isTaxRequired === "yes" && (
-              <div>
+              <div className="mt-4">
                 <Label htmlFor="taxAmount">Pago por impuesto</Label>
                 <Input 
                   type="number" 

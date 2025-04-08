@@ -96,6 +96,7 @@ function ProfilePage() {
   const handleChangePassword = () => {
     navigate("/profile/changepassword");
   };
+  
 
   const handleBackendResponse = (response) => {
     if (response.success) {
@@ -129,7 +130,7 @@ function ProfilePage() {
           <span style={{ color: '#000000', fontWeight: 'bold', fontSize: '16px' }}>
             Si tienes un pago pendiente del registro, haz click en  
           </span>
-          <span style={{ color: '#c01d0f', fontWeight: 'bold', fontSize: '18px' }}>
+          <span style={{ color: '#c01d0f', fontWeight: 'bold', fontSize: '17px' }}>
             {' '}Pago pendiente{' '}
           </span>
           <span style={{ color: '#000000', fontWeight: 'bold', fontSize: '16px' }}>
@@ -466,16 +467,16 @@ function ProfilePage() {
             <Label htmlFor="name">Nombre</Label>
               <Input type="text" placeholder="Ingresa tu nombre"
               {...register("name", { required: true })} disabled={!isEditing} />
-              {/* {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>} */}
+              {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>} 
             </div>
 
             <div>
               <Label htmlFor="lastName">Apellidos</Label>
               <Input type="text" placeholder="Editar apellido"
               {...register("lastName", { required: true })} disabled={!isEditing}/>
-              {/* {errors.lastName && (
+              {errors.lastName && (
               <p className="text-red-500 font-medium">El apellido es requerido</p>
-              )} */}
+              )} 
             </div>
 
             <div>
@@ -486,7 +487,7 @@ function ProfilePage() {
                   errors={errors}
                   disabled={!isEditing}
                   selectedCountry={watch("country")}
-                  onChange={(e) => setValue("country", e.target.value)} // <-- Añadido
+                  onChange={(e) => setValue("country", e.target.value)} 
                 />
               ) : (
                 <Input
@@ -501,15 +502,15 @@ function ProfilePage() {
               <Label htmlFor="city">Ciudad</Label>
               <Input type="text" placeholder="Ingresa tu ciudad"
                 {...register("city", { required: true })} disabled={!isEditing}/>
-              {/* {errors.city && (
+              {errors.city && (
               <p className="text-red-500 font-medium">La ciudad es requerida</p>
-              )} */}
+              )} 
             </div>
 
             <div>
               <Label htmlFor="birthDate">Fecha de nacimiento</Label>
               <Input type="date" placeholder="Editar fecha de nacimiento" {...register("birthDate", { required: true })} disabled={!isEditing} />
-              {/* {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>} */}
+              {errors.name && <p className="text-red-500 font-medium">El nombre es requerido</p>} 
             </div>
 
             <div>
@@ -521,9 +522,9 @@ function ProfilePage() {
                   <option value="Female">Femenino</option>
                   <option value="Other">Otro</option>
                 </SelectReg>
-                {/* {errors.gender && (
+                {errors.gender && (
                 <p className="text-red-500 font-medium">El género es requerido</p>
-                )} */}
+                )} 
             </div>
 
             <div>
@@ -541,9 +542,9 @@ function ProfilePage() {
                 <option value="safeConduct
                 Pass">Salvoconducto</option>
               </SelectReg>
-              {/* {errors.docType && (
+              {errors.docType && (
               <p className="text-red-500 font-medium">El tipo de documento es requerido</p>
-              )} */}
+              )} 
             </div>
 
             <div>
@@ -552,9 +553,9 @@ function ProfilePage() {
               </Label>
               <Input type="text" placeholder="Editar número de documento"
               {...register("docNumber", { required: true })} disabled={!isEditing} />
-              {/* {errors.docNumber && (
+              {errors.docNumber && (
               <p className="text-red-500 font-medium">El número de documento es requerido</p>
-              )} */}
+              )} 
             </div>
 
             <div>
@@ -562,36 +563,36 @@ function ProfilePage() {
               <Input type="email" placeholder="Editar correo electrónico"
               {...register("email", { required: true })}
               disabled={!isEditing} />
-              {/* {errors.email && (
+              {errors.email && (
               <p className="text-red-500 font-medium">El correo es requerido</p>
-              )} */}
+              )} 
             </div>
 
             <div>
               <Label htmlFor="phoneNumber">Número de teléfono</Label>
               <Input type="tel" placeholder="Ingresa tu número de teléfono"
               {...register("phoneNumber", { required: true })} disabled={!isEditing}/>
-              {/* {errors.phoneNumber && (
+              {errors.phoneNumber && (
               <p className="text-red-500 font-medium">La número de teléfono es requerido</p>
-              )} */}
+              )} 
             </div>
 
             <div>
               <Label htmlFor="address">Dirección</Label>
                   <Input type="text" placeholder="Editar dirección"
                   {...register("address", { required: true })} disabled={!isEditing}/>
-                  {/* {errors.address && (
+                  {errors.address && (
                   <p className="text-red-500 font-medium">La dirección es requerida</p>
-                  )} */}
+                  )} 
             </div>
 
             <div>
               <Label htmlFor="affiliation">Afiliación</Label>
                 <Input type="text" placeholder="Ingresa tu afiliación"
                 {...register("affiliation", { required: true })}disabled={!isEditing}/>
-                {/* {errors.affiliation && (
+                {errors.affiliation && (
                 <p className="text-red-500 font-medium">La empresa afiliada es requerida</p>
-                )} */}
+                )} 
             </div>
 
             <div>
@@ -601,9 +602,9 @@ function ProfilePage() {
                 <option value="inPerson">Presencial</option>
                 <option value="online">En línea</option>
               </SelectReg>
-              {/* {errors.attendanceType && (
+              {errors.attendanceType && (
               <p className="text-red-500 font-medium">El tipo de asistencia es requerido</p>
-              )} */}
+              )} 
             </div>
             
             <div>
@@ -613,9 +614,9 @@ function ProfilePage() {
                 <option value="author">Autor</option>
                 <option value="attendee">Asistente</option>
               </SelectReg>
-              {/* {errors.participationType && (
+              {errors.participationType && (
               <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
-              )} */}
+              )} 
             </div>
 
             <div>
@@ -626,9 +627,9 @@ function ProfilePage() {
                 <option value="student">Estudiante</option>
                 <option value="professional">Profesional</option>
               </SelectReg>
-              {/* {errors.birthDate && (
+              {errors.birthDate && (
               <p className="text-red-500 font-medium">La ocupación es requerida</p>
-              )} */}
+              )} 
             </div>
 
             <div>
@@ -646,7 +647,9 @@ function ProfilePage() {
   
                 {isIeeeMember === "yes" && (
                   <>
-                    <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+                  <div className="mt-2">
+                  <Label htmlFor="membershipNumber">Número de membresía IEEE</Label>
+                  </div>
                     <Input 
                       type="text" 
                       placeholder="Ingresa tu número de membresía"
@@ -671,7 +674,7 @@ function ProfilePage() {
 
             <div>
             {participationType === "author" && ( 
-            <div>
+            <div >
               <Label htmlFor="qtyArticles">Número de artículos</Label>
               <Input type="number" placeholder="Ingresa el número de artículos"
               {...register("qtyArticles", { required: "Este campo es obligatorio", min: 0 })} onWheel={(e) => e.target.blur()} disabled={!isEditing}/>
@@ -737,11 +740,29 @@ function ProfilePage() {
           {!isEditing && pendingPrice !== null && (
           <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
             <div className="text-center">
-              <h4 className="text-xl font-bold">Cobro Pendiente</h4>
+              <h4 className="text-xl font-bold">Cobro pendiente</h4>
               <p className="mt-2">
                 {pendingPrice > 0
-                  ? `${userDetails.name} ${userDetails.lastName}, debes pagar ${pendingPrice}$`
-                  : `${userDetails.name} ${userDetails.lastName}, no tienes pagos pendientes`}
+                  ? <>
+                  <span className="font-bold text-gray-50">
+                    {userDetails.name}{" "}
+                  </span> 
+                  <span className="font-bold text-gray-50">
+                    {userDetails.lastName}
+                  </span>, debes pagar 
+                  <span className="text-white font-bold ">
+                    {" "}{pendingPrice}$
+                  </span> para completar el registro.
+                </>
+                  : <>
+                  <span className="font-bold text-gray-50">
+                    {userDetails.name}{" "}
+                  </span> 
+                  <span className="font-bold text-gray-50">
+                    {userDetails.lastName}
+                  </span>, no tienes pagos pendientes.
+                </>
+            }
               </p>
                 
               {pendingPrice > 0 && (
@@ -759,11 +780,29 @@ function ProfilePage() {
               {IsSave && price > 0 && pendingPrice === null && (
               <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
                 <div className="text-center">
-                  <h4 className="text-xl font-bold">Nuevo Cobro</h4>
+                  <h4 className="text-xl font-bold">Nuevo cobro</h4>
                   <p className="mt-2">
                     {price > 0
-                      ? `${userDetails.name} ${userDetails.lastName}, usted debe ${price}$.`
-                      : `${userDetails.name} ${userDetails.lastName}, usted no debe nada.`}
+                    ? <>
+                    <span className="font-bold text-gray-50">
+                      {userDetails.name}{" "}
+                    </span> 
+                    <span className="font-bold text-gray-50">
+                      {userDetails.lastName}
+                    </span>, usted debe 
+                    <span className="text-white font-bold ">
+                      {" "}{price}$
+                    </span> por los cambios realizados.
+                  </>
+                      : <>
+                      <span className="font-bold text-gray-50">
+                        {userDetails.name}{" "}
+                      </span> 
+                      <span className="font-bold text-gray-50">
+                        {userDetails.lastName}
+                      </span>, no tienes pagos pendientes.
+                    </>
+                }
                   </p>
                 </div>
                     
