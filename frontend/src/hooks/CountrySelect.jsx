@@ -60,7 +60,7 @@ const CountriesSelect = ({ register, errors, disabled, selectedCountry, onChange
         )}
       </SelectReg>
       {errors.country && (
-      <p className="text-red-500 font-medium">El país es requerido</p>
+      <p className="text-red-500 font-medium mt-2">El país es requerido</p>
       )}
     </div>
   );

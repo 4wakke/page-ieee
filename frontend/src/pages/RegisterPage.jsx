@@ -344,7 +344,7 @@ function RegisterPage() {
                 <option value="Other">Otro</option>
               </SelectReg>
               {errors.gender && (
-              <p className="text-red-500 font-medium">El género es requerido</p>
+              <p className="text-red-500 font-medium mt-2">El género es requerido</p>
               )}
             </div>
 
@@ -363,7 +363,7 @@ function RegisterPage() {
                 <option value="safeConductPass">Salvoconducto</option>
               </SelectReg>
               {errors.docType && (
-              <p className="text-red-500 font-medium">El tipo de documento es requerido</p>
+              <p className="text-red-500 font-medium mt-2">El tipo de documento es requerido</p>
               )}
             </div>
 
@@ -384,7 +384,7 @@ function RegisterPage() {
               {...register("email", { required: true })}
               />
               {errors.email && (
-              <p className="text-red-500 font-medium">El correo es requerido</p>
+              <p className="text-red-500 font-medium mt-2">El correo es requerido</p>
               )}
             </div>
 
@@ -423,7 +423,7 @@ function RegisterPage() {
                 <option value="online">En línea</option>
               </SelectReg>
               {errors.attendanceType && (
-              <p className="text-red-500 font-medium">El tipo de asistencia es requerido</p>
+              <p className="text-red-500 font-medium mt-2">El tipo de asistencia es requerido</p>
               )}
             </div>
 
@@ -436,7 +436,7 @@ function RegisterPage() {
                 <option value="professional">Profesional</option>
               </SelectReg>
               {errors.occupation && (
-              <p className="text-red-500 font-medium">La ocupación es requerida</p>
+              <p className="text-red-500 font-medium mt-2">La ocupación es requerida</p>
               )}
             </div>
 
@@ -454,7 +454,7 @@ function RegisterPage() {
                   <option value="no">No</option>
                 </SelectReg>
                 {errors.isIeeeMember && (
-                  <p className="text-red-500 font-medium">Este campo es requerido</p>
+                  <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
                 )}
   
                 {isIeeeMember === "yes" && (
@@ -468,7 +468,7 @@ function RegisterPage() {
                       {...register("membershipNumber", { required: true })}
                     />
                     {errors.membershipNumber && (
-                      <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
+                      <p className="text-red-500 font-medium pb-2">El número de membresía es requerido</p>
                     )}
   
                     <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
@@ -478,7 +478,7 @@ function RegisterPage() {
                       <option value="no">No</option>
                     </SelectReg>
                     {errors.isTems && (
-                      <p className="text-red-500 font-medium">Este campo es requerido</p>
+                      <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
                     )}
                   </>
                 )}
@@ -492,7 +492,7 @@ function RegisterPage() {
                 <option value="attendee">Asistente</option>
               </SelectReg>
               {errors.participationType && (
-              <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
+              <p className="text-red-500 font-medium mt-2">El tipo de participación es requerido</p>
               )}
 
             {participationType === "author" && ( 
@@ -519,7 +519,7 @@ function RegisterPage() {
                   <option value="no">No</option>
                 </SelectReg>
                 {errors.isTaxRequired && (
-                  <p className="text-red-500 font-medium">Este campo es requerido</p>
+                  <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
                 )}
 
               {isTaxRequired === "yes" && (
@@ -529,7 +529,7 @@ function RegisterPage() {
                   type="number" 
                   placeholder="Ingresa el valor por impuesto"
                   {...register("taxAmount", {
-                    required: true,
+                    required: isTaxRequired === "yes" ? "Este campo es requerido" : false, 
                     min: { value: 1, message: "El valor mínimo es 1" },
                     max: { value: 100, message: "El valor máximo es 100" },
                     validate: value => Number.isInteger(Number(value)) || "Debe ser un número entero"

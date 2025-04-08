@@ -722,15 +722,16 @@ function ProfilePage() {
               {isTaxRequired === "yes" && (
               <div className="mt-2">
                 <Label htmlFor="taxAmount">Pago por impuesto</Label>
-                <Input
-                  type="number"
+                <Input 
+                  type="number" 
                   placeholder="Ingresa el valor por impuesto"
-                  {...register("taxAmount", { required: true,
+                  {...register("taxAmount", {
+                    required: isTaxRequired === "yes" ? "Este campo es requerido" : false, 
                     min: { value: 1, message: "El valor mínimo es 1" },
                     max: { value: 100, message: "El valor máximo es 100" },
                     validate: value => Number.isInteger(Number(value)) || "Debe ser un número entero"
                   })}
-                  onWheel={(e) => e.target.blur()} disabled={!isEditing}
+                  onWheel={(e) => e.target.blur()}
                 />
                 {errors.taxAmount && (
                 <p className="text-red-500 font-medium">{errors.taxAmount.message}</p>
