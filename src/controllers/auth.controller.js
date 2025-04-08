@@ -159,8 +159,7 @@ export const signup = async (req, res, next) => {
 };
 
 const sendRegisterEmail = async (data,res) =>{
-  //const email = data.email
-  const email = "Kevinguegra@gmail.com"
+  const email = data.email
   
   const occupationMap = {
     student: "Estudiante",
@@ -805,4 +804,4 @@ export const getCountries = async (req, res) => {
     return errorResponse(res, 'Error al listar los paises', 500, error.message);
   }
 
-}
+};
