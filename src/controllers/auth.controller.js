@@ -96,7 +96,7 @@ export const signup = async (req, res, next) => {
         email, phone_number, occupation, is_ieee_member,is_tems,
         membership_number, participation_type, attendance_type,
         tax_amount, qty_articles,created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?,NOW())
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL -5 HOUR))
     `;
 
     const values = [
@@ -205,7 +205,8 @@ export const getAllUsers = async (req, res) => {
              doc_type, doc_number, affiliation, email, phone_number, occupation, 
              is_ieee_member, is_tems, membership_number, participation_type, 
              attendance_type, tax_amount, qty_articles, created_at 
-      FROM users;
+      FROM users
+      WHERE admin <> 1
     `;
 
     const [users] = await pool.query(query);
@@ -304,7 +305,7 @@ export const updateUser = async (req, res) => {
           gender = ?, birth_date = ?, doc_type = ?, doc_number = ?, affiliation = ?, 
           email = ?, phone_number = ?, occupation = ?, is_ieee_member = ?, is_tems = ?, 
           membership_number = ?, participation_type = ?, attendance_type = ?, 
-          tax_amount = ?, qty_articles = ?
+          tax_amount = ?, qty_articles = ?, updated_at = DATE_ADD(NOW(), INTERVAL -5 HOUR)
       WHERE id = ?;
     `;
 
@@ -447,6 +448,7 @@ export const profile = async (req, res) => {
   const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.userId]);
   return res.json(result.rows[0]);
 };
+
 export const signout = (req, res) => {
   res.clearCookie('token');
   res.sendStatus(200);
@@ -541,7 +543,7 @@ const getRefreshToken = async (res) => {
 
   const { access } = await responseToken.json();
   cobruToken = access
-}
+};
 
 export const processPayment = async (req, res) => {
   try {
