@@ -18,8 +18,12 @@ export const publicRoutes = [
 
 export const privateRoutes = [
   {
-    name: <span className="font-medium text-[white]">Perfil</span>,
+    name: (
+      <div className="flex items-center space-x-2 bg-[#4369a6] text-slate-300 px-3 py-1 gap-x-1 border rounded-md transition-all duration-150 hover:brightness-125">
+        <LuCircleUserRound className="w-5 h-5 text-[white]" />
+        <span className="font-medium text-[white]">Perfil</span>
+      </div>
+    ),
     path: "/profile",
-    icon: <LuCircleUserRound className="w-5 h-5 text-[white]" />,
   },
 ];

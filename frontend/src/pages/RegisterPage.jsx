@@ -524,24 +524,6 @@ function RegisterPage() {
             <button className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Registrarse</button>
           </div>
 
-{/*
-          <div>
-            {serverErrors.length > 0 && (
-              <div className="text-red-500 font-medium bg-red-100 rounded-md shadow-md mb-4 mx-60 p-3">
-                {serverErrors.map((err, index) => (
-                  <p key={index} className="font-bold text-center">{err}</p>
-                ))}
-              </div>
-            )}
-            {serverMessage && (
-              <div className="text-green-500 font-medium p-3 bg-green-100 rounded-md shadow-md mb-4 mx-60">
-                <p className="font-bold text-center">{serverMessage}</p>
-              </div>
-            )}
-          </div>
-
-          */}
-
           <div className="mt-4 text-center">
             <div className="flex justify-center tracking-wide"> 
             <p className="mr-4">Ya tienes una cuenta?</p>
@@ -559,7 +541,7 @@ function RegisterPage() {
                 <div className="text-center">
                   <h4 className="text-xl font-bold">Cobro pendiente</h4>
                   <p className="mt-2">
-                  El precio que debes pagar por el registro es: <span className="font-bold">${price}</span>
+                  El precio que debes pagar por el registro es: <span className="font-bold">${price} USD</span>
                   </p>
                 </div>
             
