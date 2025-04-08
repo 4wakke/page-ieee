@@ -48,6 +48,8 @@ function ProfilePage() {
 
   const userEmail = localStorage.getItem("userEmail");
 
+  
+
 
   useEffect(() => {
     if (isTaxRequired === "no") {
@@ -751,7 +753,7 @@ function ProfilePage() {
                     {userDetails.lastName}
                   </span>, debes pagar 
                   <span className="text-white font-bold ">
-                    {" "}{pendingPrice}$
+                    {" "}{pendingPrice}$ USD
                   </span> para completar el registro.
                 </>
                   : <>
@@ -791,7 +793,7 @@ function ProfilePage() {
                       {userDetails.lastName}
                     </span>, usted debe 
                     <span className="text-white font-bold ">
-                      {" "}{price}$
+                      {" "}{price}$ USD
                     </span> por los cambios realizados.
                   </>
                       : <>

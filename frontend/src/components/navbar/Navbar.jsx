@@ -32,8 +32,8 @@ function Navbar() {
                     <Link
                       to={path}
                       className={twMerge(
-                        "text-slate-300 flex items-center px-3 py-1 gap-x-1 border rounded-md transition-all duration-150 hover:brightness-125",
-                        location.pathname === path && "bg-[#4369a6]"
+                        "text-slate-300 flex items-center py-1 border rounded-md transition-all duration-150 hover:brightness-125",
+                        location.pathname === path && ""
                       )}
                     >
                       {icon}
