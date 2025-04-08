@@ -48,9 +48,6 @@ function ProfilePage() {
 
   const userEmail = localStorage.getItem("userEmail");
 
-  
-
-
   useEffect(() => {
     if (isTaxRequired === "no") {
       setValue("taxAmount", "");
@@ -146,7 +143,6 @@ function ProfilePage() {
         }
       );
       
-      
 
       try {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
@@ -158,6 +154,7 @@ function ProfilePage() {
           handleBackendResponse(userData)
 
           if (userData.admin) { //!
+            toast.dismiss(); 
             navigate("/profile/admin");
           }
           
@@ -287,6 +284,7 @@ function ProfilePage() {
           setTimeout(() => {
             window.open(processPendingPaymentData.results.checkoutURL, "_blank");
           }, 0);
+          toast.dismiss(); 
           navigate("/");
         } else {
           //? console.error("Error al obtener la URL de pago", processPendingPaymentData);
@@ -442,6 +440,27 @@ function ProfilePage() {
         setTimeout(() => {
           window.open(processPaymentData.results.checkoutURL, "_blank");
         }, 4000);
+        toast.info(
+          <div>
+            <p>Si no pudiste acceder a la página de pago debido a problemas con tu navegador, aquí te dejamos el enlace.</p>
+            <div className="flex items-center space-x-2">
+              <span className="truncate max-w-[200px]">{processPaymentData.results.checkoutURL}</span>
+              <button
+                onClick={() => navigator.clipboard.writeText(processPaymentData.results.checkoutURL)}
+                className="bg-[#0570ab] text-white px-2 py-1 rounded"
+              >
+                Copiar
+              </button>
+            </div>
+          </div>,
+          {
+            autoClose: false, // El toast no se cierra automáticamente
+            closeOnClick: false, // No permitir que el toast se cierre al hacer clic
+            draggable: false, // Desactivar el arrastre del toast
+            className: "bg-blue-600 text-white font-medium p-4 rounded",
+            progressClassName: "bg-blue-300",
+          }
+        );
       } else {
         //? console.error("Error al obtener la URL de pago", processPaymentData);
         handleBackendResponse(processPaymentData);

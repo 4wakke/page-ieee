@@ -20,8 +20,6 @@ const handleBackendResponse = (response) => {
   }
 };
 
-//! EMPIEZAN CAMBIOS DE ESTILO
-
 function AdminPage() {
   useEffect(() => {
     document.body.classList.add("admin-page");
