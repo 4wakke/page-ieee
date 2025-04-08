@@ -48,9 +48,6 @@ function ProfilePage() {
 
   const userEmail = localStorage.getItem("userEmail");
 
-  
-
-
   useEffect(() => {
     if (isTaxRequired === "no") {
       setValue("taxAmount", "");
@@ -146,7 +143,6 @@ function ProfilePage() {
         }
       );
       
-      
 
       try {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
@@ -158,6 +154,7 @@ function ProfilePage() {
           handleBackendResponse(userData)
 
           if (userData.admin) { //!
+            toast.dismiss(); 
             navigate("/profile/admin");
           }
           
@@ -287,6 +284,7 @@ function ProfilePage() {
           setTimeout(() => {
             window.open(processPendingPaymentData.results.checkoutURL, "_blank");
           }, 0);
+          toast.dismiss(); 
           navigate("/");
         } else {
           //? console.error("Error al obtener la URL de pago", processPendingPaymentData);
