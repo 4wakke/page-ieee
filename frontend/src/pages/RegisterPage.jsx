@@ -232,7 +232,8 @@ function RegisterPage() {
         attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
         qtyArticles: data.qtyArticles,
         articles: data.articles,
-        userId 
+        userId,
+        taxAmount: Number(data.taxAmount),
       };
   
       //? console.log("Datos enviados a payment:", formattedData);
@@ -526,13 +527,17 @@ function RegisterPage() {
                 <Label htmlFor="taxAmount">Pago por impuesto</Label>
                 <Input 
                   type="number" 
-                  step="0.01" 
-                  placeholder="Ingresa el pago por impuesto"
-                  {...register("taxAmount", { required: true })}
+                  placeholder="Ingresa el valor por impuesto"
+                  {...register("taxAmount", {
+                    required: true,
+                    min: { value: 1, message: "El valor mínimo es 1" },
+                    max: { value: 100, message: "El valor máximo es 100" },
+                    validate: value => Number.isInteger(Number(value)) || "Debe ser un número entero"
+                  })}
                   onWheel={(e) => e.target.blur()}
                 />
                 {errors.taxAmount && (
-                  <p className="text-red-500 font-medium">El pago por impuesto es requerido</p>
+                <p className="text-red-500 font-medium">{errors.taxAmount.message}</p>
                 )}
               </div>
                 )}
