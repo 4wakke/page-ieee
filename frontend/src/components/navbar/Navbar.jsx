@@ -64,14 +64,11 @@ function Navbar() {
                   "text-[#4067a5] flex items-center px-3 py-2 font-semibold  rounded-md transition-colors duration-150  hover:bg-[#cbe5f0] bg-[#ffff] shadow-sm hover:shadow-md",
                   location.pathname === path && "bg-[#4067a5] text-[#fff] border-2"
                 )}
-
-                //                 "text-white   px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold rounded-md transition-all duration-150",
-  // "bg-[#0073ae] hover:bg-[#0091ce] shadow-sm hover:shadow-md"
                   key={path}
                 >
                   <Link to={path}>
             <span className="hidden sm:inline">
-              {name} {/* Texto largo */}
+              {name} 
             </span>
             {name === "Sobre nosotros" && <span className="sm:hidden">Tems</span>}
             {name === "Iniciar sesión" && <span className="sm:hidden">Ingresa</span>}
