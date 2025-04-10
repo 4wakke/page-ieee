@@ -8,7 +8,6 @@ import CountriesSelect from "../hooks/CountrySelect";
 import ArticlesSpaces from "../hooks/ArticlesSpaces";
 import { toast } from "react-toastify";
 
-
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ProfilePage() {
@@ -27,20 +26,17 @@ function ProfilePage() {
   }
 
   const navigate = useNavigate();
-
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
   const participationType = watch("participationType"); 
-  const [userDetails, setUserDetails] = useState(null);
   const [price, setPrice] = useState("");
+  const [IsSave, setIsSave] = useState(false);
+  const paymentTriggeredByEdit = useRef(false);
+  const [userDetails, setUserDetails] = useState(null);
   const [dollarRate, setDollarRate] = useState(null); 
   const priceRef = useRef(null);
   const pendingPriceRef = useRef(null);
-  const paymentTriggeredByEdit = useRef(false);
-  const [IsSave, setIsSave] = useState(false);
-
-
   const [pendingPrice, setPendingPrice] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [pendingUrl, setPendingUrl] = useState(null);
@@ -120,7 +116,7 @@ function ProfilePage() {
       //? console.log("Correo que se está usando:", userEmail);
       //? console.log("Valor del tipo de cambio (exchangeRate):", exchangeRate);
 
-      toast.success(
+      toast.info(
         <div>
           <span style={{ color: '#0073ae', fontWeight: 'bold', fontSize: '18px' }}>
             Recuerda:{' '} 
@@ -274,8 +270,8 @@ function ProfilePage() {
           setPendingUrl(processPendingPaymentData.results.checkoutURL);
           handleBackendResponse(processPendingPaymentData);
           toast.success("Redirigiendo a la página de pago, espere unos segundos...", {
-            className: "bg-green-600 text-white font-medium",
-            progressClassName: "bg-green-300",
+            className: "bg-blue-600 text-white font-medium",
+            progressClassName: "bg-blue-300",
             autoClose: 4000,
           });
   
@@ -439,13 +435,13 @@ function ProfilePage() {
           window.open(processPaymentData.results.checkoutURL, "_blank");
         }, 4000);
         toast.info(
-          <div>
-            <p>Si no pudiste acceder a la página de pago debido a problemas con tu navegador, aquí te dejamos el enlace.</p>
-            <div className="flex items-center space-x-2">
-              <span className="truncate max-w-[200px]">{processPaymentData.results.checkoutURL}</span>
+          <div className="flex flex-col items-center text-center mt-2">
+            <p className="text-gray-700 text-sm sm:text-base max-w-md leading-snug">Si no pudiste acceder a la página de pago debido a problemas con tu navegador, aquí te dejamos el enlace.</p>
+            <div className="flex flex-col items-center space-y-2 mt-3">
+              <span className="truncate max-w-[200px] bg-[#a6b6d1]/85 px-3 py-1.5 rounded text-sm sm:text-base text-center">{processPaymentData.results.checkoutURL}</span>
               <button
                 onClick={() => navigator.clipboard.writeText(processPaymentData.results.checkoutURL)}
-                className="bg-[#0570ab] text-white px-2 py-1 rounded"
+                className="bg-[#5c75a8] text-white px-4 py-1.5 rounded hover:brightness-110 transition-all"
               >
                 Copiar
               </button>
@@ -741,13 +737,13 @@ function ProfilePage() {
           <div className=" flex justify-center space-x-4 mt-4">
             <div>
               {isEditing ? (
-                <button type="submit" className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
+                <button type="submit" className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
               ) : (
-                <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
+                <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
               )}
               </div>
               <div>
-                <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                     Cambiar Contraseña
                 </button>
               </div>
@@ -763,7 +759,7 @@ function ProfilePage() {
           </div>
           <div ref={pendingPriceRef}>
           {!isEditing && pendingPrice !== null && (
-          <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
+          <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto">
             <div className="text-center">
               <h4 className="text-xl font-bold">Cobro pendiente</h4>
               <p className="mt-2">
@@ -792,7 +788,7 @@ function ProfilePage() {
                 
               {pendingPrice > 0 && (
                 <div className="mt-4 text-center">
-                <button onClick={handlePendingProcessPayment} disabled={!pendingPrice} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                <button onClick={handlePendingProcessPayment} disabled={!pendingPrice} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                   Pagar
                 </button>
               </div>
@@ -803,7 +799,7 @@ function ProfilePage() {
           </div>
           <div ref={priceRef}>
               {IsSave && price > 0 && pendingPrice === null && (
-              <div className="mt-4 p-4 bg-[#0073ae] text-white rounded-md shadow-md w-[30%] mx-auto">
+              <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto">
                 <div className="text-center">
                   <h4 className="text-xl font-bold">Nuevo cobro</h4>
                   <p className="mt-2">
@@ -833,7 +829,7 @@ function ProfilePage() {
                     
                 {price > 0 && IsSave && (
                   <div className="mt-4 text-center">
-                    <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                    <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                       Pagar
                     </button>
                   </div>

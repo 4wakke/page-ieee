@@ -12,7 +12,7 @@ function Navbar() {
 
   return ( 
     // bg-gradient-to-r from-white/85 to-blue-900/85
-    <nav className=" bg-gradient-to-r from-[#e5eff5] to-blue-700/50 shadow-md border-b-1 border-[#006699] top-0 backdrop-blur-md"> 
+    <nav className=" bg-gradient-to-r from-[#e5eff5] to-blue-700/50 shadow-md border-b-1 border-[#006699]"> 
       <Container className="flex justify-between py-3">
         <div className="flex-1 min-w-0 ml-4 sm:ml-10">
           <div className="flex items-center">
@@ -44,7 +44,7 @@ function Navbar() {
                 ))}
 
                 <li
-                  className="bg-[#c01d0f] text-white flex items-center px-3 py-1 gap-x-1 rounded-md hover:cursor-pointer mx-2 transition-all duration-150 hover:brightness-125 hover:text-[#ffff] hover:bg-[#6bb24d]"
+                  className="bg-[#7c91ba] text-white flex items-center px-3 py-1 gap-x-1 rounded-md hover:cursor-pointer mx-2 transition-all duration-150 hover:brightness-125 hover:text-[#ffff] hover:bg-[#8498be]"
                   onClick={() => {
                     signout();
                   }}
@@ -53,7 +53,7 @@ function Navbar() {
                   <span className="hidden sm:block">Salir</span>
                 </li>
 
-                <li className="flex gap-x-1 items-center justify-center text-[#0073ae]">
+                <li className="flex gap-x-1 items-center justify-center text-[#ffffff]">
                   <LuUserPen className="w-5 h-5 sm:inline" />
                   <span className="font-black">{user.name}</span>
                 </li>

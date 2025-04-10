@@ -263,7 +263,6 @@ function AdminPage() {
       <div ref={topScrollRef} className="overflow-x-auto mb-2 h-6">
         <div style={{ width: scrollWidth, height: "1px" }}></div>
       </div>
-      {/* cambios drasticos */}
       <div
         ref={bottomScrollRef}
         className="overflow-x-auto bg-white rounded-lg shadow-md"

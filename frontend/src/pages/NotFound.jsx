@@ -18,7 +18,7 @@ function NotFound() {
     <p className="text-white text-lg mb-6 font-medium">Para volver al inicio, presiona el botón:</p>
     <Link
       to="/"
-      className="bg-[#ffffff] hover:bg-[#0073ae] text-[#0073ae] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
+      className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
     >
       Inicio
     </Link>
