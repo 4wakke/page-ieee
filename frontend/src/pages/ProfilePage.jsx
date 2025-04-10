@@ -9,7 +9,6 @@ import ArticlesSpaces from "../hooks/ArticlesSpaces";
 import { toast } from "react-toastify";
 
 
-//! Nuevo camio
 const backRoute = import.meta.env.VITE_APP_BACK_ROUTE;
 
 function ProfilePage() {
@@ -35,7 +34,7 @@ function ProfilePage() {
   const participationType = watch("participationType"); 
   const [userDetails, setUserDetails] = useState(null);
   const [price, setPrice] = useState("");
-  const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
+  const [dollarRate, setDollarRate] = useState(null); 
   const priceRef = useRef(null);
   const pendingPriceRef = useRef(null);
   const paymentTriggeredByEdit = useRef(false);
@@ -86,11 +85,11 @@ function ProfilePage() {
     }
   }, [pendingPrice]); 
 
-  const exchangeRate = ExchangeDollar(); //? PRUEBA DOLLARRATE DINÁMICO
+  const exchangeRate = ExchangeDollar(); 
 
-  useEffect(() => { //? PRUEBA DOLLARRATE DINÁMICO
-    setDollarRate(exchangeRate); // Cuando el valor de dollarRate cambia, se actualiza en el estado.
-  }, [exchangeRate]); //? PRUEBA DOLLARRATE DINÁMICO 
+  useEffect(() => { 
+    setDollarRate(exchangeRate); 
+  }, [exchangeRate]); 
   
   const handleChangePassword = () => {
     navigate("/profile/changepassword");
@@ -114,7 +113,7 @@ function ProfilePage() {
   };
 
   useEffect(() => {
-    if (!userEmail || !exchangeRate) return; //? Evita varias peticiones 
+    if (!userEmail || !exchangeRate) return;  
     
     const fetchUserDetails = async () => {
       
@@ -142,7 +141,6 @@ function ProfilePage() {
           autoClose: 7000,
         }
       );
-      
 
       try {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
@@ -153,7 +151,7 @@ function ProfilePage() {
           let userData = {...data.results};
           handleBackendResponse(userData)
 
-          if (userData.admin) { //!
+          if (userData.admin) { 
             toast.dismiss(); 
             navigate("/profile/admin");
           }
@@ -211,7 +209,7 @@ function ProfilePage() {
   
       const formattedPendingData = {
         occupation: userData.occupation,
-        isIeeeMember: userData.isIeeeMember === 'yes',  // Cambiar 'yes' a true y 'no' a false
+        isIeeeMember: userData.isIeeeMember === 'yes',  
         isTems: userData.isTems === 'yes',
         participationType: userData.participationType,
         attendanceType: userData.attendanceType === "inPerson" ? "In-person" : "Online",
@@ -248,7 +246,6 @@ function ProfilePage() {
       handleBackendResponse(error);
     }
   };
-  
 
   const handlePendingProcessPayment = async () => {
     try {
@@ -261,7 +258,7 @@ function ProfilePage() {
           body: JSON.stringify({
             amount: pendingPrice,
             dollarRate: dollarRate,
-            description: `Pago conferencia ${userData.name} ${userData.lastName}`,
+            description: `Pago conferencia Temscon ${userData.name} ${userData.lastName}`,
             userId: userData.id,
           }),
         });
@@ -303,7 +300,6 @@ function ProfilePage() {
       handleBackendResponse(error);
     }
   };
-  
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -348,7 +344,7 @@ function ProfilePage() {
 
     //? console.log("Datos que se van a enviar:", updatedData);
 
-    if (!userDetails || !userDetails.id) { //! 
+    if (!userDetails || !userDetails.id) { 
       //? console.error("ID de usuario no disponible");
       return;
     } 
@@ -369,7 +365,7 @@ function ProfilePage() {
 
         const formattedData = {
           occupation: data.occupation,
-          isIeeeMember: data.isIeeeMember === 'yes',  // Cambiar 'yes' a true y 'no' a false
+          isIeeeMember: data.isIeeeMember === 'yes',  
           isTems: data.isTems === 'yes',
           participationType: data.participationType,
           attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
@@ -411,12 +407,12 @@ function ProfilePage() {
   const handlePayment = async () => {
     try {
 
-      if (!dollarRate) { //? PRUEBA DOLLARRATE DINÁMICO
+      if (!dollarRate) { 
         //? console.error("No se pudo obtener la tasa de cambio del dólar.");
         return;
-      } //? PRUEBA DOLLARRATE DINÁMICO
+      } 
 
-      //? console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
+      //? console.log(dollarRate); 
 
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
@@ -424,7 +420,7 @@ function ProfilePage() {
         body: JSON.stringify({
           amount: price,
           dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINÁMICO
-          description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
+          description: `Pago conferencia Temscon ${watch("name")} ${watch("lastName")}`,
           userId: userDetails.id,
         }),
       });
@@ -456,9 +452,9 @@ function ProfilePage() {
             </div>
           </div>,
           {
-            autoClose: false, // El toast no se cierra automáticamente
-            closeOnClick: false, // No permitir que el toast se cierre al hacer clic
-            draggable: false, // Desactivar el arrastre del toast
+            autoClose: false, 
+            closeOnClick: false, 
+            draggable: false, 
             className: "bg-blue-600 text-white font-medium p-4 rounded",
             progressClassName: "bg-blue-300",
           }
@@ -480,7 +476,7 @@ function ProfilePage() {
 
   return (
     <div className="flex items-center justify-center ">
-      <div className="bg-[#2e5ca6] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto ">
+      <div className="bg-[#2a4992] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto ">
         <h3 className="text-3xl font-bold text-center mb-4 tracking-wide">Perfil de usuario</h3>
         <form onSubmit={handleSubmit(handleSave)} autoComplete="off">
 

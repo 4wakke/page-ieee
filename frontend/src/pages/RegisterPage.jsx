@@ -128,7 +128,7 @@ function RegisterPage() {
         body: JSON.stringify({
           amount: price,
           dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINÁMICO
-          description: `Pago conferencia ${watch("name")} ${watch("lastName")}`,
+          description: `Pago conferencia Temscon ${watch("name")} ${watch("lastName")}`,
           userId,
         }),
       });

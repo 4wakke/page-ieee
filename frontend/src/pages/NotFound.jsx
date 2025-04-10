@@ -12,7 +12,7 @@ function NotFound() {
 
   return (
     <div className="w-screen h-screen flex items-center justify-center">
-  <div className="bg-[#2e5ca6] bg-opacity-85 w-full max-w-[450px] h-auto p-8 rounded-2xl shadow-2xl flex flex-col items-center justify-center text-center mb-16">
+  <div className="bg-[#2a4992] bg-opacity-85 w-full max-w-[450px] h-auto p-8 rounded-2xl shadow-2xl flex flex-col items-center justify-center text-center mb-16">
     <h1 className="text-5xl font-extrabold text-white mb-4">Página no encontrada</h1>
     <h3 className="text-3xl text-white mb-4 font-bold">Error 404</h3>
     <p className="text-white text-lg mb-6 font-medium">Para volver al inicio, presiona el botón:</p>
