@@ -271,7 +271,7 @@ function AdminPage() {
           ref={tableRef}
           className="min-w-full text-sm text-left text-gray-700"
         >
-          <thead className="bg-[#e5eff5] text-[#0073ae] text-sm font-semibold text-center">
+          <thead className="bg-[#dae6f4] text-[#2e5ca6] text-sm font-semibold text-center">
             <tr>
               <th className="px-4 py-3 font-semibold">Nombre</th>
               <th className="px-4 py-3 font-semibold">Apellido</th>
