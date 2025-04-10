@@ -76,7 +76,7 @@ function LoginPage() {
               {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
             </button>
           </div>
-
+ 
           <div className="mt-4">
             <button className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
               Iniciar sesión
