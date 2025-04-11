@@ -1,10 +1,20 @@
-/* eslint-disable react/prop-types */
-export function CardReg({ children, className }) {
+// eslint-disable-next-line no-unused-vars
+import React, { forwardRef } from 'react';
+
+
+// eslint-disable-next-line react/prop-types
+export const CardReg = forwardRef(({ children, className }, ref) => {
   return (
-    <div className={"bg-[#2e5ca6] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto  " + className}> {/* h-auto */}
+    <div 
+      ref={ref} // Pasamos el ref aquí
+      className={`bg-[#2a4992] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto ${className}`}
+    >
       {children}
     </div>
   );
-};
+});
+
+CardReg.displayName = 'CardReg';
+
 
 export default CardReg;

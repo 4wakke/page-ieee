@@ -263,7 +263,6 @@ function AdminPage() {
       <div ref={topScrollRef} className="overflow-x-auto mb-2 h-6">
         <div style={{ width: scrollWidth, height: "1px" }}></div>
       </div>
-      {/* cambios drasticos */}
       <div
         ref={bottomScrollRef}
         className="overflow-x-auto bg-white rounded-lg shadow-md"
@@ -272,7 +271,7 @@ function AdminPage() {
           ref={tableRef}
           className="min-w-full text-sm text-left text-gray-700"
         >
-          <thead className="bg-[#e5eff5] text-[#0073ae] text-sm font-semibold text-center">
+          <thead className="bg-[#dae6f4] text-[#2e5ca6] text-sm font-semibold text-center">
             <tr>
               <th className="px-4 py-3 font-semibold">Nombre</th>
               <th className="px-4 py-3 font-semibold">Apellido</th>
