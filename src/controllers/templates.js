@@ -2,69 +2,90 @@
 
 export const forgotPasswordTemplate = (password) => {
     const template =  `<!DOCTYPE html>
-            <html>
+            <html lang="es">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Recuperación de Contraseña</title>
+                <title>Recuperación de Contraseña - TEMSCON</title>
                 <style>
                     body {
-                        font-family: Arial, sans-serif;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                         background-color: #f4f4f4;
                         margin: 0;
                         padding: 0;
                     }
                     .container {
-                        max-width: 600px;
-                        margin: 20px auto;
-                        background: #ffffff;
-                        padding: 20px;
-                        border-radius: 8px;
-                        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-                        text-align: center;
+                        max-width: 650px;
+                        margin: 30px auto;
+                        background-color: #ffffff;
+                        border-radius: 10px;
+                        overflow: hidden;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                     }
                     .header {
+                        background-color: #002f6c;
+                        padding: 20px;
+                        text-align: center;
+                    }
+                    .content img {
+                        max-width: 200px;
+                        text-align: center;
+                        display: block;
+                        margin: 0 auto;
+                    }
+                    .title {
+                        color: #ffffff;
                         font-size: 24px;
+                        margin-top: 10px;
                         font-weight: bold;
-                        color: #333;
                     }
                     .content {
-                        font-size: 16px;
-                        color: #555;
-                        margin-top: 10px;
-                
+                        padding: 30px;
+                        text-align: left;
+                        color: #333;
                     }
-                    .password-box {
+                    .highlight-password {
+                        background-color: #d62828;
+                        color: #ffffff;
+                        padding: 10px 20px;
                         font-size: 18px;
                         font-weight: bold;
-                        color: #ffffff;
-                        background: #007BFF;
-                        padding: 10px;
-                        display: inline-block;
-                        border-radius: 5px;
-                        margin-top: 15px;
-
+                        border-radius: 6px;
+                        width: 200px;
+                        text-align: center;
+                        margin: 20px auto;
                     }
                     .footer {
-                        margin-top: 20px;
+                        background-color: #002f6c;
+                        color: #ffffff;
+                        text-align: center;
+                        padding: 15px;
                         font-size: 14px;
-                        color: #777;
                     }
-                    .text{
-                        text-align: left;
+                    p {
+                        margin-bottom: 16px;
                     }
                 </style>
             </head>
             <body>
                 <div class="container">
-                    <div class="header">Contraseña Provisional </div>
+                    <div class="header">
+                        
+                        <div class="title">Recuperación de Contraseña</div>
+                    </div>
                     <div class="content">
-                        <p class = "text">Has solicitado restablecer tu contraseña. A continuación, te proporcionamos una contraseña temporal:</p>
-                        <div class="password-box">${password}</div>
-                        <p class = "text">Por razones de seguridad, te recomendamos cambiar tu contraseña una vez que inicies sesión.</p>
+                        <img src="https://i.imgur.com/x15Wli4.png" alt="Logo TEMSCON">
+                        <p>Hemos recibido una solicitud para restablecer tu contraseña. A continuación, te proporcionamos una nueva contraseña temporal:</p>
+
+                        <div class="highlight-password">${password}</div>
+
+                        <p>Por razones de seguridad, te recomendamos cambiar esta contraseña inmediatamente después de iniciar sesión.</p>
+
+                        <p>Si no solicitaste este cambio, puedes ignorar este mensaje sin realizar ninguna acción.</p>
                     </div>
                     <div class="footer">
-                        Si no solicitaste este cambio, comunicate con soporte.
+                        © 2025 TEMSCON. Todos los derechos reservados.<br>
+                        Si necesitas ayuda, contáctanos a través de nuestro sitio web oficial.
                     </div>
                 </div>
             </body>

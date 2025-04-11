@@ -200,11 +200,13 @@ const sendRegisterEmail = async (data,res) =>{
 export const getAllUsers = async (req, res) => {
   try {
     const query = `
-      SELECT id, name, last_name, country, city, address, gender, birth_date, 
+      SELECT u.id, name, last_name, country, city, address, gender, birth_date, 
              doc_type, doc_number, affiliation, email, phone_number, occupation, 
              is_ieee_member, is_tems, membership_number, participation_type, 
-             attendance_type, tax_amount, qty_articles, created_at 
-      FROM users
+             attendance_type, tax_amount, qty_articles, created_at,
+             p.usd, p.cop, p.status
+      FROM users u
+      INNER JOIN payments p ON p.user_id = u.id AND status <> 'Cancel'
       WHERE admin <> 1
     `;
 
