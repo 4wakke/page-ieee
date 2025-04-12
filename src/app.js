@@ -20,6 +20,7 @@ const allowedOrigins = [
   'http://ieeecolcaribeconference.com',
   'https://temscon.ieeecolcaribeconference.com',
   'http://18.209.168.40',
+  'http://localhost:5200',
   
 ];
 

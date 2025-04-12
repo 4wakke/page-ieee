@@ -17,7 +17,7 @@ function HomePage() {
   // para card w-[60vw] h-[65vh] en vez de w-full max-w-[600px] h-auto
   return (
     <div className="home flex items-center justify-center px-4 min-h-[85vh] w-full mx-auto lg:mt-1 md:mt-4 sm:mt-2 mt-4">
-  <div className="bg-[#2a4992] bg-opacity-90 w-full max-w-[850px] rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+  <div className="bg-[#2a4992] bg-opacity-90 w-full max-w-[850px] rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col items-center justify-center text-center duration-500 ease-in opacity-0 animate-fadeIn">
     
     <h2 className="text-2xl sm:text-4xl font-bold text-white mb-4 sm:mb-6 leading-tight">
       Bienvenido a IEEE TEMSCON LATAM 2025

@@ -141,7 +141,7 @@ function ProfilePage() {
       try {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
-        //? console.log("Datos recibidos del backend:", data.results)
+        //?console.log("Datos recibidos del backend:", data.results)
 
         if (data.success) {
           let userData = {...data.results};
@@ -338,7 +338,7 @@ function ProfilePage() {
     updatedData.articles = [];
   }
 
-    //? console.log("Datos que se van a enviar:", updatedData);
+  //?console.log("Datos que se van a enviar:", updatedData);
 
     if (!userDetails || !userDetails.id) { 
       //? console.error("ID de usuario no disponible");
@@ -354,7 +354,7 @@ function ProfilePage() {
       
       const result = await response.json();
       
-      //? console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
+       //?console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
       if (result.success) {
         handleBackendResponse(result)
         setIsEditing(false);
@@ -472,7 +472,7 @@ function ProfilePage() {
 
   return (
     <div className="flex items-center justify-center ">
-      <div className="bg-[#2a4992] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto ">
+      <div className="bg-[#2a4992] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto duration-500 ease-in opacity-0 animate-fadeIn">
         <h3 className="text-3xl font-bold text-center mb-4 tracking-wide">Perfil de usuario</h3>
         <form onSubmit={handleSubmit(handleSave)} autoComplete="off">
 
@@ -717,12 +717,12 @@ function ProfilePage() {
                 <Input 
                   type="number" 
                   placeholder="Ingresa el valor por impuesto"
-                  {...register("taxAmount", {
+                  {...register("taxAmount",  {
                     required: isTaxRequired === "yes" ? "Este campo es requerido" : false, 
                     min: { value: 1, message: "El valor mínimo es 1" },
                     max: { value: 100, message: "El valor máximo es 100" },
                     validate: value => Number.isInteger(Number(value)) || "Debe ser un número entero"
-                  })}
+                  })} disabled={!isEditing}
                   onWheel={(e) => e.target.blur()}
                 />
                 {errors.taxAmount && (
@@ -759,7 +759,7 @@ function ProfilePage() {
           </div>
           <div ref={pendingPriceRef}>
           {!isEditing && pendingPrice !== null && (
-          <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto">
+          <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
             <div className="text-center">
               <h4 className="text-xl font-bold">Cobro pendiente</h4>
               <p className="mt-2">
@@ -799,7 +799,7 @@ function ProfilePage() {
           </div>
           <div ref={priceRef}>
               {IsSave && price > 0 && pendingPrice === null && (
-              <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto">
+              <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
                 <div className="text-center">
                   <h4 className="text-xl font-bold">Nuevo cobro</h4>
                   <p className="mt-2">
