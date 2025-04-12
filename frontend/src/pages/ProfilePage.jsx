@@ -141,7 +141,7 @@ function ProfilePage() {
       try {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
-        //? console.log("Datos recibidos del backend:", data.results)
+        //?console.log("Datos recibidos del backend:", data.results)
 
         if (data.success) {
           let userData = {...data.results};
@@ -338,7 +338,7 @@ function ProfilePage() {
     updatedData.articles = [];
   }
 
-    //? console.log("Datos que se van a enviar:", updatedData);
+  //?console.log("Datos que se van a enviar:", updatedData);
 
     if (!userDetails || !userDetails.id) { 
       //? console.error("ID de usuario no disponible");
@@ -354,7 +354,7 @@ function ProfilePage() {
       
       const result = await response.json();
       
-      //? console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
+       //?console.log("Resultado de la respuesta:", result); // Verifica la respuesta  del servidor
       if (result.success) {
         handleBackendResponse(result)
         setIsEditing(false);
@@ -717,12 +717,12 @@ function ProfilePage() {
                 <Input 
                   type="number" 
                   placeholder="Ingresa el valor por impuesto"
-                  {...register("taxAmount", {
+                  {...register("taxAmount",  {
                     required: isTaxRequired === "yes" ? "Este campo es requerido" : false, 
                     min: { value: 1, message: "El valor mínimo es 1" },
                     max: { value: 100, message: "El valor máximo es 100" },
                     validate: value => Number.isInteger(Number(value)) || "Debe ser un número entero"
-                  })}
+                  })} disabled={!isEditing}
                   onWheel={(e) => e.target.blur()}
                 />
                 {errors.taxAmount && (
