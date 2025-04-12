@@ -24,7 +24,7 @@ function Navbar() {
             </Link> */}
           </div>
         </div>
-        <div className="flex items-center justify-center md:gap-x-1 mx-10">
+        <div className="flex items-center justify-end md:gap-x-1 sm:gap-x-3 gap-x-1 sm:mr-1 mr-2 px-2">
           <ul className="flex items-center justify-center gap-x-1 sm:gap-x-3 text-xs sm:text-sm">
             {isAuth ? (
               <>
