@@ -71,7 +71,7 @@ function Navbar() {
             <span className="hidden sm:inline">
               {name} 
             </span>
-            {name === "Sobre nosotros" && <span className="sm:hidden">Tems</span>}
+            {name === "Sobre nosotros" && <span className="sm:hidden">TEMS</span>}
             {name === "Iniciar sesión" && <span className="sm:hidden">Ingresa</span>}
             {name === "Registrarse" && <span className="sm:hidden">Registro</span>}
           </Link>

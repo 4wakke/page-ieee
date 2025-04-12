@@ -7,8 +7,10 @@ body {
   background-image: url('/assets/playa-noche.jpg');
   background-size: cover;
   background-position: center;
-  /*background: #101010;*/
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: white;
+  
 }
 
 
