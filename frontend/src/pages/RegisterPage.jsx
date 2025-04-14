@@ -56,17 +56,17 @@ function RegisterPage() {
 
   useEffect(() => { 
       if (isIeeeMember === "no") {
-        setValue("isTems", "no"); 
+        setValue("isTems", ""); 
         setValue("membershipNumber", ""); 
       }
     }, [isIeeeMember, setValue]);
 
-  useEffect(() => { 
-    if (participationType === "attendee") {
-      setValue("qtyArticles", "");
-      setValue("articles", [{ sequence: "", pages: "" }]);
-    }
-  }, [participationType, setValue]); 
+    useEffect(() => {  //*
+      if (["attendee", "poster", "invited"].includes(participationType)) {
+        setValue("qtyArticles", "");
+        setValue("articles", []);
+      }
+    }, [participationType, setValue]);
 
   const handleBackendResponse = (response) => {
     if (response.success) {
@@ -91,7 +91,7 @@ function RegisterPage() {
   }, [exchangeRate]); 
 
   useEffect(() => {
-    if (price && priceRef.current) {
+    if (price !== null && priceRef.current) {
       priceRef.current.scrollIntoView({
         behavior: "smooth", 
         block: "center", 
@@ -188,23 +188,34 @@ function RegisterPage() {
       data.isTems = data.isTems === "yes";
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
 
-      if (data.participationType === "attendee") {
+      if (["attendee", "poster", "invited"].includes(data.participationType)) {
         data.qtyArticles = 0;  
         data.articles = [];  
       } else {
         let formattedArticles = [];
         if (data.qtyArticles > 0 && data.participationType === "author") {
-          formattedArticles = data.articles?.slice(0, data.qtyArticles).map(article => ({
-            sequence: article?.sequence || "",
-            pages: article?.pages ? parseInt(article.pages, 10) : ""
-          })) || [];
+          formattedArticles = data.articles?.slice(0, data.qtyArticles).map(article => {
+            const formattedArticle = {};
+            
+            // Solo asigna la propiedad `sequence` si existe
+            if (article?.sequence) {
+              formattedArticle.sequence = article.sequence;
+            }
+      
+            // Solo asigna la propiedad `pages` si existe y tiene un valor válido
+            if (article?.pages) {
+              formattedArticle.pages = parseInt(article.pages, 10);
+            }
+      
+            return formattedArticle;
+          }) || [];
         } else {
-          formattedArticles = [{ sequence: "", pages: "" }];
+          formattedArticles = [{}];
         }
         data.articles = formattedArticles;
       }
       
-      //?console.log("Datos enviados a signup:", data);
+      //? console.log("Datos enviados a signup:", data);
   
       const resp = await fetch(`${backRoute}/api/signup`, {
         method: "POST",
@@ -219,7 +230,7 @@ function RegisterPage() {
       //? console.log("Respuesta de signup:", dataSignup);
 
       if (dataSignup.success) {
-        setIsRegistered(true); //!
+        setIsRegistered(true); 
         toast.info("Si hubo algún error en el registro, la información puede ser modificada en el perfil.", {
           className: "bg-blu-700 text-white font-medium",
           progressClassName: "bg-blue-700",
@@ -242,7 +253,7 @@ function RegisterPage() {
         taxAmount: Number(data.taxAmount),
       };
   
-      //? console.log("Datos enviados a payment:", formattedData);
+      //? console.log("Datos enviados a payment:", formattedData); 
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
           body: JSON.stringify(formattedData), 
@@ -250,7 +261,7 @@ function RegisterPage() {
         });
   
         const responseData = await response.json();
-        //? console.log("Respuesta de payment:", responseData);
+        //?console.log("Respuesta de payment:", responseData);
 
         if (responseData.success && responseData.results?.price !== undefined) {
           setPrice(responseData.results.price);
@@ -496,6 +507,9 @@ function RegisterPage() {
                 <option value="">Selecciona el tipo de participación</option>
                 <option value="author">Autor</option>
                 <option value="attendee">Asistente</option>
+                <option value="poster">Poster</option>
+                <option value="invited">Invitado</option>
+                
               </SelectReg>
               {errors.participationType && (
               <p className="text-red-500 font-medium mt-2">El tipo de participación es requerido</p>
@@ -568,22 +582,45 @@ function RegisterPage() {
         </form>
 
           <div ref={priceRef}>
-            {price && (
+            {isRegistered && price !== null && (
               <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto duration-5000 ease-in opacity-0 animate-fadeIn">
                 <div className="text-center">
-                  <h4 className="text-xl font-bold">Cobro pendiente</h4>
-                  <p className="mt-2">
-                  El precio que debes pagar por el registro es: <span className="font-bold">${price} USD</span>
-                  </p>
-                </div>
-            
-                <div className="mt-4 text-center">
-                  <button onClick={handlePayment} disabled={!price} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
-                    Pagar
-                  </button>
-                </div>
-              </div>
-            )}
+                {price > 0 ? (
+        <>
+          <h4 className="text-xl font-bold">Cobro pendiente</h4>
+          <p className="mt-2">
+            El precio que debes pagar por el registro es: <span className="font-bold">${price} USD</span>
+          </p>
+        </>
+      ) : (
+        <>
+          <h4 className="text-xl font-bold">Estado de cobro</h4>
+          <p className="mt-2">
+            <span className="font-bold text-gray-50">
+              {watch("name")}{" "}
+            </span>
+            <span className="font-bold text-gray-50">
+              {watch("lastName")}
+            </span>
+            , no tienes pagos pendientes.
+          </p>
+        </>
+      )}
+    </div>
+
+    {price > 0 && (
+      <div className="mt-4 text-center">
+        <button
+          onClick={handlePayment}
+          disabled={!price}
+          className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
+        >
+          Pagar
+        </button>
+      </div>
+    )}
+  </div>
+)}
           </div>
         
       </CardReg>

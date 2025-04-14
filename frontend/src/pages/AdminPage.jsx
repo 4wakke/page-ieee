@@ -85,11 +85,15 @@ function AdminPage() {
             (formattedStartDate && formattedUserDate >= formattedStartDate) ||
             (formattedEndDate && formattedUserDate <= formattedEndDate);
   
-      return nameMatch && emailMatch && isInDateRange;
-    });
+            const statusMatch = statusFilter
+            ? user.status?.toLowerCase() === statusFilter.toLowerCase()
+            : true;
+      
+          return nameMatch && emailMatch && isInDateRange && statusMatch;
+        });
   
     setFilteredUsers(filtered);
-  }, [nameFilter, emailFilter, users, startDateFilter, endDateFilter]);
+  }, [nameFilter, emailFilter, users, startDateFilter, endDateFilter, statusFilter]);
 
   
 
@@ -146,6 +150,8 @@ function AdminPage() {
   const formatParticipation = (participationType) => {
     if (participationType === "attendee") return "Asistente";
     if (participationType === "author") return "Autor";
+    if (participationType === "poster") return "Poster";
+    if (participationType === "invited") return "Invitado";
     return participationType;
   };
 

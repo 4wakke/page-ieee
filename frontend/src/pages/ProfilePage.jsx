@@ -56,15 +56,15 @@ function ProfilePage() {
     }
   }, [isIeeeMember, setValue]);
 
-  useEffect(() => { 
-    if (participationType === "attendee") {
-      setValue("qtyArticles", 0);
+  useEffect(() => {  //*
+    if (["attendee", "poster", "invited"].includes(participationType)) {
+      setValue("qtyArticles", "");
       setValue("articles", []);
     }
   }, [participationType, setValue]); 
 
   useEffect(() => {
-    if (price && priceRef.current) {
+    if (price !== null && priceRef.current) {
       priceRef.current.scrollIntoView({
         behavior: "smooth", 
         block: "center", 
@@ -73,7 +73,7 @@ function ProfilePage() {
   }, [price]); 
 
   useEffect(() => {
-    if (pendingPrice && pendingPriceRef.current) {
+    if (pendingPrice !== null && pendingPriceRef.current) {
       pendingPriceRef.current.scrollIntoView({
         behavior: "smooth", 
         block: "center", 
@@ -145,7 +145,7 @@ function ProfilePage() {
 
         if (data.success) {
           let userData = {...data.results};
-          handleBackendResponse(userData)
+          handleBackendResponse(data)
 
           if (userData.admin) { 
             toast.dismiss(); 
@@ -159,18 +159,29 @@ function ProfilePage() {
 
         userData.taxAmount = userData.isTaxRequired === "no" ? "0" : userData.taxAmount;
 
-        if (userData.participationType === "attendee") {
+        if (["attendee", "poster", "invited"].includes(userData.participationType)) {
           userData.qtyArticles = 0;  
           userData.articles = [];  
         } else {
           let formattedArticles = [];
           if (userData.qtyArticles > 0 && userData.participationType === "author") {
-            formattedArticles = userData.articles?.slice(0, userData.qtyArticles).map(article => ({
-              sequence: article?.sequence || "",
-              pages: article?.pages ? parseInt(article.pages, 10) : ""
-            })) || [];
+            formattedArticles = userData.articles?.slice(0, userData.qtyArticles).map(article => {
+              const formattedArticle = {};
+              
+              // Solo asigna la propiedad `sequence` si existe
+              if (article?.sequence) {
+                formattedArticle.sequence = article.sequence;
+              }
+        
+              // Solo asigna la propiedad `pages` si existe y tiene un valor válido
+              if (article?.pages) {
+                formattedArticle.pages = parseInt(article.pages, 10);
+              }
+        
+              return formattedArticle;
+            }) || [];
           } else {
-            formattedArticles = [{ sequence: "", pages: "" }];
+            formattedArticles = [{}];
           }
           userData.articles = formattedArticles;
         }
@@ -276,7 +287,7 @@ function ProfilePage() {
           });
   
           setTimeout(() => {
-            window.open(processPendingPaymentData.results.checkoutURL, "_blank");
+            window.location.href = processPendingPaymentData.results.checkoutURL;
           }, 0);
           toast.dismiss(); 
           navigate("/");
@@ -628,6 +639,8 @@ function ProfilePage() {
                 <option value="">Selecciona el tipo de participación</option>
                 <option value="author">Autor</option>
                 <option value="attendee">Asistente</option>
+                <option value="poster">Poster</option>
+                <option value="invited">Invitado</option>
               </SelectReg>
               {errors.participationType && (
               <p className="text-red-500 font-medium">El tipo de participación es requerido</p>
@@ -798,34 +811,36 @@ function ProfilePage() {
             )}
           </div>
           <div ref={priceRef}>
-              {IsSave && price > 0 && pendingPrice === null && (
+              {IsSave && price !== null && pendingPrice === null && (
               <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
                 <div className="text-center">
-                  <h4 className="text-xl font-bold">Nuevo cobro</h4>
+                  <h4 className="text-xl font-bold">{price > 0 ? "Nuevo cobro" : "Estado de cobro"}</h4>
                   <p className="mt-2">
-                    {price > 0
-                    ? <>
-                    <span className="font-bold text-gray-50">
-                      {userDetails.name}{" "}
-                    </span> 
-                    <span className="font-bold text-gray-50">
-                      {userDetails.lastName}
-                    </span>, usted debe 
-                    <span className="text-white font-bold ">
-                      {" "}{price}$ USD
-                    </span> por los cambios realizados.
-                  </>
-                      : <>
-                      <span className="font-bold text-gray-50">
-                        {userDetails.name}{" "}
-                      </span> 
-                      <span className="font-bold text-gray-50">
-                        {userDetails.lastName}
-                      </span>, no tienes pagos pendientes.
-                    </>
-                }
-                  </p>
-                </div>
+                  {price > 0 ? (
+            <>
+              <span className="font-bold text-gray-50">
+                {userDetails.name}{" "}
+              </span>
+              <span className="font-bold text-gray-50">
+                {userDetails.lastName}
+              </span>
+              , usted debe
+              <span className="text-white font-bold"> {price}$ USD</span> por
+              los cambios realizados.
+            </>
+          ) : (
+            <>
+              <span className="font-bold text-gray-50">
+                {userDetails.name}{" "}
+              </span>
+              <span className="font-bold text-gray-50">
+                {userDetails.lastName}
+              </span>
+              , no tienes pagos pendientes.
+            </>
+          )}
+        </p>
+      </div>
                     
                 {price > 0 && IsSave && (
                   <div className="mt-4 text-center">
