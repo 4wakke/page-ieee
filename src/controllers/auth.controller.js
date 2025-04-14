@@ -493,6 +493,16 @@ export const payment = async (req,res) =>{
         price = 250
       }
     }
+  } else if (data.participationType == "poster"){
+      if (data.isIeeeMember){
+        if (data.isTems){
+          price = 250
+        } else {
+          price = 300
+        }
+      } else {
+        price = 350
+      }
   }
   
   if (data.qtyArticles > 1) {
@@ -517,6 +527,9 @@ export const payment = async (req,res) =>{
     }
   }
   
+  if (data.participationType == "invited"){
+    price = 0
+  }
   if (price < 0) {
     price = 0;
   }
