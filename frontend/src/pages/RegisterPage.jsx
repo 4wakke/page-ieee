@@ -38,15 +38,16 @@ function RegisterPage() {
   const priceRef = useRef(null);
   const [dollarRate, setDollarRate] = useState(null); //? PRUEBA DOLLARRATE DINÁMICO
   const cardRef = useRef(null);
+  const shouldScroll = useRef(null);
+
 
   useEffect(() => {
-    if (cardRef.current) {
-      cardRef.current.scrollIntoView({
-        behavior: "smooth",  
-        block: "center",     
-      });
+    if (shouldScroll && cardRef.current) {
+      setTimeout(() => {
+        cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100); // da tiempo al layout para renderizar
     }
-  }, []); 
+  }, [shouldScroll]);
 
   useEffect(() => {
     if (isTaxRequired === "no") {

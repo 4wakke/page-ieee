@@ -37,6 +37,7 @@ function ProfilePage() {
   const [dollarRate, setDollarRate] = useState(null); 
   const priceRef = useRef(null);
   const pendingPriceRef = useRef(null);
+  const profileCard = useRef(null);
   const [pendingPrice, setPendingPrice] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [pendingUrl, setPendingUrl] = useState(null);
@@ -71,6 +72,16 @@ function ProfilePage() {
       });
     }
   }, [price]); 
+
+  useEffect(() => {
+    if (userDetails && profileCard.current) {
+      profileCard.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [userDetails]);
+  
 
   useEffect(() => {
     if (pendingPrice !== null && pendingPriceRef.current) {
@@ -285,12 +296,10 @@ function ProfilePage() {
             progressClassName: "bg-blue-300",
             autoClose: 4000,
           });
-  
-          setTimeout(() => {
             window.location.href = processPendingPaymentData.results.checkoutURL;
-          }, 0);
-          toast.dismiss(); 
-          navigate("/");
+            //window.location.replace(processPendingPaymentData.results.checkoutURL)
+            toast.dismiss();
+            navigate("/")
         } else {
           //? console.error("Error al obtener la URL de pago", processPendingPaymentData);
           handleBackendResponse(processPendingPaymentData);
@@ -483,7 +492,7 @@ function ProfilePage() {
 
   return (
     <div className="flex items-center justify-center ">
-      <div className="bg-[#2a4992] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto duration-500 ease-in opacity-0 animate-fadeIn">
+      <div className="bg-[#2a4992] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto duration-500 ease-in opacity-0 animate-fadeIn" ref={profileCard}>
         <h3 className="text-3xl font-bold text-center mb-4 tracking-wide">Perfil de usuario</h3>
         <form onSubmit={handleSubmit(handleSave)} autoComplete="off">
 
