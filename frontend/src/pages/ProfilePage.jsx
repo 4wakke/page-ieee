@@ -254,6 +254,20 @@ function ProfilePage() {
         const priceValue = paymentData.results.price;
         setPendingPrice(priceValue);
         handleBackendResponse(paymentData);
+        if (paymentData.results.price === 0){ //FIXME:
+          // eslint-disable-next-line no-unused-vars
+          const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              amount: priceValue,
+              dollarRate: dollarRate, 
+              description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
+              userId: userData.id,
+              coupon: userData.coupon,  
+            }),
+          });
+        }
       } else {
         setPendingPrice(0);
         setPendingUrl(null);
@@ -409,6 +423,20 @@ function ProfilePage() {
           setPendingPrice(null);
           if (paymentTriggeredByEdit.current) {
             setPrice(responseData.results.price);
+            if (responseData.results.price === 0){ //FIXME:
+              // eslint-disable-next-line no-unused-vars
+              const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  amount: price,
+                  dollarRate: dollarRate, 
+                  description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
+                  userId: data.id,
+                  coupon: data.coupon,  
+                }),
+              });
+            }
           }
           handleBackendResponse(responseData);
         }

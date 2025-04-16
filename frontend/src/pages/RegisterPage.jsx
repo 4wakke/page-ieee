@@ -267,6 +267,20 @@ function RegisterPage() {
         if (responseData.success && responseData.results?.price !== undefined) {
           setPrice(responseData.results.price);
           handleBackendResponse(responseData);
+          if (responseData.results.price === 0){ //FIXME:
+            // eslint-disable-next-line no-unused-vars
+            const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                amount: price,
+                dollarRate: dollarRate, 
+                description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
+                userId: data.id,
+                coupon: data.coupon,  
+              }),
+            });
+          }
         }
         
       } else {
