@@ -151,7 +151,7 @@ function ProfilePage() {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
 
-        console.log("Datos recibidos del backend:", data.results)
+        // console.log("Datos recibidos del backend:", data.results) FIXME:
 
         if (data.success) {
           let userData = {...data.results};
@@ -364,7 +364,7 @@ function ProfilePage() {
     updatedData.articles = [];
   }
 
-  console.log("Datos que se van a enviar:", updatedData);
+  // console.log("Datos que se van a enviar:", updatedData); FIXME:
 
     if (!userDetails || !userDetails.id) { 
       return;
