@@ -516,7 +516,7 @@ export const payment = async (req,res) =>{
   });
 
   if (data.taxAmount && data.taxAmount > 0) {
-      price +=price*data.taxAmount/100
+      price += price * parseFloat(data.taxAmount)/100
   }
 
   
