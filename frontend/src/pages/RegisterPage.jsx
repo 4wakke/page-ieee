@@ -51,7 +51,7 @@ function RegisterPage() {
 
   useEffect(() => { 
     if (isTaxRequired === "yes") {
-      setValue("taxAmount", 19);
+      setValue("taxAmount",  "19");
     } else if (isTaxRequired === "no") {
       setValue("taxAmount", "");
     }
@@ -245,7 +245,7 @@ function RegisterPage() {
         qtyArticles: data.qtyArticles,
         articles: data.articles,
         userId,
-        taxAmount: Number(data.taxAmount),
+        taxAmount: data.taxAmount,
       };
   
       // console.log("Datos enviados a payment:", formattedData); FIXME:
