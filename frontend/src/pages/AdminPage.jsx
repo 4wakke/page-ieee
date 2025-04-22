@@ -48,7 +48,7 @@ function AdminPage() {
         const data = await response.json();
 
         if (data.success) {
-          console.log("datos obtenido", data);
+          // console.log("datos obtenido", data);
           
           handleBackendResponse(data)
           setUsers(data.results);
