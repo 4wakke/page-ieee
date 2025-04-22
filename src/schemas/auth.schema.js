@@ -128,13 +128,6 @@ export const signupSchema = z.object({
       invalid_type_error: 'El tipo de asistencia debe ser un texto'
     })
     .min(1)
-    .max(100),
-  taxAmount: z
-    .string({
-      required_error: 'El valor del impuesto es requerido',
-      invalid_type_error: 'El valor del impuesto debe ser un número'
-    })
-    .min(0)
     .max(100)
 });
 
