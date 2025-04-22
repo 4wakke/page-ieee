@@ -45,12 +45,14 @@ function RegisterPage() {
     if (shouldScroll && cardRef.current) {
       setTimeout(() => {
         cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100); // da tiempo al layout para renderizar
+      }, 100); 
     }
   }, [shouldScroll]);
 
-  useEffect(() => {
-    if (isTaxRequired === "no") {
+  useEffect(() => { 
+    if (isTaxRequired === "yes") {
+      setValue("taxAmount", 19);
+    } else if (isTaxRequired === "no") {
       setValue("taxAmount", "");
     }
   }, [isTaxRequired, setValue]);
@@ -118,11 +120,9 @@ function RegisterPage() {
     try {
 
       if (!dollarRate) { 
-        //? console.error("No se pudo obtener la tasa de cambio del dólar.");
         return;
       } 
 
-      //? console.log(dollarRate); //? PRUEBA DOLLARRATE DINÁMICO
       
       const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
         method: "POST",
@@ -136,8 +136,6 @@ function RegisterPage() {
       });
 
       const processPaymentData = await processPaymentResp.json();
-      //? console.log("Respuesta de proceso de pago:", processPaymentData);
-
 
       if (processPaymentData.success && processPaymentData.results.checkoutURL) {
         handleBackendResponse(processPaymentData);
@@ -174,7 +172,6 @@ function RegisterPage() {
 
         
       } else {
-        //? console.error("Error al obtener la URL de pago", processPaymentData);
         handleBackendResponse(processPaymentData);
       }
     } catch (error) {
@@ -198,12 +195,10 @@ function RegisterPage() {
           formattedArticles = data.articles?.slice(0, data.qtyArticles).map(article => {
             const formattedArticle = {};
             
-            // Solo asigna la propiedad `sequence` si existe
             if (article?.sequence) {
               formattedArticle.sequence = article.sequence;
             }
       
-            // Solo asigna la propiedad `pages` si existe y tiene un valor válido
             if (article?.pages) {
               formattedArticle.pages = parseInt(article.pages, 10);
             }
@@ -216,31 +211,30 @@ function RegisterPage() {
         data.articles = formattedArticles;
       }
       
-      //? console.log("Datos enviados a signup:", data);
+      // console.log("Datos enviados a signup:", data); FIXME:
   
-      const resp = await fetch(`${backRoute}/api/signup`, {
+      const resp = await fetch(`${backRoute}/api/signup`, { 
         method: "POST",
         body: JSON.stringify({ 
           ...data,
           articles: data.articles
         }),
         headers: { "Content-Type": "application/json" },
-      });
+      }); 
   
-      const dataSignup = await resp.json();
-      //? console.log("Respuesta de signup:", dataSignup);
+      const dataSignup = await resp.json(); 
 
-      if (dataSignup.success) {
+      if (dataSignup.success) { 
         setIsRegistered(true); 
         toast.info("Si hubo algún error en el registro, la información puede ser modificada en el perfil.", {
           className: "bg-blu-700 text-white font-medium",
           progressClassName: "bg-blue-700",
           autoClose: 12000,
         });
-      handleBackendResponse(dataSignup);
-      const userId = dataSignup.results[0]?.userId;
+      handleBackendResponse(dataSignup); 
+      const userId = dataSignup.results[0]?.userId; 
       setUserId(userId);
-      await signup(dataSignup);
+      await signup(dataSignup); 
 
       const formattedData = {
         occupation: data.occupation,
@@ -254,7 +248,8 @@ function RegisterPage() {
         taxAmount: Number(data.taxAmount),
       };
   
-      //? console.log("Datos enviados a payment:", formattedData); 
+      // console.log("Datos enviados a payment:", formattedData); FIXME:
+
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
           body: JSON.stringify(formattedData), 
@@ -262,12 +257,11 @@ function RegisterPage() {
         });
   
         const responseData = await response.json();
-        //?console.log("Respuesta de payment:", responseData);
 
         if (responseData.success && responseData.results?.price !== undefined) {
           setPrice(responseData.results.price);
           handleBackendResponse(responseData);
-          if (responseData.results.price === 0){ //FIXME:
+          if (responseData.results.price === 0){ 
             // eslint-disable-next-line no-unused-vars
             const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
               method: "POST",
@@ -283,9 +277,9 @@ function RegisterPage() {
           }
         }
         
-      } else {
+      } else { 
         handleBackendResponse(dataSignup); 
-    }
+    } 
     } catch (error) {
       handleBackendResponse(error); 
 
@@ -547,7 +541,7 @@ function RegisterPage() {
             </div>
 
             <div>
-                <Label htmlFor="isTaxRequired">¿Requiere impuesto?</Label>
+                <Label htmlFor="isTaxRequired">¿Requiere Factura Legal Colombiana?</Label>
                 <SelectReg {...register("isTaxRequired", { required: true })}>
                   <option value="">Selecciona</option>
                   <option value="yes">Sí</option>
@@ -555,26 +549,6 @@ function RegisterPage() {
                 </SelectReg>
                 {errors.isTaxRequired && (
                   <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
-                )}
-
-              {isTaxRequired === "yes" && (
-              <div className="mt-4">
-                <Label htmlFor="taxAmount">Pago por impuesto</Label>
-                <Input 
-                  type="number" 
-                  placeholder="Ingresa el valor por impuesto"
-                  {...register("taxAmount", {
-                    required: isTaxRequired === "yes" ? "Este campo es requerido" : false, 
-                    min: { value: 1, message: "El valor mínimo es 1" },
-                    max: { value: 100, message: "El valor máximo es 100" },
-                    validate: value => Number.isInteger(Number(value)) || "Debe ser un número entero"
-                  })}
-                  onWheel={(e) => e.target.blur()}
-                />
-                {errors.taxAmount && (
-                <p className="text-red-500 font-medium">{errors.taxAmount.message}</p>
-                )}
-              </div>
                 )}
             </div>
 
