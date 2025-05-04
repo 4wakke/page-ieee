@@ -204,9 +204,9 @@ export const getAllUsers = async (req, res) => {
              doc_type, doc_number, affiliation, email, phone_number, occupation, 
              is_ieee_member, is_tems, membership_number, participation_type, 
              attendance_type, tax_amount, qty_articles, created_at,
-             p.usd, p.cop, COALESCE(p.status,'No creado'),
+             p.usd, p.cop, COALESCE(p.status,'No creado') AS status,
              JSON_ARRAYAGG(
-				JSON_OBJECT(
+				        JSON_OBJECT(
                 'sequence',a.sequence,
                 'pages',a.pages
                 )) AS articles
