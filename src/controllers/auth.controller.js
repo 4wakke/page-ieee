@@ -513,7 +513,7 @@ export const payment = async (req,res) =>{
   }
   
   if (data.qtyArticles > 1) {
-    price+=(100*(data.qtyArticles-1))
+    price+=(150*(data.qtyArticles-1))
   }
   
   data.articles.forEach(article => {
@@ -540,6 +540,7 @@ export const payment = async (req,res) =>{
   if (price < 0) {
     price = 0;
   }
+ 
 
   return successResponse(res,"Precio calculado exitosamente",{"price":price})
 };
