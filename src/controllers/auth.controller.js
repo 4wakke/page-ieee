@@ -200,18 +200,31 @@ const sendRegisterEmail = async (data,res) =>{
 export const getAllUsers = async (req, res) => {
   try {
     const query = `
-      SELECT u.id, name, last_name, country, city, address, gender, birth_date, 
-             doc_type, doc_number, affiliation, email, phone_number, occupation, 
-             is_ieee_member, is_tems, membership_number, participation_type, 
-             attendance_type, tax_amount, qty_articles, created_at,
-             p.usd, p.cop, COALESCE(p.status,'No creado') AS status,
-             JSON_ARRAYAGG(
-				        JSON_OBJECT(
-                'sequence',a.sequence,
-                'pages',a.pages
-                )) AS articles
+      SELECT 
+          u.id, name, last_name, country, city, address, gender, birth_date, 
+          doc_type, doc_number, affiliation, email, phone_number, occupation, 
+          is_ieee_member, is_tems, membership_number, participation_type, 
+          attendance_type, tax_amount, qty_articles, created_at,
+          COALESCE(p.total_usd, 0) AS usd,
+          COALESCE(p.total_cop, 0) AS cop,
+          COALESCE(p.main_status, 'No creado') AS status,
+          JSON_ARRAYAGG(
+              JSON_OBJECT(
+                  'sequence', a.sequence,
+                  'pages', a.pages
+              )
+          ) AS articles
       FROM users u
-      LEFT JOIN payments p ON p.user_id = u.id AND status <> 'Cancel'
+      LEFT JOIN (
+          SELECT 
+              user_id,
+              SUM(usd) AS total_usd,
+              SUM(cop) AS total_cop,
+              MAX(CASE WHEN status = 'Pagado' THEN 'Pagado' ELSE status END) AS main_status
+          FROM payments
+          WHERE status <> 'Cancel'
+          GROUP BY user_id
+      ) p ON p.user_id = u.id
       LEFT JOIN articles a ON a.user_id = u.id
       WHERE admin <> 1
       GROUP BY u.id;
