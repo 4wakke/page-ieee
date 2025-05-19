@@ -629,7 +629,8 @@ export const processPayment = async (req, res) => {
       description: data.description || "Pago por servicio",
       expiration_days: 7,
       payment_method_enabled: JSON.stringify({
-        credit_card: true,  
+        credit_card: true,
+        credit_card_international :true, 
         pse: true,
       }),
       platform: "API",
