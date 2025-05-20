@@ -222,7 +222,7 @@ export const getAllUsers = async (req, res) => {
               SUM(cop) AS total_cop,
               MAX(CASE WHEN status = 'Pagado' THEN 'Pagado' ELSE status END) AS main_status
           FROM payments
-          WHERE status <> 'Cancel'
+          WHERE status NOT IN('Cancel','Expirado')
           GROUP BY user_id
       ) p ON p.user_id = u.id
       LEFT JOIN articles a ON a.user_id = u.id
@@ -627,7 +627,7 @@ export const processPayment = async (req, res) => {
     const newCobru = {
       amount: copAmount ,
       description: data.description || "Pago por servicio",
-      expiration_days: 7,
+      expiration_days: 15,
       payment_method_enabled: JSON.stringify({
         credit_card: true,
         credit_card_international :true, 
