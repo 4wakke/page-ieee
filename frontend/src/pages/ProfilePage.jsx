@@ -29,15 +29,19 @@ function ProfilePage() {
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
+  const isCouponRequired = watch("isCouponRequired"); //FIXME: //*ACTUAL
   const participationType = watch("participationType"); 
   const [price, setPrice] = useState("");
   const [IsSave, setIsSave] = useState(false);
   const paymentTriggeredByEdit = useRef(false);
   const [userDetails, setUserDetails] = useState(null);
-  const [dollarRate, setDollarRate] = useState(null); 
+  const [dollarRate, setDollarRate] = useState(null);
+  const [PendingCoupon, setPendingCoupon] = useState(""); //FIXME: //*ACTUAL
+  const [UserCoupon, setUserCoupon] = useState(""); //FIXME: //*ACTUAL
   const priceRef = useRef(null);
   const pendingPriceRef = useRef(null);
   const profileCard = useRef(null);
+  const previousPrice = useRef(null); //FIXME://*ACTUAL
   const [pendingPrice, setPendingPrice] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [pendingUrl, setPendingUrl] = useState(null);
@@ -51,6 +55,12 @@ function ProfilePage() {
       setValue("taxAmount", "");
     }
   }, [isTaxRequired, setValue]);
+
+  useEffect(() => { //FIXME: //* ACTUAL
+    if (isCouponRequired === "no") {
+      setValue("coupon", "");
+    }
+  }, [isCouponRequired, setValue]);
   
   useEffect(() => { 
     if (isIeeeMember === "no") {
@@ -151,13 +161,13 @@ function ProfilePage() {
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
 
-        // console.log("Datos recibidos del backend:", data.results) FIXME:
+        // console.log("Datos recibidos del backend:", data.results) //!
 
         if (data.success) {
           let userData = {...data.results};
           handleBackendResponse(data)
 
-          if (userData.admin) { 
+          if (userData.admin) {  
             toast.dismiss(); 
             navigate("/profile/admin");
           }
@@ -203,6 +213,14 @@ function ProfilePage() {
         } else {
           userData.isTaxRequired = "no";
         }
+
+        if (!userData.coupon || userData.coupon.trim() === "") { //FIXME: //*ACTUAL
+          userData.coupon = null;
+          userData.isCouponRequired = "no";
+        } else {
+          userData.isCouponRequired = "yes";
+        }
+
         setUserDetails(userData);
 
           for (const key in userData) {
@@ -233,10 +251,13 @@ function ProfilePage() {
         qtyArticles: userData.qtyArticles,
         articles: userData.articles,
         userId: userData.id,
-        taxAmount: userData.taxAmount
+        taxAmount: userData.taxAmount,
+        coupon: userData.coupon === "" ? null : userData.coupon, //FIXME://*ACTUAL
       };
+
+      setPendingCoupon(userData.coupon); //FIXME://*ACTUAL
   
-      // console.log("Datos que envio a payment pendiente:", formattedPendingData) FIXME:
+      // console.log("Datos que envio a payment pendiente:", formattedPendingData)
 
       const paymentResponse = await fetch(`${backRoute}/api/payment`, {
         method: "POST",
@@ -249,21 +270,27 @@ function ProfilePage() {
       if (paymentData.success && paymentData.results?.price !== undefined) {
         const priceValue = paymentData.results.price;
         setPendingPrice(priceValue);
-        handleBackendResponse(paymentData);
-        if (paymentData.results.price === 0){ //FIXME:
-          // eslint-disable-next-line no-unused-vars
-          const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              amount: priceValue,
-              dollarRate: dollarRate, 
-              description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
-              userId: userData.id,
-              coupon: userData.coupon,  
-            }),
-          });
+
+        if (priceValue > 0) { //FIXME://*ACTUAL
+          previousPrice.current = priceValue;  
         }
+
+        // handleBackendResponse(paymentData); //FIXME://?ACTUAL
+
+        // if (paymentData.results.price === 0){  //FIXME://*ACTUAL
+        //   // eslint-disable-next-line no-unused-vars
+        //   const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({
+        //       amount: priceValue,
+        //       dollarRate: dollarRate, 
+        //       description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
+        //       userId: userData.id,
+        //       coupon: userData.coupon,  
+        //     }),
+        //   });
+        // }
       } else {
         setPendingPrice(0);
         setPendingUrl(null);
@@ -287,6 +314,7 @@ function ProfilePage() {
             dollarRate: dollarRate,
             description: `Pago conferencia Temscon ${userData.name} ${userData.lastName}`,
             userId: userData.id,
+            coupon: PendingCoupon === "" ? null : PendingCoupon, //FIXME://*ACTUAL
           }),
         });
   
@@ -346,6 +374,10 @@ function ProfilePage() {
       updatedData.taxAmount = "0";  
     }
 
+    if (updatedData.isCouponRequired === "no") { //FIXME: //*ACTUAL
+      updatedData.coupon = "";  
+    }
+
     if (updatedData.qtyArticles && updatedData.qtyArticles > 0) {
       
       updatedData.articles = updatedData.articles
@@ -364,7 +396,7 @@ function ProfilePage() {
     updatedData.articles = [];
   }
 
-  // console.log("Datos que se van a enviar:", updatedData); FIXME:
+  // console.log("Datos que se van a enviar:", updatedData); //!
 
     if (!userDetails || !userDetails.id) { 
       return;
@@ -392,11 +424,13 @@ function ProfilePage() {
           qtyArticles: data.qtyArticles,
           articles: data.articles,
           userId: userDetails.id,
-          taxAmount: data.taxAmount
+          taxAmount: data.taxAmount,
+          coupon: data.coupon === "" ? null : data.coupon,
         };
 
         paymentTriggeredByEdit.current = true;
 
+        setUserCoupon(data.coupon);
 
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
@@ -406,24 +440,27 @@ function ProfilePage() {
         
         const responseData = await response.json();
 
+        // console.log("Respuesta de payment:", responseData); //!
+
         if (responseData.success && responseData.results?.price !== undefined) {
           setPendingPrice(null);
           if (paymentTriggeredByEdit.current) {
             setPrice(responseData.results.price);
-            if (responseData.results.price === 0){ //FIXME:
+            if (previousPrice.current > 0 && responseData.results.price === 0){ //FIXME://*ACTUAL
               // eslint-disable-next-line no-unused-vars
-              const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+              const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, { //FIXME://*ACTUAL
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  amount: price,
+                  amount: responseData.results.price, //FIXME://*ACTUAL
                   dollarRate: dollarRate, 
                   description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
                   userId: data.id,
-                  coupon: data.coupon,  
+                  coupon: data.coupon === "" ? null : data.coupon, //FIXME://*ACTUAL
                 }),
               });
             }
+            previousPrice.current = responseData.results.price; //FIXME://*ACTUAL
           }
           handleBackendResponse(responseData);
         }
@@ -450,6 +487,7 @@ function ProfilePage() {
           dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINÁMICO
           description: `Pago conferencia Temscon ${watch("name")} ${watch("lastName")}`,
           userId: userDetails.id,
+          coupon: UserCoupon === "" ? null : UserCoupon, //FIXME://*ACTUAL
         }),
       });
 
@@ -734,14 +772,44 @@ function ProfilePage() {
             )} 
             </div>
 
+{/* FIXME://*Actual */}
             <div>
-            <Label htmlFor="isTaxRequired">¿Requiere Factura Legal Colombiana?</Label>
+            <Label htmlFor="isTaxRequired">¿Requiere Factura Legal Colombiana?</Label> 
               <SelectReg {...register("isTaxRequired", { required: true })} disabled={!isEditing}>
                 <option value="">Selecciona</option>
                 <option value="yes">Sí</option>
                 <option value="no">No</option>
               </SelectReg>
               {errors.isTaxRequired && <p className="text-red-500 font-medium">Este campo es requerido</p>}
+              <div className="mt-4">
+                  <Label htmlFor="isCouponRequired">¿Tiene código de descuento?</Label>
+                  <SelectReg {...register("isCouponRequired", { required: true })} disabled={!isEditing}>
+                    <option value="">Selecciona</option>
+                    <option value="yes">Sí</option>
+                    <option value="no">No</option>
+                  </SelectReg>
+                  {errors.isCouponRequired && (
+                    <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
+                  )}
+
+                {isCouponRequired === "yes" && (
+                <div className="mt-4">
+                  <Label htmlFor="coupon">Código de descuento</Label>
+                  <Input 
+                    type="text" 
+                    placeholder="Ingresa el código de descuento"
+                    {...register("coupon", {
+                      required: isCouponRequired === "yes" ? "Este campo es requerido" : false,
+                    })}
+                    onWheel={(e) => e.target.blur()}
+                    disabled={!isEditing}
+                  />
+                  {errors.coupon && (
+                    <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
+                  )}
+                </div>
+                  )}
+              </div>
             </div>
 
           </div> {/* FIN GRID */}
