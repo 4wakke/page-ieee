@@ -158,6 +158,7 @@ function ProfilePage() {
       );
 
       try {
+        navigate("/profile/admin"); 
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
 
@@ -169,7 +170,7 @@ function ProfilePage() {
 
           if (userData.admin) {  
             toast.dismiss(); 
-            navigate("/profile/admin");
+            navigate("/profile/admin"); 
           }
           
           localStorage.setItem("userId", userData.id);
@@ -540,7 +541,7 @@ function ProfilePage() {
 
   return (
     <div className="flex items-center justify-center ">
-      <div className="bg-[#2a4992] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto duration-500 ease-in opacity-0 animate-fadeIn" ref={profileCard}>
+      <div className="bg-[#002855] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto duration-500 ease-in opacity-0 animate-fadeIn" ref={profileCard}>
         <h3 className="text-3xl font-bold text-center mb-4 tracking-wide">Perfil de usuario</h3>
         <form onSubmit={handleSubmit(handleSave)} autoComplete="off">
 
@@ -817,13 +818,13 @@ function ProfilePage() {
           <div className=" flex justify-center space-x-4 mt-4">
             <div>
               {isEditing ? (
-                <button type="submit" className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
+                <button type="submit" className="bg-[#ffffff] hover:bg-[#f6c80b] text-[#191b90] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
               ) : (
-                <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
+                <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#f6c80b] text-[#191b90] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
               )}
               </div>
               <div>
-                <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#f6c80b] text-[#191b90] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                     Cambiar Contraseña
                 </button>
               </div>
@@ -839,7 +840,7 @@ function ProfilePage() {
           </div>
           <div ref={pendingPriceRef}>
           {!isEditing && pendingPrice !== null && (
-          <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
+          <div className="mt-4 p-4 bg-[#191b90] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
             <div className="text-center">
               <h4 className="text-xl font-bold">Cobro pendiente</h4>
               <p className="mt-2">
@@ -851,7 +852,7 @@ function ProfilePage() {
                   <span className="font-bold text-gray-50">
                     {userDetails.lastName}
                   </span>, debes pagar 
-                  <span className="text-white font-bold ">
+                  <span className="text-[#f6c80b] font-bold ">
                     {" "}{pendingPrice}$ USD
                   </span> para completar el registro.
                 </>
@@ -868,7 +869,7 @@ function ProfilePage() {
                 
               {pendingPrice > 0 && (
                 <div className="mt-4 text-center">
-                <button onClick={handlePendingProcessPayment} disabled={!pendingPrice} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                <button onClick={handlePendingProcessPayment} disabled={!pendingPrice} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#c01d0f] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                   Pagar
                 </button>
               </div>
@@ -879,7 +880,7 @@ function ProfilePage() {
           </div>
           <div ref={priceRef}>
               {IsSave && price !== null && pendingPrice === null && (
-              <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
+              <div className="mt-4 p-4 bg-[#191b90] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
                 <div className="text-center">
                   <h4 className="text-xl font-bold">{price > 0 ? "Nuevo cobro" : "Estado de cobro"}</h4>
                   <p className="mt-2">
@@ -892,7 +893,7 @@ function ProfilePage() {
                 {userDetails.lastName}
               </span>
               , usted debe
-              <span className="text-white font-bold"> {price}$ USD</span> por
+              <span className="text-[#f6c80b] font-bold"> {price}$ USD</span> por
               los cambios realizados.
             </>
           ) : (
@@ -911,7 +912,7 @@ function ProfilePage() {
                     
                 {price > 0 && IsSave && (
                   <div className="mt-4 text-center">
-                    <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                    <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#c01d0f] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                       Pagar
                     </button>
                   </div>

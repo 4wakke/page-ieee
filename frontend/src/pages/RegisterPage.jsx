@@ -614,7 +614,7 @@ function RegisterPage() {
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center mb-6">
-            <button className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg" disabled={isRegistered}>Registrarse </button>
+            <button className="bg-[#ffffff] hover:bg-[#f6c80b] text-[#191b90] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg" disabled={isRegistered}>Registrarse </button>
           </div>
 
           <div className="mt-4 text-center">
@@ -630,13 +630,13 @@ function RegisterPage() {
 
           <div ref={priceRef}>
             {isRegistered && price !== null && (
-              <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto duration-5000 ease-in opacity-0 animate-fadeIn">
+              <div className="mt-4 p-4 bg-[#191b90] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto duration-5000 ease-in opacity-0 animate-fadeIn">
                 <div className="text-center">
                 {price > 0 ? (
         <>
           <h4 className="text-xl font-bold">Cobro pendiente</h4>
           <p className="mt-2">
-            El precio que debes pagar por el registro es: <span className="font-bold">${price} USD</span>
+            El precio que debes pagar por el registro es: <span className="font-bold text-[#f6c80b]">${price} USD</span>
           </p>
         </>
       ) : (
@@ -660,7 +660,7 @@ function RegisterPage() {
         <button
           onClick={handlePayment}
           disabled={!price}
-          className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
+          className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#c01d0f] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
         >
           Pagar
         </button>

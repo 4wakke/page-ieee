@@ -242,13 +242,13 @@ function AdminPage() {
     <div className="container mx-auto p-2">
 
       <div className="flex items-center justify-center mb-6 ">
-        <button type="button" onClick={handleChangePassword} className="bg-[#4067a5] hover:bg-[#5c75a8] text-[#ffffff] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+        <button type="button" onClick={handleChangePassword} className="bg-[#f6c80b] hover:bg-[#baaf84] text-[#ffffff] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
             Cambiar Contraseña
         </button>
       </div>
 
-      <h1 className="text-2xl font-bold mb-4 text-black text-center">
-        Tabla de usuarios
+      <h1 className="text-2xl font-bold mb-4 text-[#191b90] text-center">
+        Filtros
       </h1>
       <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Filtro por nombre */}
@@ -332,7 +332,9 @@ function AdminPage() {
           </div>
         </div>
       </div>
-
+<h1 className="text-2xl font-bold mb-4 text-[#191b90] text-center">
+        Tabla de Usuarios
+      </h1>
       <div ref={topScrollRef} className="overflow-x-auto mb-2 h-6">
         <div style={{ width: scrollWidth, height: "1px" }}></div>
       </div>
@@ -340,11 +342,12 @@ function AdminPage() {
         ref={bottomScrollRef}
         className="overflow-x-auto bg-white rounded-lg shadow-md"
       >
+        
         <table
           ref={tableRef}
           className="min-w-full text-sm text-left text-gray-700"
         >
-          <thead className="bg-[#dae6f4] text-[#2e5ca6] text-sm font-semibold text-center">
+          <thead className="bg-[#ffd3da] text-[#e64261] text-sm font-semibold text-center">
             <tr>
               <th className="px-4 py-3 font-semibold">Nombre</th>
               <th className="px-4 py-3 font-semibold">Apellido</th>
