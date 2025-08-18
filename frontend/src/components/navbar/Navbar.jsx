@@ -12,13 +12,19 @@ function Navbar() {
 
   return ( 
     // bg-gradient-to-r from-white/85 to-blue-900/85
-    <nav className=" bg-gradient-to-r from-[#e5eff5] to-blue-700/50 shadow-md border-b-1 border-[#006699]"> 
+    <nav className=" bg-gradient-to-r from-[#e5eff5] to-[#7de3ff]/40 shadow-md border-b-1 border-[#006699]"> 
+    {/* FIXME: Cambio de color de nabvar: from-[#e5eff5] to-blue-700/50 a: */}
+
       <Container className="flex justify-between py-3">
-        <div className="flex-1 min-w-0 ml-4 sm:ml-10">
+        <div className="flex-1 min-w-0 ml-4 sm:ml-16">
+              {/* FIXME: Cambio de margen hacia izq a 16 */}
+
           <div className="flex items-center">
             <Link to="./" className="flex items-center ">
-              <img src="/assets/logo-temscon.png" alt="TEMSCon Logo" className="h-10 sm:h-12 w-auto max-w-[120px] sm:max-w-none object-contain" />
+              <img src="/assets/logo2.png" alt="ColCaribe Logo" className="h-10 sm:h-12 w-auto max-w-[120px] sm:max-w-none object-contain" />
             </Link>
+            {/* FIXME: Cambio de logo*/}
+
             {/* <Link to="https://www.ieee.org/" className="hidden lg:block shrink-0 ">
               <img src="/assets/logo-ieee.svg" alt="IEEE Logo" className="h-8 w-auto object-contain" />
             </Link> */}
@@ -44,7 +50,7 @@ function Navbar() {
                 ))}
 
                 <li
-                  className="bg-[#7c91ba] text-white flex items-center px-3 py-1 gap-x-1 rounded-md hover:cursor-pointer mx-2 transition-all duration-150 hover:brightness-125 hover:text-[#ffff] hover:bg-[#8498be]"
+                  className="bg-[#e64261] text-white flex items-center px-3 py-1 gap-x-1 rounded-md hover:cursor-pointer mx-2 transition-all duration-150 hover:brightness-125 hover:text-[#ffff] hover:bg-[#e07488]"
                   onClick={() => {
                     signout();
                   }}
@@ -53,7 +59,7 @@ function Navbar() {
                   <span className="hidden sm:block">Salir</span>
                 </li>
 
-                <li className="flex gap-x-1 items-center justify-center text-[#ffffff]">
+                <li className="flex gap-x-1 items-center justify-center text-[#2a2200]">
                   <LuUserPen className="w-5 h-5 sm:inline" />
                   <span className="font-black">{user.name}</span>
                 </li>
@@ -62,16 +68,18 @@ function Navbar() {
               publicRoutes.map(({ path, name }) => (
                 <li
                 className={twMerge(
-                  "text-[#4067a5] flex items-center px-3 py-2 font-semibold  rounded-md transition-colors duration-150  hover:bg-[#5c75a8] bg-[#ffff] shadow-sm hover:shadow-md hover:text-[#ffff]",
-                  location.pathname === path && "bg-[#c01f12] text-[#fff] "
+                  "text-[#191b90] flex items-center px-3 py-2 font-semibold  rounded-md transition-colors duration-150  hover:bg-[#f6c80b] bg-[#ffff] shadow-sm hover:shadow-md hover:text-[#ffff]",
+                  location.pathname === path && "bg-[#e64261] text-[#fff] "
                 )}
+                
                   key={path}
                 >
+                  {/* FIXME: Cambio color botones: text-[#4067a5] hover:bg-[#5c75a8] bg-[#c01f12] text-[#fff] */}
                   <Link to={path}>
             <span className="hidden sm:inline">
               {name} 
             </span>
-            {name === "Sobre nosotros" && <span className="sm:hidden">TEMS</span>}
+            {name === "Sobre nosotros" && <span className="sm:hidden">C3</span>}
             {name === "Iniciar sesión" && <span className="sm:hidden">Ingresa</span>}
             {name === "Registrarse" && <span className="sm:hidden">Registro</span>}
           </Link>

@@ -103,16 +103,18 @@ function AdminPage() {
     return date.toISOString().split("T")[0]; // Devuelve la fecha en formato "YYYY-MM-DD"
   };
 
-  const formatArticles = (articles) => { //FIXME:
-    if (!Array.isArray(articles) || articles.length === 0) {
-      return "No hay artículos";
-    }
-  
+  const formatArticles = (articles) => { //FIXME://*ACTUAL
+    if (!Array.isArray(articles) || articles.length === 0 || articles.every(article => !article.sequence || !article.pages)) {
+    return "No hay artículos";
+  }
     return (
+      // FIXME: //*ACTUAL 
       <ul className="list-disc list-inside text-left">
         {articles.map((article, index) => (
+          article.sequence ? (
           <li key={index}>{article.sequence}</li>
-        ))}
+        ) : null
+      ))}
       </ul>
     );
   };
@@ -153,6 +155,10 @@ function AdminPage() {
     if (occupation === "professional") return "Profesional";
     if (occupation === "student") return "Estudiante";
     return occupation;
+  };
+
+  const formatCoupon = (coupon) => {
+    return coupon && coupon.trim().length > 0 ? "Tiene código" : "No tiene código";
   };
 
   // Función para mostrar "Sí" o "No" en los campos de membresía
@@ -236,13 +242,13 @@ function AdminPage() {
     <div className="container mx-auto p-2">
 
       <div className="flex items-center justify-center mb-6 ">
-        <button type="button" onClick={handleChangePassword} className="bg-[#4067a5] hover:bg-[#5c75a8] text-[#ffffff] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+        <button type="button" onClick={handleChangePassword} className="bg-[#f6c80b] hover:bg-[#baaf84] text-[#ffffff] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
             Cambiar Contraseña
         </button>
       </div>
 
-      <h1 className="text-2xl font-bold mb-4 text-black text-center">
-        Tabla de usuarios
+      <h1 className="text-2xl font-bold mb-4 text-[#191b90] text-center">
+        Filtros
       </h1>
       <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Filtro por nombre */}
@@ -326,7 +332,9 @@ function AdminPage() {
           </div>
         </div>
       </div>
-
+<h1 className="text-2xl font-bold mb-4 text-[#191b90] text-center">
+        Tabla de Usuarios
+      </h1>
       <div ref={topScrollRef} className="overflow-x-auto mb-2 h-6">
         <div style={{ width: scrollWidth, height: "1px" }}></div>
       </div>
@@ -334,11 +342,12 @@ function AdminPage() {
         ref={bottomScrollRef}
         className="overflow-x-auto bg-white rounded-lg shadow-md"
       >
+        
         <table
           ref={tableRef}
           className="min-w-full text-sm text-left text-gray-700"
         >
-          <thead className="bg-[#dae6f4] text-[#2e5ca6] text-sm font-semibold text-center">
+          <thead className="bg-[#ffd3da] text-[#e64261] text-sm font-semibold text-center">
             <tr>
               <th className="px-4 py-3 font-semibold">Nombre</th>
               <th className="px-4 py-3 font-semibold">Apellido</th>
@@ -360,11 +369,13 @@ function AdminPage() {
               <th className="px-4 py-3 font-semibold">Tipo de asistencia</th>
               <th className="px-4 py-3 font-semibold">Cantidad de impuesto</th>
               <th className="px-4 py-3 font-semibold">Número de artículos</th>
-              <th className="px-4 py-3 font-semibold">Lista de artículos</th>  {/* FIXME:  */}    
+              <th className="px-4 py-3 font-semibold">Lista de artículos</th>  {/* FIXME://!ANTERIOR   */}    
               <th className="px-4 py-3 font-semibold">Fecha de registro</th>
               <th className="px-4 py-3 font-semibold">Pago en dolar</th>
               <th className="px-4 py-3 font-semibold">Pago en pesos</th>
               <th className="px-4 py-3 font-semibold">Estado de cobro</th>
+              {/* FIXME://*ACTUAL */}
+              <th className="px-4 py-3 font-semibold">Código de descuento</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 text-center">
@@ -418,7 +429,7 @@ function AdminPage() {
                   <td className="px-4 py-3">
                     {user.qty_articles}
                   </td>
-                  <td className="px-4 py-3">{formatArticles(user.articles)}</td> {/* FIXME:  */}
+                  <td className="px-4 py-3">{formatArticles(user.articles)}</td> {/* FIXME://!ANTERIOR  */}
                   <td className="px-4 py-3">
                     {formatDate(user.created_at)}
                   </td>
@@ -430,6 +441,10 @@ function AdminPage() {
                   </td>
                   <td className="px-4 py-3">
                     {user.status}
+                  </td>
+                  {/* FIXME://*ACTUAL */}
+                  <td className="px-4 py-3">
+                    {formatCoupon(user.coupon)}
                   </td>
                   
                 </tr>

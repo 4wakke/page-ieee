@@ -30,8 +30,10 @@ function RegisterPage() {
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
+  const isCouponRequired = watch("isCouponRequired"); //FIXME://?ACTUAL
   const participationType = watch("participationType"); 
   const [price, setPrice] = useState(""); 
+  const [coupon, setCoupon] = useState(""); //FIXME: //*ACTUAL
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [userId, setUserId] = useState(null); //?
@@ -56,6 +58,12 @@ function RegisterPage() {
       setValue("taxAmount", "");
     }
   }, [isTaxRequired, setValue]);
+
+  useEffect(() => { //FIXME://?ACTUAL
+    if (isCouponRequired === "no") {
+      setValue("coupon", "");
+    }
+  }, [isCouponRequired, setValue]); 
 
   useEffect(() => { 
       if (isIeeeMember === "no") {
@@ -132,6 +140,7 @@ function RegisterPage() {
           dollarRate: dollarRate, 
           description: `Pago conferencia Temscon ${watch("name")} ${watch("lastName")}`,
           userId,
+          coupon: coupon === "" ? null : coupon //FIXME: //*ACTUAL
         }),
       });
 
@@ -185,6 +194,8 @@ function RegisterPage() {
       data.isIeeeMember = data.isIeeeMember === "yes";
       data.isTems = data.isTems === "yes";
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
+      data.coupon = data.isCouponRequired === "no" ? null : data.coupon || null; //FIXME://?ACTUAL
+
 
       if (["attendee", "poster", "invited"].includes(data.participationType)) {
         data.qtyArticles = 0;  
@@ -211,7 +222,7 @@ function RegisterPage() {
         data.articles = formattedArticles;
       }
       
-      // console.log("Datos enviados a signup:", data); FIXME:
+      // console.log("Datos enviados a signup:", data); //!
   
       const resp = await fetch(`${backRoute}/api/signup`, { 
         method: "POST",
@@ -224,6 +235,8 @@ function RegisterPage() {
   
       const dataSignup = await resp.json(); 
 
+      // console.log("Respuesta de signup:", dataSignup); //!
+
       if (dataSignup.success) { 
         setIsRegistered(true); 
         toast.info("Si hubo algún error en el registro, la información puede ser modificada en el perfil.", {
@@ -234,6 +247,8 @@ function RegisterPage() {
       handleBackendResponse(dataSignup); 
       const userId = dataSignup.results[0]?.userId; 
       setUserId(userId);
+      setCoupon(data.coupon); //FIXME: //?ACTUAL
+
       await signup(dataSignup); 
 
       const formattedData = {
@@ -246,9 +261,10 @@ function RegisterPage() {
         articles: data.articles,
         userId,
         taxAmount: data.taxAmount,
+        coupon: data.coupon === "" ? null : data.coupon, //FIXME: //*ACTUAL
       };
   
-      // console.log("Datos enviados a payment:", formattedData); FIXME:
+      // console.log("Datos enviados a payment:", formattedData); //!
 
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
@@ -271,7 +287,7 @@ function RegisterPage() {
                 dollarRate: dollarRate, 
                 description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
                 userId: data.id,
-                coupon: data.coupon,  
+                coupon: coupon === "" ? null : coupon,   //FIXME: //*ACTUAL
               }),
             });
           }
@@ -470,7 +486,79 @@ function RegisterPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 tracking-wide mt-6">  {/* Inicio GRID 2 */}
 
-          <div>
+            <div>
+                <Label htmlFor="isTaxRequired">¿Requiere Factura Legal Colombiana?</Label>
+                <SelectReg {...register("isTaxRequired", { required: true })}>
+                  <option value="">Selecciona</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </SelectReg>
+                {errors.isTaxRequired && (
+                  <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
+                )}
+
+              
+                <div className="mt-4">
+                <Label htmlFor="isCouponRequired">¿Tiene código de descuento?</Label> {/* //* */}
+                <SelectReg {...register("isCouponRequired", { required: true })}>
+                  <option value="">Selecciona</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </SelectReg>
+                {errors.isCouponRequired && (
+                  <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
+                )}
+
+              {isCouponRequired === "yes" && (
+              <div className="mt-4">
+                <Label htmlFor="coupon">Código de descuento</Label>
+                <Input 
+                  type="text" 
+                  placeholder="Ingresa el código de descuento"
+                  {...register("coupon", {
+                    required: isCouponRequired === "yes" ? "Este campo es requerido" : false,
+                  })}
+                  onWheel={(e) => e.target.blur()}
+                />
+                {errors.coupon && (
+                  <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
+                )}
+              </div>
+                )}
+            </div>
+            </div>
+
+              <div>
+              <Label htmlFor="participationType">Tipo de participación</Label>
+              <SelectReg {...register("participationType", { required: true })}>
+                <option value="">Selecciona el tipo de participación</option>
+                <option value="author">Autor</option>
+                <option value="attendee">Asistente</option>
+                <option value="poster">Poster</option>
+                <option value="invited">Invitado</option>
+                
+              </SelectReg>
+              {errors.participationType && (
+              <p className="text-red-500 font-medium mt-2">El tipo de participación es requerido</p>
+              )}
+
+            {participationType === "author" && ( 
+            <div>
+              <div className="mt-4">
+              <Label htmlFor="qtyArticles">Número de artículos</Label>
+              </div>
+              <Input type="number" placeholder="Ingresa el número de artículos"
+              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
+              {qtyArticles > 0 && (
+                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} isRegister={true}/>)}
+                {errors.qtyArticles && (
+              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
+              )}
+            </div>
+            )}
+            </div>
+
+            <div>
                 <Label htmlFor="isIeeeMember">¿Eres miembro de IEEE?</Label>
                 <SelectReg
                   {...register("isIeeeMember", { required: true })}
@@ -510,37 +598,7 @@ function RegisterPage() {
                 )}
               </div>
 
-              <div>
-              <Label htmlFor="participationType">Tipo de participación</Label>
-              <SelectReg {...register("participationType", { required: true })}>
-                <option value="">Selecciona el tipo de participación</option>
-                <option value="author">Autor</option>
-                <option value="attendee">Asistente</option>
-                <option value="poster">Poster</option>
-                <option value="invited">Invitado</option>
-                
-              </SelectReg>
-              {errors.participationType && (
-              <p className="text-red-500 font-medium mt-2">El tipo de participación es requerido</p>
-              )}
-
-            {participationType === "author" && ( 
-            <div>
-              <div className="mt-4">
-              <Label htmlFor="qtyArticles">Número de artículos</Label>
-              </div>
-              <Input type="number" placeholder="Ingresa el número de artículos"
-              {...register("qtyArticles", { required: "Este campo es obligatorio", min: 1 })} onWheel={(e) => e.target.blur()}/>
-              {qtyArticles > 0 && (
-                <ArticlesSpaces register={register} errors={errors} qtyArticles={qtyArticles} isRegister={true}/>)}
-                {errors.qtyArticles && (
-              <p className="text-red-500 font-medium">El número de artículos es requerido</p>
-              )}
-            </div>
-            )}
-            </div>
-
-            <div>
+            {/* <div> FIXME: //*ACTUAL
                 <Label htmlFor="isTaxRequired">¿Requiere Factura Legal Colombiana?</Label>
                 <SelectReg {...register("isTaxRequired", { required: true })}>
                   <option value="">Selecciona</option>
@@ -550,13 +608,13 @@ function RegisterPage() {
                 {errors.isTaxRequired && (
                   <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
                 )}
-            </div>
+            </div> */}
 
 
           </div> {/* FIN GRID 2 */}
 
           <div className="mt-4 text-center mb-6">
-            <button className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg" disabled={isRegistered}>Registrarse </button>
+            <button className="bg-[#ffffff] hover:bg-[#f6c80b] text-[#191b90] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg" disabled={isRegistered}>Registrarse </button>
           </div>
 
           <div className="mt-4 text-center">
@@ -572,13 +630,13 @@ function RegisterPage() {
 
           <div ref={priceRef}>
             {isRegistered && price !== null && (
-              <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto duration-5000 ease-in opacity-0 animate-fadeIn">
+              <div className="mt-4 p-4 bg-[#191b90] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto duration-5000 ease-in opacity-0 animate-fadeIn">
                 <div className="text-center">
                 {price > 0 ? (
         <>
           <h4 className="text-xl font-bold">Cobro pendiente</h4>
           <p className="mt-2">
-            El precio que debes pagar por el registro es: <span className="font-bold">${price} USD</span>
+            El precio que debes pagar por el registro es: <span className="font-bold text-[#f6c80b]">${price} USD</span>
           </p>
         </>
       ) : (
@@ -602,7 +660,7 @@ function RegisterPage() {
         <button
           onClick={handlePayment}
           disabled={!price}
-          className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
+          className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#c01d0f] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg"
         >
           Pagar
         </button>

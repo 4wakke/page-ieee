@@ -29,15 +29,19 @@ function ProfilePage() {
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
+  const isCouponRequired = watch("isCouponRequired"); //FIXME: //*ACTUAL
   const participationType = watch("participationType"); 
   const [price, setPrice] = useState("");
   const [IsSave, setIsSave] = useState(false);
   const paymentTriggeredByEdit = useRef(false);
   const [userDetails, setUserDetails] = useState(null);
-  const [dollarRate, setDollarRate] = useState(null); 
+  const [dollarRate, setDollarRate] = useState(null);
+  const [PendingCoupon, setPendingCoupon] = useState(""); //FIXME: //*ACTUAL
+  const [UserCoupon, setUserCoupon] = useState(""); //FIXME: //*ACTUAL
   const priceRef = useRef(null);
   const pendingPriceRef = useRef(null);
   const profileCard = useRef(null);
+  const previousPrice = useRef(null); //FIXME://*ACTUAL
   const [pendingPrice, setPendingPrice] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [pendingUrl, setPendingUrl] = useState(null);
@@ -51,6 +55,12 @@ function ProfilePage() {
       setValue("taxAmount", "");
     }
   }, [isTaxRequired, setValue]);
+
+  useEffect(() => { //FIXME: //* ACTUAL
+    if (isCouponRequired === "no") {
+      setValue("coupon", "");
+    }
+  }, [isCouponRequired, setValue]);
   
   useEffect(() => { 
     if (isIeeeMember === "no") {
@@ -148,18 +158,19 @@ function ProfilePage() {
       );
 
       try {
+        navigate("/profile/admin"); 
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
 
-        // console.log("Datos recibidos del backend:", data.results) FIXME:
+        // console.log("Datos recibidos del backend:", data.results) //!
 
         if (data.success) {
           let userData = {...data.results};
           handleBackendResponse(data)
 
-          if (userData.admin) { 
+          if (userData.admin) {  
             toast.dismiss(); 
-            navigate("/profile/admin");
+            navigate("/profile/admin"); 
           }
           
           localStorage.setItem("userId", userData.id);
@@ -203,6 +214,14 @@ function ProfilePage() {
         } else {
           userData.isTaxRequired = "no";
         }
+
+        if (!userData.coupon || userData.coupon.trim() === "") { //FIXME: //*ACTUAL
+          userData.coupon = null;
+          userData.isCouponRequired = "no";
+        } else {
+          userData.isCouponRequired = "yes";
+        }
+
         setUserDetails(userData);
 
           for (const key in userData) {
@@ -233,10 +252,13 @@ function ProfilePage() {
         qtyArticles: userData.qtyArticles,
         articles: userData.articles,
         userId: userData.id,
-        taxAmount: userData.taxAmount
+        taxAmount: userData.taxAmount,
+        coupon: userData.coupon === "" ? null : userData.coupon, //FIXME://*ACTUAL
       };
+
+      setPendingCoupon(userData.coupon); //FIXME://*ACTUAL
   
-      // console.log("Datos que envio a payment pendiente:", formattedPendingData) FIXME:
+      // console.log("Datos que envio a payment pendiente:", formattedPendingData)
 
       const paymentResponse = await fetch(`${backRoute}/api/payment`, {
         method: "POST",
@@ -249,21 +271,27 @@ function ProfilePage() {
       if (paymentData.success && paymentData.results?.price !== undefined) {
         const priceValue = paymentData.results.price;
         setPendingPrice(priceValue);
-        handleBackendResponse(paymentData);
-        if (paymentData.results.price === 0){ //FIXME:
-          // eslint-disable-next-line no-unused-vars
-          const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              amount: priceValue,
-              dollarRate: dollarRate, 
-              description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
-              userId: userData.id,
-              coupon: userData.coupon,  
-            }),
-          });
+
+        if (priceValue > 0) { //FIXME://*ACTUAL
+          previousPrice.current = priceValue;  
         }
+
+        // handleBackendResponse(paymentData); //FIXME://?ACTUAL
+
+        // if (paymentData.results.price === 0){  //FIXME://*ACTUAL
+        //   // eslint-disable-next-line no-unused-vars
+        //   const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({
+        //       amount: priceValue,
+        //       dollarRate: dollarRate, 
+        //       description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
+        //       userId: userData.id,
+        //       coupon: userData.coupon,  
+        //     }),
+        //   });
+        // }
       } else {
         setPendingPrice(0);
         setPendingUrl(null);
@@ -287,6 +315,7 @@ function ProfilePage() {
             dollarRate: dollarRate,
             description: `Pago conferencia Temscon ${userData.name} ${userData.lastName}`,
             userId: userData.id,
+            coupon: PendingCoupon === "" ? null : PendingCoupon, //FIXME://*ACTUAL
           }),
         });
   
@@ -346,6 +375,10 @@ function ProfilePage() {
       updatedData.taxAmount = "0";  
     }
 
+    if (updatedData.isCouponRequired === "no") { //FIXME: //*ACTUAL
+      updatedData.coupon = "";  
+    }
+
     if (updatedData.qtyArticles && updatedData.qtyArticles > 0) {
       
       updatedData.articles = updatedData.articles
@@ -364,7 +397,7 @@ function ProfilePage() {
     updatedData.articles = [];
   }
 
-  // console.log("Datos que se van a enviar:", updatedData); FIXME:
+  // console.log("Datos que se van a enviar:", updatedData); //!
 
     if (!userDetails || !userDetails.id) { 
       return;
@@ -392,11 +425,13 @@ function ProfilePage() {
           qtyArticles: data.qtyArticles,
           articles: data.articles,
           userId: userDetails.id,
-          taxAmount: data.taxAmount
+          taxAmount: data.taxAmount,
+          coupon: data.coupon === "" ? null : data.coupon,
         };
 
         paymentTriggeredByEdit.current = true;
 
+        setUserCoupon(data.coupon);
 
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
@@ -406,24 +441,27 @@ function ProfilePage() {
         
         const responseData = await response.json();
 
+        // console.log("Respuesta de payment:", responseData); //!
+
         if (responseData.success && responseData.results?.price !== undefined) {
           setPendingPrice(null);
           if (paymentTriggeredByEdit.current) {
             setPrice(responseData.results.price);
-            if (responseData.results.price === 0){ //FIXME:
+            if (previousPrice.current > 0 && responseData.results.price === 0){ //FIXME://*ACTUAL
               // eslint-disable-next-line no-unused-vars
-              const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
+              const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, { //FIXME://*ACTUAL
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  amount: price,
+                  amount: responseData.results.price, //FIXME://*ACTUAL
                   dollarRate: dollarRate, 
                   description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
                   userId: data.id,
-                  coupon: data.coupon,  
+                  coupon: data.coupon === "" ? null : data.coupon, //FIXME://*ACTUAL
                 }),
               });
             }
+            previousPrice.current = responseData.results.price; //FIXME://*ACTUAL
           }
           handleBackendResponse(responseData);
         }
@@ -450,6 +488,7 @@ function ProfilePage() {
           dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINÁMICO
           description: `Pago conferencia Temscon ${watch("name")} ${watch("lastName")}`,
           userId: userDetails.id,
+          coupon: UserCoupon === "" ? null : UserCoupon, //FIXME://*ACTUAL
         }),
       });
 
@@ -502,7 +541,7 @@ function ProfilePage() {
 
   return (
     <div className="flex items-center justify-center ">
-      <div className="bg-[#2a4992] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto duration-500 ease-in opacity-0 animate-fadeIn" ref={profileCard}>
+      <div className="bg-[#002855] bg-opacity-85 shadow-lg p-6 rounded-lg w-full max-w-5xl mx-auto duration-500 ease-in opacity-0 animate-fadeIn" ref={profileCard}>
         <h3 className="text-3xl font-bold text-center mb-4 tracking-wide">Perfil de usuario</h3>
         <form onSubmit={handleSubmit(handleSave)} autoComplete="off">
 
@@ -734,14 +773,44 @@ function ProfilePage() {
             )} 
             </div>
 
+{/* FIXME://*Actual */}
             <div>
-            <Label htmlFor="isTaxRequired">¿Requiere Factura Legal Colombiana?</Label>
+            <Label htmlFor="isTaxRequired">¿Requiere Factura Legal Colombiana?</Label> 
               <SelectReg {...register("isTaxRequired", { required: true })} disabled={!isEditing}>
                 <option value="">Selecciona</option>
                 <option value="yes">Sí</option>
                 <option value="no">No</option>
               </SelectReg>
               {errors.isTaxRequired && <p className="text-red-500 font-medium">Este campo es requerido</p>}
+              <div className="mt-4">
+                  <Label htmlFor="isCouponRequired">¿Tiene código de descuento?</Label>
+                  <SelectReg {...register("isCouponRequired", { required: true })} disabled={!isEditing}>
+                    <option value="">Selecciona</option>
+                    <option value="yes">Sí</option>
+                    <option value="no">No</option>
+                  </SelectReg>
+                  {errors.isCouponRequired && (
+                    <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
+                  )}
+
+                {isCouponRequired === "yes" && (
+                <div className="mt-4">
+                  <Label htmlFor="coupon">Código de descuento</Label>
+                  <Input 
+                    type="text" 
+                    placeholder="Ingresa el código de descuento"
+                    {...register("coupon", {
+                      required: isCouponRequired === "yes" ? "Este campo es requerido" : false,
+                    })}
+                    onWheel={(e) => e.target.blur()}
+                    disabled={!isEditing}
+                  />
+                  {errors.coupon && (
+                    <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
+                  )}
+                </div>
+                  )}
+              </div>
             </div>
 
           </div> {/* FIN GRID */}
@@ -749,13 +818,13 @@ function ProfilePage() {
           <div className=" flex justify-center space-x-4 mt-4">
             <div>
               {isEditing ? (
-                <button type="submit" className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
+                <button type="submit" className="bg-[#ffffff] hover:bg-[#f6c80b] text-[#191b90] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Guardar</button>
               ) : (
-                <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
+                <button type="button" onClick={handleEdit} className="bg-[#ffffff] hover:bg-[#f6c80b] text-[#191b90] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">Editar</button>
               )}
               </div>
               <div>
-                <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#5c75a8] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                <button type="button" onClick={handleChangePassword} className="bg-[#ffffff] hover:bg-[#f6c80b] text-[#191b90] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                     Cambiar Contraseña
                 </button>
               </div>
@@ -771,7 +840,7 @@ function ProfilePage() {
           </div>
           <div ref={pendingPriceRef}>
           {!isEditing && pendingPrice !== null && (
-          <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
+          <div className="mt-4 p-4 bg-[#191b90] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
             <div className="text-center">
               <h4 className="text-xl font-bold">Cobro pendiente</h4>
               <p className="mt-2">
@@ -783,7 +852,7 @@ function ProfilePage() {
                   <span className="font-bold text-gray-50">
                     {userDetails.lastName}
                   </span>, debes pagar 
-                  <span className="text-white font-bold ">
+                  <span className="text-[#f6c80b] font-bold ">
                     {" "}{pendingPrice}$ USD
                   </span> para completar el registro.
                 </>
@@ -800,7 +869,7 @@ function ProfilePage() {
                 
               {pendingPrice > 0 && (
                 <div className="mt-4 text-center">
-                <button onClick={handlePendingProcessPayment} disabled={!pendingPrice} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                <button onClick={handlePendingProcessPayment} disabled={!pendingPrice} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#c01d0f] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                   Pagar
                 </button>
               </div>
@@ -811,7 +880,7 @@ function ProfilePage() {
           </div>
           <div ref={priceRef}>
               {IsSave && price !== null && pendingPrice === null && (
-              <div className="mt-4 p-4 bg-[#4067a5] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
+              <div className="mt-4 p-4 bg-[#191b90] text-white rounded-md shadow-md sm:w-[50%] md:w-[50%] lg:w-[40%] mx-auto transition-opacity duration-1000 ease-in opacity-0 animate-fadeIn">
                 <div className="text-center">
                   <h4 className="text-xl font-bold">{price > 0 ? "Nuevo cobro" : "Estado de cobro"}</h4>
                   <p className="mt-2">
@@ -824,7 +893,7 @@ function ProfilePage() {
                 {userDetails.lastName}
               </span>
               , usted debe
-              <span className="text-white font-bold"> {price}$ USD</span> por
+              <span className="text-[#f6c80b] font-bold"> {price}$ USD</span> por
               los cambios realizados.
             </>
           ) : (
@@ -843,7 +912,7 @@ function ProfilePage() {
                     
                 {price > 0 && IsSave && (
                   <div className="mt-4 text-center">
-                    <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#4067a5] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
+                    <button onClick={handlePayment} className="bg-[#ffffff] hover:bg-[#c01d0f] text-[#c01d0f] px-4 py-2 rounded font-semibold hover:text-[#fff] tracking-wide duration-300 shadow-md hover:shadow-lg">
                       Pagar
                     </button>
                   </div>
