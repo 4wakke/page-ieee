@@ -524,7 +524,7 @@ export const payment = async (req,res) =>{
         price = 350
       }
   }
-  
+
   if (data.qtyArticles > 1) {
     price+=(150*(data.qtyArticles-1))
   }
@@ -538,7 +538,6 @@ export const payment = async (req,res) =>{
   if (data.taxAmount && data.taxAmount > 0) {
       price += price * parseFloat(data.taxAmount)/100
   }
-
   
   if (payments.length > 0) {
     const payment = payments[0];
@@ -547,6 +546,21 @@ export const payment = async (req,res) =>{
     }
   }
   
+   if (data.coupon){
+    
+    const CouponsQuery = `
+      SELECT *
+      FROM coupons
+      WHERE code = ?;
+    `;
+    const [coupons] = await pool.query(CouponsQuery, [data.coupon]);
+    
+    if (coupons.length > 0){
+      const coupon = coupons[0];
+      price -= price * coupon.percentage / 100
+    }
+  }
+
   if (data.participationType == "invited"){
     price = 0
   }
@@ -587,6 +601,23 @@ export const processPayment = async (req, res) => {
     if (missingFields.length > 0) {
       return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
     } 
+    
+    let coupon = null;
+
+    if (data.coupon) {
+      const query = `
+        SELECT 1
+        FROM coupons
+        WHERE code = ?
+        LIMIT 1
+      `;
+
+      const [rows] = await pool.query(query, [data.coupon]);
+
+      if (rows.length) {
+        coupon = data.coupon;
+      }
+    }
 
     const query = `
       SELECT dollar_rate 
