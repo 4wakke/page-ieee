@@ -19,6 +19,7 @@ const allowedOrigins = [
   'http://18.209.168.40:80',
   'http://ieeecolcaribeconference.com',
   'https://temscon.ieeecolcaribeconference.com',
+  'https://c3.ieeecolcaribeconference.com',
   'http://18.209.168.40',
   'http://localhost:5200',
   
