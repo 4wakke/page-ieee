@@ -158,7 +158,7 @@ function ProfilePage() {
       );
 
       try {
-        navigate("/profile/admin"); 
+        // navigate("/profile/admin"); // Revisar admin 
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
 
