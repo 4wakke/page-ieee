@@ -45,7 +45,7 @@ export const forgotPasswordTemplate = (password) => {
                         color: #333;
                     }
                     .highlight-password {
-                        background-color: #f4cc0c
+                        background-color: #f4cc0c;
                         color: #ffffff;
                         padding: 10px 20px;
                         font-size: 18px;
@@ -74,7 +74,7 @@ export const forgotPasswordTemplate = (password) => {
                         <div class="title">Recuperación de Contraseña</div>
                     </div>
                     <div class="content">
-                        <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.jpg" alt="Logo TEMSCON">
+                        <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.jpg" alt="Logo C3">
                         <p>Hemos recibido una solicitud para restablecer tu contraseña. A continuación, te proporcionamos una nueva contraseña temporal:</p>
 
                         <div class="highlight-password">${password}</div>
@@ -175,7 +175,7 @@ export const forgotPasswordTemplate = (password) => {
                                 <div class="title">¡Registro Exitoso!</div>
                             </div>
                             <div class="content">
-                                <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.png" alt="Logo C3" >
+                                <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.jpg" alt="Logo C3" >
                                 <p>Hola <span class="highlight">${data.name} ${data.lastName}</span>,</p>
 
                                 <p>Nos complace confirmarte que tu registro a la conferencia <strong>IEEE C3</strong> ha sido completado con éxito.</p>
