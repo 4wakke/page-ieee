@@ -45,7 +45,7 @@ export const forgotPasswordTemplate = (password) => {
                         color: #333;
                     }
                     .highlight-password {
-                        background-color: #d62828;
+                        background-color: #f4cc0c
                         color: #ffffff;
                         padding: 10px 20px;
                         font-size: 18px;
@@ -74,7 +74,7 @@ export const forgotPasswordTemplate = (password) => {
                         <div class="title">Recuperación de Contraseña</div>
                     </div>
                     <div class="content">
-                        <img src="https://imgur.com/a/BKpqWWE.png" alt="Logo TEMSCON">
+                        <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.png" alt="Logo C3">
                         <p>Hemos recibido una solicitud para restablecer tu contraseña. A continuación, te proporcionamos una nueva contraseña temporal:</p>
 
                         <div class="highlight-password">${password}</div>
@@ -139,7 +139,7 @@ export const forgotPasswordTemplate = (password) => {
                                 color: #333;
                             }
                             .highlight {
-                                color: #d62828; /* Rojo vibrante */
+                                color: #f4cc0c; 
                                 font-weight: bold;
                             }
                             .info-table {
@@ -160,7 +160,7 @@ export const forgotPasswordTemplate = (password) => {
                             }
                             .btn {
                                 display: inline-block;
-                                background-color: #d62828;
+                                background-color: #f4cc2e;
                                 color: #ffffff;
                                 padding: 10px 20px;
                                 margin-top: 20px;
@@ -175,7 +175,7 @@ export const forgotPasswordTemplate = (password) => {
                                 <div class="title">¡Registro Exitoso!</div>
                             </div>
                             <div class="content">
-                                <img src="https://imgur.com/a/BKpqWWE.png" alt="Logo TEMSCON" >
+                                <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.png" alt="Logo C3" >
                                 <p>Hola <span class="highlight">${data.name} ${data.lastName}</span>,</p>
 
                                 <p>Nos complace confirmarte que tu registro a la conferencia <strong>IEEE C3</strong> ha sido completado con éxito.</p>
