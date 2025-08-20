@@ -6,7 +6,7 @@ export const forgotPasswordTemplate = (password) => {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Recuperación de Contraseña - TEMSCON</title>
+                <title>Recuperación de Contraseña - C3</title>
                 <style>
                     body {
                         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -74,7 +74,7 @@ export const forgotPasswordTemplate = (password) => {
                         <div class="title">Recuperación de Contraseña</div>
                     </div>
                     <div class="content">
-                        <img src="https://i.imgur.com/x15Wli4.png" alt="Logo TEMSCON">
+                        <img src="https://imgur.com/a/BKpqWWE.png" alt="Logo TEMSCON">
                         <p>Hemos recibido una solicitud para restablecer tu contraseña. A continuación, te proporcionamos una nueva contraseña temporal:</p>
 
                         <div class="highlight-password">${password}</div>
@@ -84,7 +84,7 @@ export const forgotPasswordTemplate = (password) => {
                         <p>Si no solicitaste este cambio, puedes ignorar este mensaje sin realizar ninguna acción.</p>
                     </div>
                     <div class="footer">
-                        © 2025 TEMSCON. Todos los derechos reservados.<br>
+                        © 2025 IEEE Colombian Caribean Conference. Todos los derechos reservados.<br>
                         Si necesitas ayuda, contáctanos a través de nuestro sitio web oficial.
                     </div>
                 </div>
@@ -100,7 +100,7 @@ export const forgotPasswordTemplate = (password) => {
                     <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Confirmación de Registro - TEMSCON</title>
+                        <title>Confirmación de Registro - C3</title>
                         <style>
                             body {
                                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -175,10 +175,10 @@ export const forgotPasswordTemplate = (password) => {
                                 <div class="title">¡Registro Exitoso!</div>
                             </div>
                             <div class="content">
-                                <img src="https://i.imgur.com/x15Wli4.png" alt="Logo TEMSCON" >
+                                <img src="https://imgur.com/a/BKpqWWE.png" alt="Logo TEMSCON" >
                                 <p>Hola <span class="highlight">${data.name} ${data.lastName}</span>,</p>
 
-                                <p>Nos complace confirmarte que tu registro a la conferencia <strong>TEMSCON</strong> ha sido completado con éxito.</p>
+                                <p>Nos complace confirmarte que tu registro a la conferencia <strong>IEEE C3</strong> ha sido completado con éxito.</p>
 
                                 <p>A continuación te compartimos los detalles de tu inscripción:</p>
 
@@ -201,12 +201,12 @@ export const forgotPasswordTemplate = (password) => {
                                     </tr>
                                 </table>
 
-                                <a href="http://ieeecolcaribeconference.com/" class="btn">Pagina de registro</a>
+                                <a href="https://c3.ieeecolcaribeconference.com/" class="btn">Pagina de registro</a>
 
                                 <p>Gracias por ser parte de esta experiencia. ¡Nos vemos en TEMSCON!</p>
                             </div>
                             <div class="footer">
-                                © 2025 TEMSCON. Todos los derechos reservados.<br>
+                                © 2025 IEEE Colombian Caribean Conference. Todos los derechos reservados.<br>
                                 Síguenos en nuestras redes sociales para más novedades.
                             </div>
                         </div>
