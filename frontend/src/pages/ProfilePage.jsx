@@ -29,19 +29,19 @@ function ProfilePage() {
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
-  const isCouponRequired = watch("isCouponRequired"); //FIXME: //*ACTUAL
+  const isCouponRequired = watch("isCouponRequired"); 
   const participationType = watch("participationType"); 
   const [price, setPrice] = useState("");
   const [IsSave, setIsSave] = useState(false);
   const paymentTriggeredByEdit = useRef(false);
   const [userDetails, setUserDetails] = useState(null);
   const [dollarRate, setDollarRate] = useState(null);
-  const [PendingCoupon, setPendingCoupon] = useState(""); //FIXME: //*ACTUAL
-  const [UserCoupon, setUserCoupon] = useState(""); //FIXME: //*ACTUAL
+  const [PendingCoupon, setPendingCoupon] = useState(""); 
+  const [UserCoupon, setUserCoupon] = useState(""); 
   const priceRef = useRef(null);
   const pendingPriceRef = useRef(null);
   const profileCard = useRef(null);
-  const previousPrice = useRef(null); //FIXME://*ACTUAL
+  const previousPrice = useRef(null); 
   const [pendingPrice, setPendingPrice] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [pendingUrl, setPendingUrl] = useState(null);
@@ -56,7 +56,7 @@ function ProfilePage() {
     }
   }, [isTaxRequired, setValue]);
 
-  useEffect(() => { //FIXME: //* ACTUAL
+  useEffect(() => { 
     if (isCouponRequired === "no") {
       setValue("coupon", "");
     }
@@ -64,7 +64,7 @@ function ProfilePage() {
   
   useEffect(() => { 
     if (isIeeeMember === "no") {
-      setValue("isTems", "no"); 
+      // setValue("isTems", "no"); //TODO: eliminar tems
       setValue("membershipNumber", ""); 
     }
   }, [isIeeeMember, setValue]);
@@ -158,11 +158,11 @@ function ProfilePage() {
       );
 
       try {
-        // navigate("/profile/admin"); // Revisar admin 
+        // navigate("/profile/admin"); //FIXME:  diseño admin
         const response = await fetch(`${backRoute}/api/userDetail?email=${encodeURIComponent(userEmail)}&exchangeRate=${exchangeRate}`);
         const data = await response.json();
 
-        // console.log("Datos recibidos del backend:", data.results) //!
+        // console.log("Datos recibidos del backend:", data.results) //?
 
         if (data.success) {
           let userData = {...data.results};
@@ -176,7 +176,7 @@ function ProfilePage() {
           localStorage.setItem("userId", userData.id);
 
         userData.isIeeeMember = userData.isIeeeMember === 1 ? "yes" : "no";
-        userData.isTems = userData.isTems === 1 ? "yes" : "no";
+        // userData.isTems = userData.isTems === 1 ? "yes" : "no"; //TODO: eliminar tems
 
         userData.taxAmount = userData.isTaxRequired === "no" ? "0" : userData.taxAmount;
 
@@ -188,13 +188,10 @@ function ProfilePage() {
           if (userData.qtyArticles > 0 && userData.participationType === "author") {
             formattedArticles = userData.articles?.slice(0, userData.qtyArticles).map(article => {
               const formattedArticle = {};
-              
-              // Solo asigna la propiedad `sequence` si existe
+
               if (article?.sequence) {
                 formattedArticle.sequence = article.sequence;
               }
-        
-              // Solo asigna la propiedad `pages` si existe y tiene un valor válido
               if (article?.pages) {
                 formattedArticle.pages = parseInt(article.pages, 10);
               }
@@ -215,7 +212,7 @@ function ProfilePage() {
           userData.isTaxRequired = "no";
         }
 
-        if (!userData.coupon || userData.coupon.trim() === "") { //FIXME: //*ACTUAL
+        if (!userData.coupon || userData.coupon.trim() === "") { 
           userData.coupon = null;
           userData.isCouponRequired = "no";
         } else {
@@ -246,19 +243,19 @@ function ProfilePage() {
       const formattedPendingData = {
         occupation: userData.occupation,
         isIeeeMember: userData.isIeeeMember === 'yes',  
-        isTems: userData.isTems === 'yes',
+        // isTems: userData.isTems === 'yes', //TODO: eliminar tems
         participationType: userData.participationType,
         attendanceType: userData.attendanceType === "inPerson" ? "In-person" : "Online",
         qtyArticles: userData.qtyArticles,
         articles: userData.articles,
         userId: userData.id,
         taxAmount: userData.taxAmount,
-        coupon: userData.coupon === "" ? null : userData.coupon, //FIXME://*ACTUAL
+        coupon: userData.coupon === "" ? null : userData.coupon, 
       };
 
-      setPendingCoupon(userData.coupon); //FIXME://*ACTUAL
+      setPendingCoupon(userData.coupon); 
   
-      // console.log("Datos que envio a payment pendiente:", formattedPendingData)
+      // console.log("Datos que envio a payment pendiente:", formattedPendingData) //?
 
       const paymentResponse = await fetch(`${backRoute}/api/payment`, {
         method: "POST",
@@ -272,26 +269,10 @@ function ProfilePage() {
         const priceValue = paymentData.results.price;
         setPendingPrice(priceValue);
 
-        if (priceValue > 0) { //FIXME://*ACTUAL
+        if (priceValue > 0) { 
           previousPrice.current = priceValue;  
         }
 
-        // handleBackendResponse(paymentData); //FIXME://?ACTUAL
-
-        // if (paymentData.results.price === 0){  //FIXME://*ACTUAL
-        //   // eslint-disable-next-line no-unused-vars
-        //   const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({
-        //       amount: priceValue,
-        //       dollarRate: dollarRate, 
-        //       description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
-        //       userId: userData.id,
-        //       coupon: userData.coupon,  
-        //     }),
-        //   });
-        // }
       } else {
         setPendingPrice(0);
         setPendingUrl(null);
@@ -313,12 +294,13 @@ function ProfilePage() {
           body: JSON.stringify({
             amount: pendingPrice,
             dollarRate: dollarRate,
-            description: `Pago conferencia Temscon ${userData.name} ${userData.lastName}`,
+            description: `Pago conferencia C3 ${userData.name} ${userData.lastName}`,
             userId: userData.id,
-            coupon: PendingCoupon === "" ? null : PendingCoupon, //FIXME://*ACTUAL
+            coupon: PendingCoupon === "" ? null : PendingCoupon, 
           }),
         });
-  
+  //TODO: cambio pago conferencia tems x c3
+
         const processPendingPaymentData = await processResponse.json();
   
         if (
@@ -367,15 +349,15 @@ function ProfilePage() {
     if (updatedData.isIeeeMember !== undefined) {
       updatedData.isIeeeMember = updatedData.isIeeeMember === "yes";
     }
-    if (updatedData.isTems !== undefined) {
-      updatedData.isTems = updatedData.isTems === "yes";
-    }
+    // if (updatedData.isTems !== undefined) {
+    //   updatedData.isTems = updatedData.isTems === "yes";
+    // } //TODO: eliminar tems
 
     if (updatedData.isTaxRequired === "no") {
       updatedData.taxAmount = "0";  
     }
 
-    if (updatedData.isCouponRequired === "no") { //FIXME: //*ACTUAL
+    if (updatedData.isCouponRequired === "no") { 
       updatedData.coupon = "";  
     }
 
@@ -397,7 +379,7 @@ function ProfilePage() {
     updatedData.articles = [];
   }
 
-  // console.log("Datos que se van a enviar:", updatedData); //!
+  // console.log("Datos que se van a enviar:", updatedData); //?
 
     if (!userDetails || !userDetails.id) { 
       return;
@@ -419,7 +401,7 @@ function ProfilePage() {
         const formattedData = {
           occupation: data.occupation,
           isIeeeMember: data.isIeeeMember === 'yes',  
-          isTems: data.isTems === 'yes',
+          // isTems: data.isTems === 'yes', //TODO: eliminar tems
           participationType: data.participationType,
           attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
           qtyArticles: data.qtyArticles,
@@ -441,27 +423,27 @@ function ProfilePage() {
         
         const responseData = await response.json();
 
-        // console.log("Respuesta de payment:", responseData); //!
+        // console.log("Respuesta de payment:", responseData); //?
 
         if (responseData.success && responseData.results?.price !== undefined) {
           setPendingPrice(null);
           if (paymentTriggeredByEdit.current) {
             setPrice(responseData.results.price);
-            if (previousPrice.current > 0 && responseData.results.price === 0){ //FIXME://*ACTUAL
+            if (previousPrice.current > 0 && responseData.results.price === 0){ 
               // eslint-disable-next-line no-unused-vars
-              const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, { //FIXME://*ACTUAL
+              const processPaymentResp = await fetch(`${backRoute}/api/processPayment`, { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  amount: responseData.results.price, //FIXME://*ACTUAL
+                  amount: responseData.results.price, 
                   dollarRate: dollarRate, 
                   description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
                   userId: data.id,
-                  coupon: data.coupon === "" ? null : data.coupon, //FIXME://*ACTUAL
+                  coupon: data.coupon === "" ? null : data.coupon, 
                 }),
               });
             }
-            previousPrice.current = responseData.results.price; //FIXME://*ACTUAL
+            previousPrice.current = responseData.results.price; 
           }
           handleBackendResponse(responseData);
         }
@@ -485,12 +467,13 @@ function ProfilePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: price,
-          dollarRate: dollarRate, //? PRUEBA DOLLARRATE DINÁMICO
-          description: `Pago conferencia Temscon ${watch("name")} ${watch("lastName")}`,
+          dollarRate: dollarRate, 
+          description: `Pago conferencia C3 ${watch("name")} ${watch("lastName")}`,
           userId: userDetails.id,
-          coupon: UserCoupon === "" ? null : UserCoupon, //FIXME://*ACTUAL
+          coupon: UserCoupon === "" ? null : UserCoupon, 
         }),
       });
+      //TODO: cambio pago conferencia tems x c3
 
       const processPaymentData = await processPaymentResp.json();
 
@@ -745,7 +728,7 @@ function ProfilePage() {
                       <p className="text-red-500 font-medium">El número de membresía IEEE es requerido</p>
                     )}
   
-                    <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
+                    {/* <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
                     <SelectReg {...register("isTems", { required: true })} disabled={!isEditing}>
                       <option value="">Selecciona</option>
                       <option value="yes">Sí</option>
@@ -753,7 +736,8 @@ function ProfilePage() {
                     </SelectReg>
                     {errors.isTems && (
                       <p className="text-red-500 font-medium">Este campo es requerido</p>
-                    )}
+                    )} */} 
+                    {/* TODO: eliminar tems */}
                   </>
                 )}
             </div>
