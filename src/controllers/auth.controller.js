@@ -495,43 +495,43 @@ export const payment = async (req,res) =>{
 
   if (data.participationType == "author"){
     if (data.isIeeeMember){
-      if (data.isTems){
-        price = 300
-      } else {
-        price = 350
-      }
+      price = 250
     } else {
-      price = 400
-    }
-  } else if (data.participationType == "attendee") {
-    if (data.isIeeeMember){
-      price = 184
-    } else {
-      if (data.occupation=="student"){
-        price = 200    
-      } else {
-        price = 250
-      }
-    }
-  } else if (data.participationType == "poster"){
-      if (data.isIeeeMember){
-        if (data.isTems){
-          price = 250
+        if (data.occupation=="student"){
+          price = 270    
         } else {
           price = 300
         }
+    }
+  } else if (data.participationType == "attendee") {
+    if (data.isIeeeMember){
+      price = 100
+    } else {
+        if (data.occupation=="student"){
+          price = 150  
+        } else {
+          price = 200
+        }
+    }
+  } else if (data.participationType == "poster"){
+      if (data.isIeeeMember){
+        price = 200
       } else {
-        price = 350
+        if (data.occupation=="student"){
+          price = 250  
+        } else {
+         price = 250
+        }
       }
   }
   
   if (data.qtyArticles > 1) {
-    price+=(150*(data.qtyArticles-1))
+    price+=(80*(data.qtyArticles-1))
   }
   
   data.articles.forEach(article => {
     if (article.pages > 6) {
-      price += 80 * (article.pages - 6);
+      price += 60 * (article.pages - 6);
     }
   });
 
