@@ -74,7 +74,7 @@ export const forgotPasswordTemplate = (password) => {
                         <div class="title">Recuperación de Contraseña</div>
                     </div>
                     <div class="content">
-                        <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.png" alt="Logo C3">
+                        <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.jpg" alt="Logo TEMSCON">
                         <p>Hemos recibido una solicitud para restablecer tu contraseña. A continuación, te proporcionamos una nueva contraseña temporal:</p>
 
                         <div class="highlight-password">${password}</div>
