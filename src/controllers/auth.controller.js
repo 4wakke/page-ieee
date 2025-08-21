@@ -67,7 +67,6 @@ export const signup = async (req, res, next) => {
     phoneNumber,
     occupation,
     isIeeeMember,
-    isTems,
     membershipNumber,
     participationType,
     attendanceType,
@@ -93,7 +92,7 @@ export const signup = async (req, res, next) => {
       INSERT INTO users (
         name, last_name, password, country, city, address,
         gender, birth_date, doc_type, doc_number, affiliation,
-        email, phone_number, occupation, is_ieee_member,is_tems,
+        email, phone_number, occupation, is_ieee_member,
         membership_number, participation_type, attendance_type,
         tax_amount, qty_articles,created_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL -5 HOUR))
@@ -115,7 +114,6 @@ export const signup = async (req, res, next) => {
       phoneNumber,
       occupation,
       isIeeeMember,
-      isTems,
       membershipNumber,
       participationType,
       attendanceType,
@@ -203,7 +201,7 @@ export const getAllUsers = async (req, res) => {
       SELECT 
           u.id, name, last_name, country, city, address, gender, birth_date, 
           doc_type, doc_number, affiliation, email, phone_number, occupation, 
-          is_ieee_member, is_tems, membership_number, participation_type, 
+          is_ieee_member, membership_number, participation_type, 
           attendance_type, tax_amount, qty_articles, created_at,
           COALESCE(p.total_usd, 0) AS usd,
           COALESCE(p.total_cop, 0) AS cop,
@@ -247,7 +245,7 @@ export const getUser = async (req, res) => {
       SELECT u.id, name, last_name AS lastName, country, city, address, gender,
              CAST(birth_date AS DATE) AS birthDate, doc_type AS docType, doc_number AS docNumber, 
              affiliation, email, phone_number AS phoneNumber, occupation, 
-             is_ieee_member AS isIeeeMember, is_tems isTems, membership_number AS membershipNumber,
+             is_ieee_member AS isIeeeMember, membership_number AS membershipNumber,
               participation_type AS participationType, attendance_type AS attendanceType, 
               tax_amount AS taxAmount, qty_articles AS qtyArticles ,
              json_arrayagg(
@@ -298,7 +296,6 @@ export const updateUser = async (req, res) => {
     phoneNumber,
     occupation,
     isIeeeMember,
-    isTems,
     membershipNumber,
     participationType,
     attendanceType,
@@ -324,7 +321,7 @@ export const updateUser = async (req, res) => {
       UPDATE users 
       SET name = ?, last_name = ?, password = ?, country = ?, city = ?, address = ?, 
           gender = ?, birth_date = ?, doc_type = ?, doc_number = ?, affiliation = ?, 
-          email = ?, phone_number = ?, occupation = ?, is_ieee_member = ?, is_tems = ?, 
+          email = ?, phone_number = ?, occupation = ?, is_ieee_member = ?, 
           membership_number = ?, participation_type = ?, attendance_type = ?, 
           tax_amount = ?, qty_articles = ?, updated_at = DATE_ADD(NOW(), INTERVAL -5 HOUR)
       WHERE id = ?;
@@ -346,7 +343,6 @@ export const updateUser = async (req, res) => {
       phoneNumber || existingUser[0].phone_number,
       occupation || existingUser[0].occupation,
       isIeeeMember ?? existingUser[0].is_ieee_member,
-      isTems ?? existingUser[0].is_tems,
       membershipNumber || existingUser[0].membership_number,
       participationType || existingUser[0].participation_type,
       attendanceType || existingUser[0].attendance_type,
@@ -426,7 +422,6 @@ export const updateUser = async (req, res) => {
         update: true,
         occupation: occupation || existingUser[0].occupation,
         isIeeeMember: isIeeeMember ?? existingUser[0].is_ieee_member,
-        isTems: isTems ?? existingUser[0].is_tems,
         participationType: participationType || existingUser[0].participation_type,
         taxAmount: taxAmount || existingUser[0].tax_amount,
         qtyArticles: qtyArticles || existingUser[0].qty_articles,
@@ -478,7 +473,7 @@ export const signout = (req, res) => {
 export const payment = async (req,res) =>{
   const data = req.body
   let price = 0
-  const requiredFields = ["participationType","isIeeeMember","isTems","occupation","qtyArticles","articles","userId"]
+  const requiredFields = ["participationType","isIeeeMember","occupation","qtyArticles","articles","userId"]
   const missingFields = requiredFields.filter(field => !(field in req.body));
   if (missingFields.length > 0) {
     return errorResponse(res,`Faltan los siguientes campos: ${missingFields.join(', ')}`,400)
