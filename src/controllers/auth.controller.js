@@ -95,7 +95,7 @@ export const signup = async (req, res, next) => {
         email, phone_number, occupation, is_ieee_member,
         membership_number, participation_type, attendance_type,
         tax_amount, qty_articles,created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL -5 HOUR))
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL -5 HOUR))
     `;
 
     const values = [
