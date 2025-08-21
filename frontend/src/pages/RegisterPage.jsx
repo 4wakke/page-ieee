@@ -30,10 +30,10 @@ function RegisterPage() {
   const isTaxRequired = watch("isTaxRequired");
   const qtyArticles = watch("qtyArticles", 0);
   const isIeeeMember = watch("isIeeeMember");
-  const isCouponRequired = watch("isCouponRequired"); //FIXME://?ACTUAL
+  const isCouponRequired = watch("isCouponRequired"); 
   const participationType = watch("participationType"); 
   const [price, setPrice] = useState(""); 
-  const [coupon, setCoupon] = useState(""); //FIXME: //*ACTUAL
+  const [coupon, setCoupon] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [userId, setUserId] = useState(null); //?
@@ -59,7 +59,7 @@ function RegisterPage() {
     }
   }, [isTaxRequired, setValue]);
 
-  useEffect(() => { //FIXME://?ACTUAL
+  useEffect(() => { 
     if (isCouponRequired === "no") {
       setValue("coupon", "");
     }
@@ -67,7 +67,7 @@ function RegisterPage() {
 
   useEffect(() => { 
       if (isIeeeMember === "no") {
-        setValue("isTems", ""); 
+        // setValue("isTems", ""); //TODO: Quitar
         setValue("membershipNumber", ""); 
       }
     }, [isIeeeMember, setValue]);
@@ -138,11 +138,12 @@ function RegisterPage() {
         body: JSON.stringify({
           amount: price,
           dollarRate: dollarRate, 
-          description: `Pago conferencia Temscon ${watch("name")} ${watch("lastName")}`,
+          description: `Pago conferencia C3 ${watch("name")} ${watch("lastName")}`,
           userId,
-          coupon: coupon === "" ? null : coupon //FIXME: //*ACTUAL
+          coupon: coupon === "" ? null : coupon 
         }),
       });
+      //TODO: Quitar temscon por c3
 
       const processPaymentData = await processPaymentResp.json();
 
@@ -192,9 +193,9 @@ function RegisterPage() {
       try {
 
       data.isIeeeMember = data.isIeeeMember === "yes";
-      data.isTems = data.isTems === "yes";
+      // data.isTems = data.isTems === "yes"; //TODO: Quitar 
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
-      data.coupon = data.isCouponRequired === "no" ? null : data.coupon || null; //FIXME://?ACTUAL
+      data.coupon = data.isCouponRequired === "no" ? null : data.coupon || null; 
 
 
       if (["attendee", "poster", "invited"].includes(data.participationType)) {
@@ -222,7 +223,7 @@ function RegisterPage() {
         data.articles = formattedArticles;
       }
       
-      // console.log("Datos enviados a signup:", data); //!
+      // console.log("Datos enviados a signup:", data); //?
   
       const resp = await fetch(`${backRoute}/api/signup`, { 
         method: "POST",
@@ -235,7 +236,7 @@ function RegisterPage() {
   
       const dataSignup = await resp.json(); 
 
-      // console.log("Respuesta de signup:", dataSignup); //!
+      // console.log("Respuesta de signup:", dataSignup); //?
 
       if (dataSignup.success) { 
         setIsRegistered(true); 
@@ -247,24 +248,24 @@ function RegisterPage() {
       handleBackendResponse(dataSignup); 
       const userId = dataSignup.results[0]?.userId; 
       setUserId(userId);
-      setCoupon(data.coupon); //FIXME: //?ACTUAL
+      setCoupon(data.coupon); 
 
       await signup(dataSignup); 
 
       const formattedData = {
         occupation: data.occupation,
         isIeeeMember: data.isIeeeMember,  
-        isTems: data.isTems,   
+        // isTems: data.isTems,   //TODO: Quitar
         participationType: data.participationType,
         attendanceType: data.attendanceType === "inPerson" ? "In-person" : "Online",
         qtyArticles: data.qtyArticles,
         articles: data.articles,
         userId,
         taxAmount: data.taxAmount,
-        coupon: data.coupon === "" ? null : data.coupon, //FIXME: //*ACTUAL
+        coupon: data.coupon === "" ? null : data.coupon, 
       };
   
-      // console.log("Datos enviados a payment:", formattedData); //!
+      // console.log("Datos enviados a payment:", formattedData); //?
 
         const response = await fetch(`${backRoute}/api/payment`, {
           method: "POST",
@@ -287,7 +288,7 @@ function RegisterPage() {
                 dollarRate: dollarRate, 
                 description: `Pago conferencia Pepqa ${watch("name")} ${watch("lastName")}`,
                 userId: data.id,
-                coupon: coupon === "" ? null : coupon,   //FIXME: //*ACTUAL
+                coupon: coupon === "" ? null : coupon,  
               }),
             });
           }
@@ -585,7 +586,7 @@ function RegisterPage() {
                       <p className="text-red-500 font-medium pb-2">El número de membresía es requerido</p>
                     )}
   
-                    <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label>
+                    {/* <Label htmlFor="isTems">¿Eres miembro de TEMS?</Label> 
                     <SelectReg {...register("isTems", { required: true })}>
                       <option value="">Selecciona</option>
                       <option value="yes">Sí</option>
@@ -593,23 +594,11 @@ function RegisterPage() {
                     </SelectReg>
                     {errors.isTems && (
                       <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
-                    )}
+                    )} */}
                   </>
                 )}
+                {/* //TODO: Quitar */}
               </div>
-
-            {/* <div> FIXME: //*ACTUAL
-                <Label htmlFor="isTaxRequired">¿Requiere Factura Legal Colombiana?</Label>
-                <SelectReg {...register("isTaxRequired", { required: true })}>
-                  <option value="">Selecciona</option>
-                  <option value="yes">Sí</option>
-                  <option value="no">No</option>
-                </SelectReg>
-                {errors.isTaxRequired && (
-                  <p className="text-red-500 font-medium mt-2">Este campo es requerido</p>
-                )}
-            </div> */}
-
 
           </div> {/* FIN GRID 2 */}
 

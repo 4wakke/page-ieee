@@ -103,12 +103,11 @@ function AdminPage() {
     return date.toISOString().split("T")[0]; // Devuelve la fecha en formato "YYYY-MM-DD"
   };
 
-  const formatArticles = (articles) => { //FIXME://*ACTUAL
+  const formatArticles = (articles) => { 
     if (!Array.isArray(articles) || articles.length === 0 || articles.every(article => !article.sequence || !article.pages)) {
     return "No hay artículos";
   }
     return (
-      // FIXME: //*ACTUAL 
       <ul className="list-disc list-inside text-left">
         {articles.map((article, index) => (
           article.sequence ? (
@@ -363,18 +362,18 @@ function AdminPage() {
               <th className="px-4 py-3 font-semibold">Número telefónico</th>
               <th className="px-4 py-3 font-semibold">Ocupación</th>
               <th className="px-4 py-3 font-semibold">Miembro IEEE</th>
-              <th className="px-4 py-3 font-semibold">Miembro TEMS</th>
+              {/* <th className="px-4 py-3 font-semibold">Miembro TEMS</th> */}
+              {/* TODO: CAMBIO TEMS */}
               <th className="px-4 py-3 font-semibold">Número membresía</th>
               <th className="px-4 py-3 font-semibold">Tipo de participación</th>
               <th className="px-4 py-3 font-semibold">Tipo de asistencia</th>
               <th className="px-4 py-3 font-semibold">Cantidad de impuesto</th>
               <th className="px-4 py-3 font-semibold">Número de artículos</th>
-              <th className="px-4 py-3 font-semibold">Lista de artículos</th>  {/* FIXME://!ANTERIOR   */}    
+              <th className="px-4 py-3 font-semibold">Lista de artículos</th>    
               <th className="px-4 py-3 font-semibold">Fecha de registro</th>
               <th className="px-4 py-3 font-semibold">Pago en dolar</th>
               <th className="px-4 py-3 font-semibold">Pago en pesos</th>
               <th className="px-4 py-3 font-semibold">Estado de cobro</th>
-              {/* FIXME://*ACTUAL */}
               <th className="px-4 py-3 font-semibold">Código de descuento</th>
             </tr>
           </thead>
@@ -413,9 +412,12 @@ function AdminPage() {
                   <td className="px-4 py-3">
                     {formatMembership(user.is_ieee_member)}
                   </td>
-                  <td className="px-4 py-3">
+                  
+                  {/* <td className="px-4 py-3">
                     {formatMembership(user.is_tems)}
-                  </td>
+                  </td> */} 
+                  {/* TODO: Eliminar tems */}
+
                   <td className="px-4 py-3">
                     {formatMembershipNumber(user.membership_number)}
                   </td>
@@ -429,7 +431,7 @@ function AdminPage() {
                   <td className="px-4 py-3">
                     {user.qty_articles}
                   </td>
-                  <td className="px-4 py-3">{formatArticles(user.articles)}</td> {/* FIXME://!ANTERIOR  */}
+                  <td className="px-4 py-3">{formatArticles(user.articles)}</td> 
                   <td className="px-4 py-3">
                     {formatDate(user.created_at)}
                   </td>
@@ -442,7 +444,6 @@ function AdminPage() {
                   <td className="px-4 py-3">
                     {user.status}
                   </td>
-                  {/* FIXME://*ACTUAL */}
                   <td className="px-4 py-3">
                     {formatCoupon(user.coupon)}
                   </td>
