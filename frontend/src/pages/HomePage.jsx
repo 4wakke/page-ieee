@@ -20,13 +20,11 @@ function HomePage() {
     
     <div className="home flex items-center justify-center px-4 min-h-[85vh] w-full mx-auto lg:mt-1 md:mt-4 sm:mt-2 mt-4">
   <div className="bg-[#002855] bg-opacity-90 w-full max-w-[850px] rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col items-center justify-center text-center duration-500 ease-in opacity-0 animate-fadeIn lg:mr-96">
-    {/* FIXME: cambio color amarillo( mr-96 MARGEN HACIA LA IZQUIERDA border-2 bg-border-[#2d8c99] )  */}
-
 
     <h2 className="text-2xl sm:text-4xl font-bold text-[#ffffff] mb-4 sm:mb-6 leading-tight">
       Bienvenido a la Conferencia del Caribe Colombiano C3 2025
     </h2>
-{/* FIXME: cambio color amarillo  f6c80b */}
+
     <h3 className="italic text-[#dff2fe] text-lg sm:text-xl mb-4">
       Conferencia Técnica y Científica Bianual de la Sección del Caribe Colombiano de IEEE
     </h3> 
@@ -49,8 +47,6 @@ function HomePage() {
       </button>
     </Link>
 
-    {/* FIXME: CAmbio de color text-[#4067a5] y 5c75a8 a 191b90 en ambos */}
-
 
     <p className="text-white text-base sm:text-lg mb-2">
       ¿Ya tienes una cuenta?
@@ -60,7 +56,6 @@ function HomePage() {
       <button className="bg-white text-[#e64261] font-semibold py-2 sm:py-3 px-6 sm:px-7 rounded-md text-base sm:text-lg mb-4 hover:bg-[#f6c80b] hover:text-white transition-all duration-300 shadow-md hover:shadow-lg tracking-wide w-full sm:w-auto">
         Iniciar sesión
       </button>
-      {/* FIXME: CAmbio de color text-[#4067a5] y 5c75a8 a e64261 en ambos */}
     </Link>
   </div>
 </div>

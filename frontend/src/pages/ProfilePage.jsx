@@ -70,11 +70,18 @@ function ProfilePage() {
   }, [isIeeeMember, setValue]);
 
   useEffect(() => {  //*
-    if (["attendee", "poster", "invited"].includes(participationType)) {
+    if (["attendee", "poster"].includes(participationType)) {
       setValue("qtyArticles", "");
       setValue("articles", []);
     }
   }, [participationType, setValue]); 
+
+  // useEffect(() => {  //TODO: QUITAR INVITADO
+  //   if (["attendee", "poster", "invited"].includes(participationType)) {
+  //     setValue("qtyArticles", "");
+  //     setValue("articles", []);
+  //   }
+  // }, [participationType, setValue]); 
 
   useEffect(() => {
     if (price !== null && priceRef.current) {
@@ -179,8 +186,10 @@ function ProfilePage() {
         // userData.isTems = userData.isTems === 1 ? "yes" : "no"; //TODO: eliminar tems
 
         userData.taxAmount = userData.isTaxRequired === "no" ? "0" : userData.taxAmount;
+        
 
-        if (["attendee", "poster", "invited"].includes(userData.participationType)) {
+        // if (["attendee", "poster", "invited"].includes(userData.participationType)) { //TODO: QUITAR INVITADO
+        if (["attendee", "poster"].includes(userData.participationType)) {
           userData.qtyArticles = 0;  
           userData.articles = [];  
         } else {
@@ -681,7 +690,7 @@ function ProfilePage() {
                 <option value="author">Autor</option>
                 <option value="attendee">Asistente</option>
                 <option value="poster">Poster</option>
-                <option value="invited">Invitado</option>
+                {/* <option value="invited">Invitado</option> //TODO: QUITAR INVITADO*/}
               </SelectReg>
               {errors.participationType && (
               <p className="text-red-500 font-medium">El tipo de participación es requerido</p>

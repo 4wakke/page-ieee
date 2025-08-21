@@ -73,11 +73,18 @@ function RegisterPage() {
     }, [isIeeeMember, setValue]);
 
     useEffect(() => {  //*
-      if (["attendee", "poster", "invited"].includes(participationType)) {
+      if (["attendee", "poster"].includes(participationType)) {
         setValue("qtyArticles", "");
         setValue("articles", []);
       }
     }, [participationType, setValue]);
+
+    // useEffect(() => {  //TODO: QUITAR INVITADO
+    //   if (["attendee", "poster", "invited"].includes(participationType)) {
+    //     setValue("qtyArticles", "");
+    //     setValue("articles", []);
+    //   }
+    // }, [participationType, setValue]);
 
   const handleBackendResponse = (response) => {
     if (response.success) {
@@ -197,8 +204,8 @@ function RegisterPage() {
       data.taxAmount = data.isTaxRequired === "no" ? "0" : data.taxAmount;
       data.coupon = data.isCouponRequired === "no" ? null : data.coupon || null; 
 
-
-      if (["attendee", "poster", "invited"].includes(data.participationType)) {
+// if (["attendee", "poster", "invited"].includes(data.participationType)) { //TODO: QUITAR INVITADO
+      if (["attendee", "poster"].includes(data.participationType)) {
         data.qtyArticles = 0;  
         data.articles = [];  
       } else {
@@ -536,7 +543,7 @@ function RegisterPage() {
                 <option value="author">Autor</option>
                 <option value="attendee">Asistente</option>
                 <option value="poster">Poster</option>
-                <option value="invited">Invitado</option>
+                {/* <option value="invited">Invitado</option> //TODO: QUITAR INVITADO */}
                 
               </SelectReg>
               {errors.participationType && (

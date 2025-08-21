@@ -169,8 +169,8 @@ function AdminPage() {
   const formatParticipation = (participationType) => {
     if (participationType === "attendee") return "Asistente";
     if (participationType === "author") return "Autor";
-    if (participationType === "poster") return "Poster";
-    if (participationType === "invited") return "Invitado";
+    if (participationType === "poster") return "Poster"; 
+    // if (participationType === "invited") return "Invitado"; //TODO: QUITAR INVITADO
     return participationType;
   };
 
@@ -363,7 +363,7 @@ function AdminPage() {
               <th className="px-4 py-3 font-semibold">Ocupación</th>
               <th className="px-4 py-3 font-semibold">Miembro IEEE</th>
               {/* <th className="px-4 py-3 font-semibold">Miembro TEMS</th> */}
-              {/* TODO: CAMBIO TEMS */}
+              {/* //TODO: CAMBIO TEMS */}
               <th className="px-4 py-3 font-semibold">Número membresía</th>
               <th className="px-4 py-3 font-semibold">Tipo de participación</th>
               <th className="px-4 py-3 font-semibold">Tipo de asistencia</th>
@@ -416,7 +416,7 @@ function AdminPage() {
                   {/* <td className="px-4 py-3">
                     {formatMembership(user.is_tems)}
                   </td> */} 
-                  {/* TODO: Eliminar tems */}
+                  {/* //TODO: Eliminar tems */}
 
                   <td className="px-4 py-3">
                     {formatMembershipNumber(user.membership_number)}
