@@ -74,7 +74,7 @@ export const forgotPasswordTemplate = (password) => {
                         <div class="title">Recuperación de Contraseña</div>
                     </div>
                     <div class="content">
-                        <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.jpg" alt="Logo C3">
+                        <img src="https://i.imgur.com/2iJH4j0.png" alt="Logo C3">
                         <p>Hemos recibido una solicitud para restablecer tu contraseña. A continuación, te proporcionamos una nueva contraseña temporal:</p>
 
                         <div class="highlight-password">${password}</div>
@@ -175,7 +175,7 @@ export const forgotPasswordTemplate = (password) => {
                                 <div class="title">¡Registro Exitoso!</div>
                             </div>
                             <div class="content">
-                                <img src="https://imgur.com/a/BKpqWWE#01G7Pjs.jpg" alt="Logo C3" >
+                                <img src="https://i.imgur.com/2iJH4j0.png" alt="Logo C3" >
                                 <p>Hola <span class="highlight">${data.name} ${data.lastName}</span>,</p>
 
                                 <p>Nos complace confirmarte que tu registro a la conferencia <strong>IEEE C3</strong> ha sido completado con éxito.</p>
@@ -203,7 +203,7 @@ export const forgotPasswordTemplate = (password) => {
 
                                 <a href="https://c3.ieeecolcaribeconference.com/" class="btn">Pagina de registro</a>
 
-                                <p>Gracias por ser parte de esta experiencia. ¡Nos vemos en TEMSCON!</p>
+                                <p>Gracias por ser parte de esta experiencia. ¡Nos vemos en el C3!</p>
                             </div>
                             <div class="footer">
                                 © 2025 IEEE Colombian Caribean Conference. Todos los derechos reservados.<br>
