@@ -520,7 +520,7 @@ export const payment = async (req,res) =>{
       }
   }
 
-  if (data.qtyArticles > 1) {
+  if (data.qtyArticles > 2) {
     price+=(80*(data.qtyArticles-1))
   }
   
