@@ -521,7 +521,7 @@ export const payment = async (req,res) =>{
   }
 
   if (data.qtyArticles > 2) {
-    price+=(80*(data.qtyArticles-1))
+    price+=(80*(data.qtyArticles-2))
   }
   
   data.articles.forEach(article => {
@@ -643,10 +643,10 @@ export const processPayment = async (req, res) => {
         }
         
     }
-
-      if (cobruToken || isTokenExpired(cobruToken) ){
-        await getRefreshToken(res)
-      }
+    
+    if (cobruToken || isTokenExpired(cobruToken) ){
+      await getRefreshToken(res)
+    }
       
       
     const copAmount = Math.ceil(data.amount * dollarRateDb[0].dollar_rate)
